@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.bg-comment {
+  background-image: url("../../public/comment.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%; 
+}
