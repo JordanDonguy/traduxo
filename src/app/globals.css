@@ -31,3 +31,12 @@ body {
   background-repeat: no-repeat;
   width: 100%; 
 }
+
+select {
+  text-align-last: center;
+}
+
+input::placeholder {
+  color: #aaa;
+  opacity: 1; /* Fix Safari's default opacity */
+}

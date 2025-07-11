@@ -25,12 +25,14 @@ function TranslatorInput() {
   // Get all language codes supported by ISO6391
   const languageCodes = ISO6391.getAllCodes();
 
+  // Handle translation request
   function handleTranslate(e: React.FormEvent) {
     e.preventDefault();
     setShowWarning(false);
     setInputText("");
   }
 
+  // Handle voice input
   function handleVoice() {
     if (inputLang === "auto") {
       setShowWarning(true);
@@ -46,19 +48,27 @@ function TranslatorInput() {
       onError: (err) => {
         console.log("Speech error:", err);
       },
-      onStart: () => setIsListening(true),
-      onEnd: () => setIsListening(false),
     });
+
+    if (!recognizer) {
+      alert("Voice input isn't supported on this browser, please use Chrome or any other compatible browser.");
+      return
+    }
 
     if (!isListening) {
       recognizer?.start();
+      setIsListening(true);
+    } else if (!inputText) {
+      setIsListening(false)
+      recognizer?.abort();
     } else {
+      setIsListening(false);
       recognizer?.stop();
     }
   }
 
   return (
-    <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-neutral-800 rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
+    <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-zinc-800 rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
 
       {/* Language select section */}
       <section className="w-[90%] h-1/2 flex justify-between items-center">
