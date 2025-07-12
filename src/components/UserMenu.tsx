@@ -9,7 +9,6 @@ type UserMenuProps = {
 };
 
 function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
-  console.log(showMenu)
   return (
     <div className={`z-20 fixed w-full h-full flex flex-col gap-6 items-center pt-20 px-6 xl:px-0 duration-400 origin-top ${showMenu ? "scale-y-100 bg-zinc-900" : "scale-y-0 bg-zinc-950"}`}>
       <div className="flex justify-between w-full max-w-2xl">

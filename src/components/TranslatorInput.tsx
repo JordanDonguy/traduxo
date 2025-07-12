@@ -11,6 +11,8 @@ function TranslatorInput() {
     inputText,
     setInputText,
     setTranslatedText,
+    setInputTextLang,
+    setTranslatedTextLang,
     setIsLoading,
   } = useTranslationContext();
 
@@ -26,10 +28,54 @@ function TranslatorInput() {
   const languageCodes = ISO6391.getAllCodes();
 
   // Handle translation request
-  function handleTranslate(e: React.FormEvent) {
+  async function handleTranslate(e: React.FormEvent) {
     e.preventDefault();
-    setShowWarning(false);
+    setIsLoading(true);
+    setTranslatedText([]);
+
+    const prompt = 
+`You will receive a user request that may include extra words such as
+"Can you translate ... into ...".  
+1. Identify the idiom or expression that needs translating
+2. Translate the following English expression or idiom ${inputLang !== "auto" ? `from ${inputLang} ` : ""}into ${outputLang} in a natural and culturally appropriate way.
+${inputLang === "auto" ? "3. Detect the ORIGINAL language of the extracted expression (two-letter ISO-639-1 code, lowercase)." : ""}
+
+**Output**
+${inputLang === "auto"
+        ? `Return EXACTLY this JSON array (no markdown):
+["expression", "main translation", "alternative 1", "alternative 2", "alternative 3", "orig-lang-code"]`
+        : `Return EXACTLY this JSON array (no markdown):
+["expression", "main translation", "alternative 1", "alternative 2", "alternative 3"]`}
+
+**IMPORTANT:** Always return exactly one translation and 3 alternatives.
+
+Expression: ${inputText}`;
+
     setInputText("");
+
+    const res = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+
+    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    const { text } = await res.json();
+    const cleanedText = text
+      .replace(/```json\s*/, '')  // remove opening ```json and any whitespace
+      .replace(/[\s\n\r]*```+[\s\n\r]*$/, '')  // Remove trailing backticks with optional whitespace/newlines around
+
+    const translationArray = JSON.parse(cleanedText);
+
+    if (inputLang === "auto") {
+      setInputTextLang(translationArray[translationArray.length - 1]);
+    } else {
+      setInputTextLang(inputLang)
+    };
+    setTranslatedTextLang(outputLang);
+
+    setTranslatedText(translationArray);
+    setIsLoading(false);
   }
 
   // Handle voice input
@@ -73,7 +119,7 @@ function TranslatorInput() {
       {/* Language select section */}
       <section className="w-[90%] h-1/2 flex justify-between items-center">
 
-        <div className={`${showWarning ? "scale-y-100 opacity-90" : "scale-y-0 opacity-0"} h-60 absolute bottom-35 md:bottom-40 md:left-28 p-2 bg-comment flex drop-shadow-lg duration-300 origin-bottom`}>
+        <div className={`${showWarning ? "scale-y-100 opacity-95" : "scale-y-0 opacity-0"} h-60 absolute bottom-35 md:bottom-40 md:left-28 p-2 bg-comment flex drop-shadow-lg duration-300 origin-bottom`}>
           <span className="max-w-40 block ml-8 mt-8 text-lg">You need to select a language to use voice input</span>
         </div>
 
@@ -120,6 +166,7 @@ function TranslatorInput() {
             onChange={(e) => setInputText(e.target.value)}
             value={inputText}
             autoComplete="off"
+            maxLength={200}
           />
 
           <button type="submit" className="sr-only">
@@ -134,6 +181,9 @@ function TranslatorInput() {
             {!isListening ? <Mic /> : <CircleStop />}
           </button>
         </form>
+        {inputText.length === 200 ? (
+          <p className="text-sm absolute bottom-0 left-[5%] text-neutral-400 italic">200 characters max allowed</p>
+        ) : ""}
       </section>
     </div>
   )
