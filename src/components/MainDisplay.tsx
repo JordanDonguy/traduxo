@@ -4,18 +4,18 @@ import { useTranslationContext } from "@/context/TranslationContext";
 import { useState, useEffect } from "react";
 
 function MainDisplay() {
-  const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, isLoading } = useTranslationContext();
+  const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, isLoading, error } = useTranslationContext();
   const [mounted, setMounted] = useState<boolean>(false);
   const [fading, setFading] = useState<number[]>([]);
 
   // This is used to make a css translating effect when component mounts
   useEffect(() => {
-    if (translatedText.length) {
+    if (translatedText.length || error.length) {
       setMounted(true);
     } else {
       setMounted(false);
     }
-  }, [translatedText]);
+  }, [translatedText, error]);
 
   function capitalizeFirstLetter(str: string): string {
     if (!str) return "";
@@ -43,7 +43,9 @@ function MainDisplay() {
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
 
-      {isLoading ? (
+      {error.length ? (
+        <p className="text-2xl/10 text-center whitespace-pre-line">{error}</p>
+      ) : isLoading ? (
         <p>Loading…</p>
       ) : translatedText.length === 0 ? (
         <h2 className="text-4xl text-center w-[85%]">

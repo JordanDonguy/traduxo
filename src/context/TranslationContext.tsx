@@ -8,11 +8,13 @@ type TranslationState = {
   inputTextLang: string;
   translatedTextLang: string;
   isLoading: boolean;
+  error: string;
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
 // We use `TranslationState | undefined` as the type, and set the default value to `undefined`.
@@ -25,6 +27,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   return (
     <TranslationContext.Provider
@@ -34,11 +37,13 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         inputTextLang,
         translatedTextLang,
         isLoading,
+        error,
         setInputText,
         setTranslatedText,
         setInputTextLang,
         setTranslatedTextLang,
         setIsLoading,
+        setError,
       }}
     >
       {children}
