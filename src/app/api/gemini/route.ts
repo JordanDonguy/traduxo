@@ -39,10 +39,10 @@ export async function POST(req: NextRequest) {
     const res = NextResponse.json({ text: result.text });
     res.headers.set("X-RateLimit-Remaining", remaining.toString());
     return res;
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     return Response.json(
-      { error: 'Gemini API error', details: String(err.message) },
+      { error: 'Gemini API error', details: String((err as Error).message) },
       { status: 500 },
     );
   }

@@ -105,6 +105,9 @@ Expression: ${inputText}`;
       onError: (err) => {
         console.log("Speech error:", err);
       },
+      onStop: () => {
+        setIsListening(false)
+      }
     });
 
     if (!recognizer) {
