@@ -31,6 +31,12 @@ function TranslatorInput() {
   // Handle translation request
   async function handleTranslate(e: React.FormEvent) {
     e.preventDefault();
+
+    // Blur the active element (input) immediately on submit to close mobile keyboard
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    };
+
     setIsLoading(true);
     setError("");
     setTranslatedText([]);
@@ -125,7 +131,7 @@ Expression: ${inputText}`;
       setIsListening(false);
       recognizer?.stop();
     }
-  }
+  };
 
   return (
     <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-zinc-800 rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">

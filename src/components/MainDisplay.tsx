@@ -2,6 +2,7 @@
 
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useState, useEffect } from "react";
+import LoadingAnimation from "./LoadingAnimation";
 
 function MainDisplay() {
   const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, isLoading, error } = useTranslationContext();
@@ -10,7 +11,7 @@ function MainDisplay() {
 
   // This is used to make a css translating effect when component mounts
   useEffect(() => {
-    if (translatedText.length || error.length) {
+    if (translatedText.length) {
       setMounted(true);
     } else {
       setMounted(false);
@@ -46,7 +47,7 @@ function MainDisplay() {
       {error.length ? (
         <p className="text-2xl/10 text-center whitespace-pre-line">{error}</p>
       ) : isLoading ? (
-        <p>Loading…</p>
+        <LoadingAnimation />
       ) : translatedText.length === 0 ? (
         <h2 className="text-4xl text-center w-[85%]">
           What do you need to translate today?
