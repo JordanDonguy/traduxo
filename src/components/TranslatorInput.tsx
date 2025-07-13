@@ -134,12 +134,12 @@ Expression: ${inputText}`;
   };
 
   return (
-    <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-zinc-800 rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
+    <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-[var(--bg-2)] rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
 
       {/* Language select section */}
       <section className="w-[90%] h-1/2 flex justify-between items-center">
 
-        <div className={`${showWarning ? "scale-y-100 opacity-95" : "scale-y-0 opacity-0"} h-60 absolute bottom-35 md:bottom-40 md:left-28 p-2 bg-comment flex drop-shadow-lg duration-300 origin-bottom`}>
+        <div className={`${showWarning ? "scale-y-100 opacity-95" : "scale-y-0 opacity-0"} h-60 absolute bottom-35 md:bottom-40 md:left-28 p-2 bg-warning flex drop-shadow-lg duration-300 origin-bottom`}>
           <span className="max-w-40 block ml-8 mt-8 text-lg">You need to select a language to use voice input</span>
         </div>
 
@@ -148,7 +148,7 @@ Expression: ${inputText}`;
           value={inputLang}
           onChange={(e) => setInputLang(e.target.value)}
           onClick={() => setShowWarning(false)}
-          className="appearance-none w-2/5 bg-zinc-950 h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-zinc-700 focus:outline-none"
+          className="appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none"
         >
           <option value="auto">✨ Auto</option>
           {languageCodes.map((code) => (
@@ -164,7 +164,7 @@ Expression: ${inputText}`;
         <select
           value={outputLang}
           onChange={(e) => setOutputLang(e.target.value)}
-          className="appearance-none w-2/5 bg-zinc-950 h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-zinc-700 focus:outline-none"
+          className="appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none"
         >
           {languageCodes.map((code) => (
             <option key={code} value={code}>
@@ -178,7 +178,7 @@ Expression: ${inputText}`;
       <section className="w-full h-1/2 flex items-center justify-center">
         <form
           onSubmit={handleTranslate}
-          className="w-[90%] flex bg-zinc-950 rounded-r-4xl rounded-l-2xl h-12 border border-neutral-700 mt-2"
+          className="w-[90%] flex bg-[var(--input)] rounded-r-4xl rounded-l-2xl h-12 border border-[var(--input-border)] mt-2"
         >
           <input
             className="w-full h-full px-6 focus:outline-none"
@@ -195,7 +195,7 @@ Expression: ${inputText}`;
 
           <button
             type="button"
-            className="w-12 hover:cursor-pointer hover:bg-zinc-700 rounded-full flex justify-center items-center"
+            className="w-12 hover:cursor-pointer hover:bg-[var(--hover)] rounded-full flex justify-center items-center"
             onClick={handleVoice}
           >
             {!isListening ? <Mic /> : <CircleStop />}
