@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
-import { checkQuota } from "../../lib/rateLimiter";
+import { checkQuota } from "../../../lib/dailyLimiter";
 
 export const runtime = 'nodejs';  // switch to 'edge' for lower latency
 

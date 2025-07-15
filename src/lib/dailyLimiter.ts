@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 export const redis = Redis.fromEnv(); // Get redis ENV vaiables
  
-export const QUOTA   = 50;            // 50 requests
+export const QUOTA   = 300;            // 50 requests
 export const WINDOW  = 24 * 60 * 60;  // 1 day
 
 // Extract IP from request headers
