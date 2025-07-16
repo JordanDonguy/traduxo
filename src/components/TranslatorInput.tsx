@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslationContext } from '@/context/TranslationContext';
+import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/utils/speechRecognition";
 import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRight } from "lucide-react";
@@ -13,12 +14,17 @@ function TranslatorInput() {
     setTranslatedText,
     setInputTextLang,
     setTranslatedTextLang,
+    setExplanation,
     setIsLoading,
     setError,
   } = useTranslationContext();
 
-  const [inputLang, setInputLang] = useState<string>("auto");
-  const [outputLang, setOutputLang] = useState<string>("en");
+  const {
+    inputLang,
+    outputLang,
+    setInputLang,
+    setOutputLang
+  } = useLanguageContext();
 
   // showWarning state to show a message if user tries to voice input with inputLand set to "auto"
   const [showWarning, setShowWarning] = useState<boolean>(false);
@@ -40,6 +46,7 @@ function TranslatorInput() {
     setIsLoading(true);
     setError("");
     setTranslatedText([]);
+    setExplanation("");
 
     const prompt =
       `You will receive a user request that may include extra words such as
@@ -61,7 +68,7 @@ Expression: ${inputText}`;
 
     setInputText("");
 
-    const res = await fetch('/api/gemini', {
+    const res = await fetch('/api/gemini/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt }),
