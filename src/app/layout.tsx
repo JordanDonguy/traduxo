@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { TranslationProvider } from '@/context/TranslationContext';
+import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "next-themes";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const openSans = Open_Sans({
+  variable: "--font-open_sans",
   subsets: ["latin"],
 });
 
@@ -25,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-y-scroll">
       <head>
         <meta
           name="viewport"
@@ -34,7 +30,7 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${openSans.className} antialiased`}
       >
         <ThemeProvider
           attribute="data-theme"    /* puts data-theme="light|dark" on <html> */
@@ -42,9 +38,11 @@ export default function RootLayout({
           enableSystem              /* let users return to “system” */
         >
 
-          <TranslationProvider>
-            {children}
-          </TranslationProvider>
+          <LanguageProvider>
+            <TranslationProvider>
+              {children}
+            </TranslationProvider>
+          </LanguageProvider>
 
         </ThemeProvider>
       </body>

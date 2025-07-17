@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslationContext } from '@/context/TranslationContext';
 import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/utils/speechRecognition";
+import { getTranslationPrompt } from "@/utils/geminiPrompts";
 import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRight } from "lucide-react";
 
@@ -48,23 +49,7 @@ function TranslatorInput() {
     setTranslatedText([]);
     setExplanation("");
 
-    const prompt =
-      `You will receive a user request that may include extra words such as
-"Can you translate ... into ...".  
-1. Identify the idiom or expression that needs translating
-2. Translate the following English expression or idiom ${inputLang !== "auto" ? `from ${inputLang} ` : ""}into ${outputLang} in a natural and culturally appropriate way.
-${inputLang === "auto" ? "3. Detect the ORIGINAL language of the extracted expression (two-letter ISO-639-1 code, lowercase)." : ""}
-
-**Output**
-${inputLang === "auto"
-        ? `Return EXACTLY this JSON array (no markdown):
-["expression", "main translation", "alternative 1", "alternative 2", "alternative 3", "orig-lang-code"]`
-        : `Return EXACTLY this JSON array (no markdown):
-["expression", "main translation", "alternative 1", "alternative 2", "alternative 3"]`}
-
-**IMPORTANT:** Always return exactly one translation and 3 alternatives.
-
-Expression: ${inputText}`;
+    const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
 
     setInputText("");
 
@@ -141,7 +126,7 @@ Expression: ${inputText}`;
   };
 
   return (
-    <div className="fixed bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-[var(--bg-2)] rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
+    <div className="fixed z-20 bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-[var(--bg-2)] shadow-sm rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
 
       {/* Language select section */}
       <section className="w-[90%] h-1/2 flex justify-between items-center">

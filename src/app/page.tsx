@@ -13,7 +13,7 @@ export default function Home() {
         <TranslatorInput />
       </main>
 
-      <footer className="w-full hidden lg:block text-center text-xs text-zinc-400 h-6 pb-2">
+      <footer className="w-full z-10 hidden fixed bottom-0 bg-[var(--bg)] lg:block text-center text-xs text-[var(--input-placeholder)] h-16 pt-10 pb-2">
         Smart Translator might not always be 100% accurate — use your best judgment!
       </footer>
     </div>

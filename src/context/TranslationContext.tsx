@@ -7,12 +7,14 @@ type TranslationState = {
   translatedText: string[];
   inputTextLang: string;
   translatedTextLang: string;
+  explanation: string;
   isLoading: boolean;
   error: string;
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
+  setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -28,6 +30,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [explanation, setExplanation] = useState<string>("");
 
   return (
     <TranslationContext.Provider
@@ -36,12 +39,14 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         translatedText,
         inputTextLang,
         translatedTextLang,
+        explanation,
         isLoading,
         error,
         setInputText,
         setTranslatedText,
         setInputTextLang,
         setTranslatedTextLang,
+        setExplanation,
         setIsLoading,
         setError,
       }}

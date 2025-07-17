@@ -24,7 +24,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
       window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   return (
-    <div className={`z-20 fixed w-full h-full flex flex-col gap-6 items-center pt-20 px-6 xl:px-0 duration-400 origin-top ${showMenu ? "scale-y-100 bg-[var(--menu)]" : "scale-y-0 bg-[var(--bg)]"}`}>
+    <div className={`z-30 fixed w-full h-full flex flex-col gap-6 items-center pt-20 px-6 xl:px-0 duration-400 origin-top ${showMenu ? "scale-y-100 bg-[var(--menu)]" : "scale-y-0 bg-[var(--bg)]"}`}>
       <div className="flex justify-between w-full max-w-2xl">
         <h2 className="text-2xl">User Settings</h2>
         <button
