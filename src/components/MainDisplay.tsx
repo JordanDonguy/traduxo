@@ -90,6 +90,9 @@ function MainDisplay() {
     const reader = res.body.getReader();      // Streaming response reader
     const decoder = new TextDecoder();        // Binary chunk decoder
 
+    // Adds a slight delay to make Gemini's streamed response appear more naturally.
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
     // Make a loop that adds decoded chunk to explanation for as long as streaming's on
     while (true) {
       const { done, value } = await reader.read();
@@ -98,7 +101,8 @@ function MainDisplay() {
       // decode chunk and add it to explanation state
       // Sometimes Gemini uses quotes instead of bold, so I use a little utils function to fix that (quoteToBold)
       const chunk = quoteToBold(decoder.decode(value, { stream: true }));
-      setExplanation(prev => prev + chunk)
+      setExplanation(prev => prev + chunk);
+      await delay(10); // Delay slightly Gemini's streamed response
     }
     setIsExpLoading(false);
   }
@@ -146,9 +150,9 @@ function MainDisplay() {
           </article>
 
           {explanationError.length ? (
-            <p className="text-2xl/10 text-center whitespace-pre-line">{explanationError}</p>
+            <p className="text-2xl/10 text-center whitespace-pre-line mt-8">{explanationError}</p>
           ) : explanation.length ? (
-            <div className="flex-1 flex flex-col justify-center explanation mt-2 mb-4">
+            <div className="flex-1 flex flex-col justify-center explanation mt-12 mb-4">
               <ReactMarkdown>{explanation}</ReactMarkdown>
             </div>
           ) : isExpLoading ? (
