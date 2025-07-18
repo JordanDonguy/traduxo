@@ -9,12 +9,13 @@ export default function Home() {
       <AppHeader />
 
       <main className="flex flex-col justify-center items-center w-full flex-1">
+        <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>
         <MainDisplay />
         <TranslatorInput />
       </main>
 
       <footer className="w-full z-10 hidden fixed bottom-0 bg-[var(--bg)] lg:block text-center text-xs text-[var(--input-placeholder)] h-16 pt-10 pb-2">
-        Smart Translator might not always be 100% accurate — use your best judgment!
+        Traduxo might not always be 100% accurate — use your best judgment!
       </footer>
     </div>
   );

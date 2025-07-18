@@ -7,10 +7,12 @@
   --menu: #d7e0e3;
   --input: #dee5e7;
   --input-placeholder: #8b8b8b;
-  --input-border: #ababab;
+  --input-border: #a6a6a6;
   --hover: #cacacf;
   --btn: #dbe0e1;
   --warning: #485a65;
+  --example: #d4d4db;
+  --example-border: #cccccc;
 }
 
 [data-theme='dark'] {
@@ -36,7 +38,13 @@
     --input-border: #404040;
     --hover: #3f3f46;
     --btn: #1b1b1d;
+    --example: #222227;
+    --example-border: #2e2d31;
   }
+}
+
+.logo {
+  color: var(--logo-color);
 }
 
 body {
@@ -71,23 +79,35 @@ input::placeholder {
 }
 
 .explanation ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  margin: 0px 0px 1rem;
+  margin-bottom: .5rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--example-border);
+}
+
+.explanation ul:last-of-type {
+  border-bottom: none;
 }
 
 .explanation h2 {
-  font-size: 1.5rem
+  font-size: 1.6rem;
+  margin: 2.5rem 0px 1rem;
+  font-weight: 600
 }
 
-
-.explanation li p {
+.explanation h3 {
   font-size: 1.25rem;
-  padding: 0px .5rem .5rem;
+  padding: 1rem 0px;
+  font-weight: 600;
+  
+}
+
+h3::before {
+  content: ">\00a0\00a0💬\00a0\00a0 ";
+  color: var(--input-placeholder);
 }
 
 strong {
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .explanation p,
@@ -95,8 +115,28 @@ strong {
   overflow-wrap: break-word;
 }
 
+.explanation p {
+  margin: .5rem 0px;
+}
+
+.explanation ul li {
+  background-color: var(--example);
+  border-radius: .5rem;
+  padding: .5rem;
+  margin: .75rem 0px;
+}
+
+.explanation ul li:nth-child(3) {
+  background-color: transparent;
+
+}
+
+.explanation ul li:nth-child(3)::before {
+  content: "💡 ";
+}
+
 [data-theme="dark"] .explanation strong {
-  font-weight: 900;
+  font-weight: 800;
   color: white;
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
@@ -104,4 +144,20 @@ strong {
 [data-theme="dark"] .font-semibold {
   color: white;
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes dice-roll {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(1080deg);
+  }
+
+  /* 3 full spins (360 * 3) */
+}
+
+.animate-dice-roll {
+  animation: dice-roll 0.6s ease-out;
 }

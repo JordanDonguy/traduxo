@@ -66,6 +66,7 @@ function MainDisplay() {
       document.activeElement.blur();
     };
 
+    // Trigger loading animation, reset errors state if any
     setIsExpLoading(true);
     setExplanationError("");
 
@@ -99,10 +100,9 @@ function MainDisplay() {
       const chunk = quoteToBold(decoder.decode(value, { stream: true }));
       setExplanation(prev => prev + chunk)
     }
-
     setIsExpLoading(false);
   }
-    console.log(explanation)
+
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
 
@@ -115,8 +115,8 @@ function MainDisplay() {
           What do you need to translate today?
         </h2>
       ) : (
-        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col gap-8 ${explanation.length > 200 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
-          <article className={`flex gap-4 pr-4 bg-[var(--bg-2)] rounded-md duration-500 ease-in-out transform font-semibold ${mounted ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}>
+        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 200 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
+          <article className={`flex gap-4 pr-4 bg-[var(--bg-2)] mb-8 rounded-md duration-500 ease-in-out transform font-semibold ${mounted ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}>
             <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">{inputTextLang.length <= 2 ? inputTextLang?.toUpperCase() : ""}</p>
             <p className="text-xl min-h-8 flex items-center">{capitalizeFirstLetter(translatedText[0])}</p>
           </article>
@@ -148,16 +148,16 @@ function MainDisplay() {
           {explanationError.length ? (
             <p className="text-2xl/10 text-center whitespace-pre-line">{explanationError}</p>
           ) : explanation.length ? (
-            <div className="flex-1 flex flex-col justify-center gap-8 explanation">
+            <div className="flex-1 flex flex-col justify-center explanation mt-2 mb-4">
               <ReactMarkdown>{explanation}</ReactMarkdown>
             </div>
           ) : isExpLoading ? (
-            <div className="flex justify-center items-center w-full h-[58px]">
+            <div className="flex justify-center items-center w-full h-[58px] mt-8">
               <LoadingAnimation />
             </div>
           ) : (
             <div
-              className={`flex justify-center items-center flex-1 w-full self-center duration-500 ease-in-out transform
+              className={`flex justify-center items-center flex-1 w-full self-center duration-500 ease-in-out transform mt-8
               ${mounted
                   ? (ready ? "scale-x-100 opacity-100" : "delay-1000 scale-x-100 opacity-100")
                   : "scale-x-0 opacity-0"

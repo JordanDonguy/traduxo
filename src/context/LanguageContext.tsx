@@ -7,6 +7,7 @@ type LanguageState = {
   outputLang: string;
   setInputLang: React.Dispatch<React.SetStateAction<string>>;
   setOutputLang: React.Dispatch<React.SetStateAction<string>>;
+  detectedLang: string;
 }
 
 const LanguageContext = createContext<LanguageState | undefined>(undefined);
@@ -15,13 +16,19 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [inputLang, setInputLang] = useState<string>("auto");
   const [outputLang, setOutputLang] = useState<string>("en");
 
+  const detectedLang =
+    inputLang === "auto"
+      ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
+      : inputLang;
+
   return (
     <LanguageContext.Provider
       value={{
         inputLang,
         outputLang,
         setInputLang,
-        setOutputLang
+        setOutputLang,
+        detectedLang,
       }}
     >
       {children}
