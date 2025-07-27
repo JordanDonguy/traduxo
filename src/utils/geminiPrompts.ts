@@ -37,8 +37,8 @@ export function getTranslationPrompt({
 You will receive a user request that may include extra words such as
 "Can you translate ... into ...".  
 
-1. Identify the idiom or expression that needs translating  
-2. Translate the following English expression or idiom ${fromLangText}into ${outputLang} in a natural and culturally appropriate way.  
+1. Identify the idiom or expression that needs translating.
+2. Translate the following expression ${fromLangText}into ${outputLang} in a natural and idomatic way.
 ${detectionInstruction}
 
 **Output**  
@@ -66,37 +66,40 @@ export function getExplanationPrompt({
 
   return `
 SYSTEM
-You are an expert bilingual translator and language teacher.
+You are a professional bilingual translator and language teacher.
 
-Your job is to:
-1. Explain the meaning, origin, nuance and tone of the **original** expression.
-2. Provide 2–3 clear usage examples of the translation in natural context.
+Your tasks:
+1. Explain the meaning, origin, nuance, and tone of the original expression.
+2. Provide 2 or 3 clear, natural usage examples for the translation.
 
-✳️ VERY IMPORTANT:
-- No introduction phrase.
-- Reply entirely in ${translatedTextLang}.
-- Translate the titles and lists in ${translatedTextLang}.
-- Make smart use of bold emphasis.
+Important instructions:
+- Do not write any introductory sentences.
+- Respond entirely in ${translatedTextLang}.
+- Translate all headings and list labels into ${translatedTextLang}.
+- Use exactly two level-2 headings (##) as specified below.
+- For each example, bold **only** the original expression and its translation. Do not bold any other text or entire phrases.
 
-TEMPLATE
+Format:
+
 ## 💡 Explanation
 
-Write 3–4 very short (~50 words) paragraphs.
+Write 3 to 4 very short paragraphs with level-3 headings (###) including emojis.
 
 ## 📘 Examples
 
-### Example 1:
-- **Original**:
-- **Translation**:
-- **Explanation**:
+For each example, use this structure:
 
-✅ Examples must include the source expression. Do not use quotation marks. Bold emphasis ONLY on ({original}) and ({translation}).
+### 💬 Example 1:
+- **Original:** {original}
+- **Translation:** {translation}
+- **Explanation:** (short explanation)
 
 USER  
-Original (${inputTextLang}): "${original}"
+Original*** (${inputTextLang}): "${original}"
 
 Translation (${translatedTextLang}): "${translations}"
-  `.trim();
+
+`.trim();
 };
 
 // ------------------------------------- Suggestion Prompt -------------------------------------
@@ -106,14 +109,26 @@ export function getSuggestionPrompt({
   alreadySuggested
 }: SuggestionPromptParams): string {
   return `
-You are a native language teacher.
-Suggest a useful, natural idiom or expression real native speakers use in everyday speech or writing. Translate it from ${outputLang} to ${detectedLang}.
-Avoid clichés like "break the ice" or "it's raining cats and dogs." Focus on modern, expressive, or regionally relevant expressions. Do not invent expressions.
+You are a native-speaking language teacher and idiom expert.
 
-**Output**  
-Return EXACTLY this JSON array (no markdown):  
-["expression", "main translation", "alternative 1", "alternative 2", "alternative 3"]
+Your task:
+Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${outputLang}. Then translate it into a **natural, equivalent** expression in ${detectedLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
 
-**IMPORTANT:** Always return exactly one translation and 3 alternatives. ${alreadySuggested.length ? `Do not use any of these expressions: ${alreadySuggested.join(", ")}.` : ""}
+Guidelines:
+- Avoid tired clichés like "break the ice" or "raining cats and dogs".
+- Focus on up-to-date, authentic, regionally relevant expressions.
+- Do not invent new expressions.
+- Translations must preserve the original expression’s meaning, connotation, and emotional impact.
+
+**Output**
+Return EXACTLY this JSON array (no markdown, no explanation):
+
+["original expression in ${outputLang}", "best equivalent translation in ${detectedLang}", "alternative 1", "alternative 2", "alternative 3"]
+
+**IMPORTANT:**
+- Return only one expression and exactly three alternatives.
+- All four entries must be natural and idiomatic in ${detectedLang}, and must reflect the same meaning and tone as the original expression.
+${alreadySuggested.length ? `- Do not include any of these previously suggested expressions: ${alreadySuggested.join(", ")}.` : ""}
+
   `
 };

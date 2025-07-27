@@ -12,7 +12,6 @@ function MainDisplay() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
 
-
   const [fading, setFading] = useState<number[]>([]);                 // To be used when switching translations (fading effect)
   const [isExpLoading, setIsExpLoading] = useState<boolean>(false);   // To display a loading animation when explanation's loading
   const [explanationError, setExplanationError] = useState<string>(""); // Display error message if any when requesting explanation
@@ -111,7 +110,7 @@ function MainDisplay() {
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
 
       {error.length ? (
-        <p className="text-2xl/10 text-center whitespace-pre-line">{error}</p>
+        <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">{error}</p>
       ) : isLoading ? (
         <LoadingAnimation />
       ) : translatedText.length === 0 ? (

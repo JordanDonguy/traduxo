@@ -33,6 +33,11 @@ export async function POST(req: NextRequest) {
     const result = await ai.models.generateContent({
       model,
       contents: prompt,
+      config: {
+        temperature: 0.8,
+        topP: 0.8,
+        topK: 50,
+      }
     });
 
     // 4. build the response and add remaining‑quota header */
