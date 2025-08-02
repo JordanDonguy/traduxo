@@ -67,10 +67,10 @@ function AppHeader() {
       setIsLoading(false)
       return
     };
-
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
     const { text } = await res.json();
+
     const cleanedText = text
       .replace(/```json\s*/, '')  // remove opening ```json and any whitespace
       .replace(/[\s\n\r]*```+[\s\n\r]*$/, '')  // Remove trailing backticks with optional whitespace/newlines around
@@ -83,7 +83,7 @@ function AppHeader() {
     setIsLoading(false);
 
     // Keep suggestion history < 5
-    if (alreadySuggested.length >= 15) {
+    if (alreadySuggested.length >= 20) {
       setAlreadySuggested(prev => prev.slice(1));
     };
     // Add suggestion to alreadySuggested to prevent having the same one on next request
@@ -95,7 +95,7 @@ function AppHeader() {
 
       <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} />
 
-      <div className="z-30 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex items-center justify-between px-4 xl:pl-8 xl:pr-6">
+      <div className="z-30 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
           onClick={suggestTranslation}
           className="md:hidden p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"

@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
 import LoadingAnimation from "./LoadingAnimation";
 import { getExplanationPrompt } from "@/utils/geminiPrompts";
-import { quoteToBold } from "@/utils/quoteToBold";
 
 function MainDisplay() {
   const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, explanation, setExplanation, isLoading, error } = useTranslationContext();
@@ -15,6 +14,18 @@ function MainDisplay() {
   const [fading, setFading] = useState<number[]>([]);                 // To be used when switching translations (fading effect)
   const [isExpLoading, setIsExpLoading] = useState<boolean>(false);   // To display a loading animation when explanation's loading
   const [explanationError, setExplanationError] = useState<string>(""); // Display error message if any when requesting explanation
+
+
+  useEffect(() => {
+    const paragraphs = document.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      p.innerHTML = p.innerHTML
+        // Replace double quotes
+        .replace(/"([^"]+)"/g, '<strong>$1</strong>')
+        // Replace french style quotes
+        .replace(/«([^»]+)»/g, '<strong>$1</strong>');
+    });
+  }, [explanation.length]);
 
   // This is used to make a css translating effect when component mounts
   // The delay is then removed to prevent late color switching when switching light / dark theme
@@ -89,9 +100,6 @@ function MainDisplay() {
     const reader = res.body.getReader();      // Streaming response reader
     const decoder = new TextDecoder();        // Binary chunk decoder
 
-    // Adds a slight delay to make Gemini's streamed response appear more naturally.
-    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
-
     // Make a loop that adds decoded chunk to explanation for as long as streaming's on
     while (true) {
       const { done, value } = await reader.read();
@@ -99,9 +107,8 @@ function MainDisplay() {
 
       // decode chunk and add it to explanation state
       // Sometimes Gemini uses quotes instead of bold, so I use a little utils function to fix that (quoteToBold)
-      const chunk = quoteToBold(decoder.decode(value, { stream: true }));
+      const chunk = decoder.decode(value, { stream: true });
       setExplanation(prev => prev + chunk);
-      await delay(10); // Delay slightly Gemini's streamed response
     }
     setIsExpLoading(false);
   }
@@ -118,7 +125,7 @@ function MainDisplay() {
           What do you need to translate today?
         </h2>
       ) : (
-        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 200 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
+        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 10 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
           <article className={`flex gap-4 pr-4 bg-[var(--bg-2)] mb-8 rounded-md duration-500 ease-in-out transform font-semibold ${mounted ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}>
             <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">{inputTextLang.length <= 2 ? inputTextLang?.toUpperCase() : ""}</p>
             <p className="text-xl min-h-8 flex items-center">{capitalizeFirstLetter(translatedText[0])}</p>
