@@ -1,0 +1,30 @@
+"use client";
+
+import { SessionProvider } from "next-auth/react";
+import { TranslationProvider } from '@/context/TranslationContext';
+import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "next-themes";
+
+export default function AppProvider({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <ThemeProvider
+      attribute="data-theme"    /* puts data-theme="light|dark" on <html> */
+      defaultTheme="system"     /* follow OS by default */
+      enableSystem              /* let users return to “system” */
+    >
+
+      <SessionProvider>
+        <LanguageProvider>
+          <TranslationProvider>
+            {children}
+          </TranslationProvider>
+        </LanguageProvider>
+      </SessionProvider>
+
+    </ThemeProvider>
+  )
+}

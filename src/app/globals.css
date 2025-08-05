@@ -9,6 +9,7 @@
   --input-placeholder: #8b8b8b;
   --input-border: #a6a6a6;
   --hover: #cacacf;
+  --hover-2: #cacacf;
   --btn: #dbe0e1;
   --warning: #485a65;
   --example: #d4d4db;
@@ -24,6 +25,7 @@
   --input-placeholder: #a3a3a3;
   --input-border: #404040;
   --hover: #3f3f46;
+  --hover-2: #29292e;
   --btn: #1b1b1d;
 }
 
@@ -31,12 +33,13 @@
   :root:not([data-theme='light']) {
     --bg: #121212;
     --text: #ededed;
-    --bg-2: #232326;
-    --menu: #1a1a1e;
+    --bg-2: #232325;
+    --menu: #1a1c1e;
     --input: #0f0f11;
     --input-placeholder: #a3a3a3;
     --input-border: #404040;
     --hover: #3f3f46;
+    --hover-2: #29292d;
     --btn: #1b1b1d;
     --example: #222227;
     --example-border: #2e2d31;
@@ -107,7 +110,7 @@ input::placeholder {
 h3::before {
   content: ">\00a0\00a0";
   color: var(--input-placeholder);
-} 
+}
 
 strong {
   font-weight: 800;
@@ -163,4 +166,37 @@ strong {
 
 .animate-dice-roll {
   animation: dice-roll 0.6s ease-out;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px var(--your-bg-color) inset !important;
+  -webkit-text-fill-color: var(--your-text-color) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.spinner {
+  position: fixed;
+  width: 140px;
+  height: 140px;
+  border: 8px solid #b1b1b1;
+  border-top: 8px solid rgb(47, 47, 47);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

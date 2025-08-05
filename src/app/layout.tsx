@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
-import { TranslationProvider } from '@/context/TranslationContext';
-import { LanguageProvider } from "@/context/LanguageContext";
-import { ThemeProvider } from "next-themes";
+import AppProvider from "@/providers/AppProvider";
 
 const openSans = Open_Sans({
   variable: "--font-open_sans",
@@ -32,19 +30,9 @@ export default function RootLayout({
       <body
         className={`${openSans.className} antialiased`}
       >
-        <ThemeProvider
-          attribute="data-theme"    /* puts data-theme="light|dark" on <html> */
-          defaultTheme="system"     /* follow OS by default */
-          enableSystem              /* let users return to “system” */
-        >
-
-          <LanguageProvider>
-            <TranslationProvider>
-              {children}
-            </TranslationProvider>
-          </LanguageProvider>
-
-        </ThemeProvider>
+        <AppProvider>
+          {children}
+        </AppProvider>
       </body>
     </html>
   );

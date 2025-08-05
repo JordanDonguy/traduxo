@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const WINDOW = 60_000;
-const LIMIT = 10;
+const LIMIT = 20;
 const buckets = new Map<string, { count: number; reset: number }>();
 
 // Auto-cleanup: runs every minute to remove stale IPs

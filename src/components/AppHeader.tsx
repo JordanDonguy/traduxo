@@ -34,6 +34,8 @@ function AppHeader() {
     setIsRolling(true);
     setTimeout(() => setIsRolling(false), 600); // Match animation duration
 
+    setShowMenu(false);
+
     // Blur the active element (input) immediately on submit to close mobile keyboard
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -82,7 +84,7 @@ function AppHeader() {
     setTranslatedText(translationArray);
     setIsLoading(false);
 
-    // Keep suggestion history < 5
+    // Keep suggestion history < 20
     if (alreadySuggested.length >= 20) {
       setAlreadySuggested(prev => prev.slice(1));
     };
