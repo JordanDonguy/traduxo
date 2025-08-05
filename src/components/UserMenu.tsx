@@ -41,7 +41,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
   }, [theme, mounted]);
 
   // Back to menu (left arrow button)
-  const bactToMenu = () => {
+  const backToMenu = () => {
     setIsLogin(false)
   };
 
@@ -58,7 +58,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
         {/* -------------- Back to Menu button -------------- */}
         {isLogin ? (
           <button
-            onClick={bactToMenu}
+            onClick={backToMenu}
             className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
           >
             <CircleArrowLeft />
@@ -105,7 +105,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
             {status === "authenticated" ? (
               <button
                 onClick={() => {
-                  signOut({ redirect: false });
+                  signOut({ callbackUrl: "/?logout=true" });
                   setShowMenu(false)
                 }}
                 aria-label="Toggle colour scheme"

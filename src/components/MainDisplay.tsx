@@ -5,16 +5,23 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
 import LoadingAnimation from "./LoadingAnimation";
 import { getExplanationPrompt } from "@/utils/geminiPrompts";
+import { useRouter } from "next/navigation";
+import { showAuthToasts } from "@/utils/authToasts";
 
 function MainDisplay() {
   const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, explanation, setExplanation, isLoading, error } = useTranslationContext();
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
+  const router = useRouter();
 
   const [fading, setFading] = useState<number[]>([]);                 // To be used when switching translations (fading effect)
   const [isExpLoading, setIsExpLoading] = useState<boolean>(false);   // To display a loading animation when explanation's loading
   const [explanationError, setExplanationError] = useState<string>(""); // Display error message if any when requesting explanation
 
+  // Display a toast message if there's an error or success message in url params
+  useEffect(() => {
+    showAuthToasts(router)
+  }, [router])
 
   useEffect(() => {
     const paragraphs = document.querySelectorAll('p');

@@ -30,7 +30,7 @@ const authOptions: NextAuthOptions = {
 
           // Throw error if email or password is missing, rejects login
           if (!credentials?.email || !credentials?.password) {
-            throw new Error("Please enter an email and a password");
+            throw new Error("NoMailOrPassword");
           }
 
           // Fetch user by email from Prisma
@@ -39,11 +39,11 @@ const authOptions: NextAuthOptions = {
           });
 
           // Throw error if user not found or error occurs
-          if (!user) throw new Error("User not found, please sign up");
+          if (!user) throw new Error("NoUserFound");
 
           // Check if user is a Google-only user (e.g. no hashed password)
           if (!user.password) {
-            throw new Error("This account was created using Google sign-in. To set a password and log in with email/password, please sign in with Google first, then create a password in your user profile.");
+            throw new Error("NeedToCreatePassword");
           }
 
           // Compare provided password with hashed password from DB
@@ -52,7 +52,7 @@ const authOptions: NextAuthOptions = {
             user.password
           );
           // Throw error if password does not match
-          if (!isValid) throw new Error("Password incorrect");
+          if (!isValid) throw new Error("PasswordIncorrect");
 
           // Return user object to create session
           return {
@@ -61,7 +61,7 @@ const authOptions: NextAuthOptions = {
           };
         } catch (error) {
           if (error instanceof ZodError) {
-            throw new Error(error.issues[0].message);
+            throw new Error("InvalidInput");
           }
           throw error;
         }
@@ -127,7 +127,7 @@ const authOptions: NextAuthOptions = {
             }
           }
           // Otherwise block Google sign-in
-          throw new Error("An account with this email already exists. Please sign in with your password and link Google account from your profile.");
+          throw new Error("NeedGoogleLinking");
         }
 
         return true; // allow Google sign-in if no problem
@@ -186,8 +186,7 @@ const authOptions: NextAuthOptions = {
 
   // Custom sign-in page route
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    error: "/",
   },
 };
 

@@ -18,7 +18,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const detectedLang =
     inputLang === "auto"
-      ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
+      ? (typeof window !== "undefined"
+        ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
+        : "en")
       : inputLang;
 
   return (

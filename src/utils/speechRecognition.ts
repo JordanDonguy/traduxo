@@ -1,3 +1,5 @@
+"use client"
+
 export function createSpeechRecognition({
   lang = "en-US",
   onResult,
