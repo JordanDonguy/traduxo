@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 type ChangePasswordProps = {
   showMenu: boolean;
@@ -16,6 +17,8 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { update } = useSession();
 
   // -------------- Change / create password --------------
   const handleSubmit = async () => {
@@ -33,6 +36,7 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
 
     // Fetch either update or create password route depending if user already has a password or not
     const res = isCredentials ? (
+      // ----------- Update password -----------
       await fetch("/api/auth/update-password", {
         method: "POST",
         headers: {
@@ -41,6 +45,7 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
         body: JSON.stringify({ currentPassword, password })
       })
     ) : (
+      // ----------- Or create password -----------
       await fetch("/api/auth/create-password", {
         method: "POST",
         headers: {
@@ -67,6 +72,9 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
     // Close menu and reset loading state
     setShowMenu(false)
     setIsLoading(false);
+
+    // Update next auth session state
+    await update();
   };
 
   return (

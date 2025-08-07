@@ -23,6 +23,8 @@ export function showAuthToasts(router: Router) {
   const error = params.get('error');
   const login = params.get('login');
   const logout = params.get('logout');
+  const linked = params.get('linked');
+  const accountDeleted = params.get('delete');
   let shouldClean = false;
 
   // Display error toast
@@ -42,6 +44,17 @@ export function showAuthToasts(router: Router) {
   if (logout === 'true') {
     toast.success('Successfully logged out.');
     shouldClean = true;
+  }
+
+  // Display logout toast
+  if (linked === 'google') {
+    toast.success('Google account successfully linked.');
+    shouldClean = true;
+  }
+
+  if (accountDeleted === 'true') {
+    toast.success('Accound successfully deleted.');
+    shouldClean = true
   }
 
   // Cleanup url
