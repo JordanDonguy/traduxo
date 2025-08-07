@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useTranslationContext } from '@/context/TranslationContext';
 import { useLanguageContext } from "@/context/LanguageContext";
-import { createSpeechRecognition } from "@/utils/speechRecognition";
-import { getTranslationPrompt } from "@/utils/geminiPrompts";
+import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
+import { getTranslationPrompt } from "@/lib/shared/geminiPrompts";
 import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRight } from "lucide-react";
 

@@ -17,3 +17,9 @@ export const updatePasswordSchema = z.object({
 export const createPasswordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters")
 });
+
+export const authEnvSchema = z.object({
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  JWT_SECRET: z.string(),
+});

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimiter } from "./lib/middlewares/rateLimit";
+import { rateLimiter } from "./lib/server/middlewares/rateLimit";
 
 export async function middleware(req: NextRequest) {
   // global rate‑limit for all API requests

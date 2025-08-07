@@ -4,7 +4,7 @@ import { useState } from "react";
 import UserMenu from "./UserMenu";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { getSuggestionPrompt } from "@/utils/geminiPrompts";
+import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
 import { User, Dices } from "lucide-react";
 import Logo from "./Logo";
 

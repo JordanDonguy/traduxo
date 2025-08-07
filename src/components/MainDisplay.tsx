@@ -4,9 +4,9 @@ import { useTranslationContext } from "@/context/TranslationContext";
 import { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
 import LoadingAnimation from "./LoadingAnimation";
-import { getExplanationPrompt } from "@/utils/geminiPrompts";
+import { getExplanationPrompt } from "@/lib/shared/geminiPrompts";
 import { useRouter } from "next/navigation";
-import { showAuthToasts } from "@/utils/authToasts";
+import { showAuthToasts } from "@/lib/client/utils/authToasts";
 
 function MainDisplay() {
   const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, explanation, setExplanation, isLoading, error } = useTranslationContext();
