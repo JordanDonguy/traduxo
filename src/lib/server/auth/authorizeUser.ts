@@ -4,15 +4,10 @@ import sanitizeHtml from "sanitize-html";
 import bcrypt from "bcrypt";
 import { ZodError } from "zod";
 
-type Credentials = {
-  email: string;
-  password: string;
-}
-
-export async function authorizeUser(credentials: Credentials, prismaClient = prisma) {
+export async function authorizeUser(credentials: Record<string, string> | undefined, prismaClient = prisma) {
   try {
     // Throw error if email or password is missing, rejects login
-    if (!credentials?.email || !credentials?.password) {
+    if (!credentials || !credentials?.email || !credentials?.password) {
       throw new Error("NoMailOrPassword");
     };
 

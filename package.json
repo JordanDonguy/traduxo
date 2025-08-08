@@ -7,7 +7,8 @@
     "generate": "prisma generate",
     "build": "npm run generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
   },
   "dependencies": {
     "@google/genai": "^1.9.0",
@@ -31,13 +32,16 @@
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "jest": "^30.0.5",
     "tailwindcss": "^4",
+    "ts-jest": "^29.4.1",
     "typescript": "^5"
   }
 }

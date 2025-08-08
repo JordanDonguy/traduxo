@@ -28,11 +28,8 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
         },
 
         // Called when user tries to login with credentials
-        authorize(credentials) {
-          if (!credentials || typeof credentials.email !== "string" || typeof credentials.password !== "string") {
-            throw new Error("NoMailOrPassword");
-          }
-          return authorizeUser(credentials);
+        authorize: async(credentials) => {
+          return await authorizeUser(credentials);
         }
       }),
 
