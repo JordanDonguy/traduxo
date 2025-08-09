@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import authOptions from '@/lib/server/auth/authOptions';
 import { updatePasswordSchema } from '@/lib/shared/schemas';
 import { ZodError } from 'zod';
-import { prisma } from '@/lib/server/prisma';
+import type { PrismaClient } from "@prisma/client/extension";
 
 export async function updatePassword(
   req: Request,
@@ -13,7 +13,7 @@ export async function updatePassword(
     prismaClient,
   }: {
     getSessionFn: typeof getServerSession;
-    prismaClient: typeof prisma;
+    prismaClient: Partial<PrismaClient>;
   }
 ) {
   try {

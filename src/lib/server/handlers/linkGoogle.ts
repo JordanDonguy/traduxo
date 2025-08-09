@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import authOptions from "@/lib/server/auth/authOptions";
-import { prisma } from "@/lib/server/prisma";
+import type { PrismaClient } from "@prisma/client/extension";
 
 export async function linkGoogle(
   {
@@ -9,7 +9,7 @@ export async function linkGoogle(
     prismaClient,
   }: {
     getSessionFn: typeof getServerSession;
-    prismaClient: typeof prisma;
+    prismaClient: Partial<PrismaClient>;
   }
 ) {
   // 1. Get user session

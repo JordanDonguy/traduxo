@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { prisma } from "@/lib/server/prisma";
 import { loginSchema } from "@/lib/shared/schemas";
 import { ZodError } from "zod";
 import sanitizeHtml from "sanitize-html";
+import type { PrismaClient } from "@prisma/client/extension";
 
 export async function signupHandler({
   body,
   prismaClient,
 }: {
   body: unknown; // raw input, unknown shape until validated by Zod
-  prismaClient: typeof prisma;
+  prismaClient: Partial<PrismaClient>;
 }) {
   try {
     // 1. Validate and parse input using zod
