@@ -55,12 +55,12 @@ export function startRateLimiterCleanup(store = rateLimitStore): NodeJS.Timeout 
 // Start auto-cleanup by default (in prod environments)
 const cleanupInterval = startRateLimiterCleanup();
 
-// Optional helper for testing: clear store between tests
+// Helper for testing: clear store between tests
 export function resetRateLimiterStore(store = rateLimitStore) {
   store.buckets.clear();
 }
 
-// Optional helper: stop auto-cleanup (for tests or graceful shutdown)
+// Helper: stop auto-cleanup (for tests or graceful shutdown)
 export function stopRateLimiterCleanup(interval = cleanupInterval) {
   clearInterval(interval);
 }

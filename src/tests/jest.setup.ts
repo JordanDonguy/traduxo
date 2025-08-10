@@ -9,6 +9,8 @@ beforeAll(() => {
 process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
 process.env.GOOGLE_CLIENT_SECRET = 'test-google-client-secret';
 process.env.JWT_SECRET = 'test-jwt-secret';
+process.env.UPSTASH_REDIS_REST_URL="https://test-redis-rest-url.com"
+process.env.UPSTASH_REDIS_REST_TOKEN="test-redis-rest-token"
 
 jest.mock('@/lib/server/prisma', () => ({
   prisma: {
