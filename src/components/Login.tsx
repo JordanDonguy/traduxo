@@ -110,9 +110,10 @@ export default function Login({ showMenu, setShowMenu }: LoginProps) {
         </div>
       ) : null}
 
-      <div className={`flex flex-col gap-6 ${isLoading ? "opacity-60" : "opacity-100"}`}>
+      <h1 className="text-2xl text-center font-bold pb-6">{isSignup ? "Sign Up" : "Login"}</h1>
 
-        <h1 className="text-2xl text-center font-bold">{isSignup ? "Sign Up" : "Login"}</h1>
+      <div className={`flex flex-col gap-6 ${isLoading ? "opacity-60" : "opacity-100"}  overflow-y-auto max-h-[calc(100vh-8rem)] pb-8 scrollbar-hide`}>
+
 
         {/* -------------- Display error if any -------------- */}
         {error && <p className="text-red-500 text-center">{error}</p>}

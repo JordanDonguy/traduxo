@@ -26,6 +26,9 @@ model History {
   userId      String    @db.Uuid
   inputText   String
   translation String
+  alt1        String?
+  alt2        String?
+  alt3        String?
   inputLang   String
   outputLang  String
   createdAt   DateTime  @default(now())
@@ -37,6 +40,9 @@ model Saved {
   userId      String    @db.Uuid
   inputText   String
   translation String
+  alt1        String?
+  alt2        String?
+  alt3        String?
   inputLang   String
   outputLang  String
   createdAt   DateTime  @default(now())

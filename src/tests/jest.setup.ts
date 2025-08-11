@@ -20,6 +20,14 @@ jest.mock('@/lib/server/prisma', () => ({
       update: jest.fn(),
       delete: jest.fn()
     },
+    history: {
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+      count: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      delete: jest.fn(),
+    }
   },
 }));
 
@@ -31,6 +39,14 @@ export type MockPrismaClient = Partial<PrismaClient> & {
     update: jest.Mock;
     delete: jest.Mock;
   };
+  history: {
+    create: jest.Mock;
+    deleteMany: jest.Mock;
+    count: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    delete: jest.Mock;
+  }
 };
 
 export const mockPrisma = prisma as unknown as MockPrismaClient;
