@@ -59,11 +59,6 @@ const mockUser: AdapterUser = {
 
 // ------------- Tests -------------
 describe('createAuthOptions', () => {
-  // ------ cleanup mocks after each test ------
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
   const mockEnv = {
     GOOGLE_CLIENT_ID: 'fake-id',
     GOOGLE_CLIENT_SECRET: 'fake-secret',

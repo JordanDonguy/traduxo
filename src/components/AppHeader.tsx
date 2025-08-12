@@ -4,7 +4,10 @@ import { useState } from "react";
 import UserMenu from "./UserMenu";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
+import { translationHelper } from "@/lib/client/utils/translate";
+import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
+import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
+import { useSession } from "next-auth/react";
 import { User, Dices } from "lucide-react";
 import Logo from "./Logo";
 
@@ -17,6 +20,9 @@ function AppHeader() {
     setExplanation,
     setIsLoading,
     setError,
+    expressionPool,
+    setExpressionPool,
+    translationHistory,
   } = useTranslationContext();
 
   const {
@@ -24,73 +30,75 @@ function AppHeader() {
     detectedLang
   } = useLanguageContext();
 
-  const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [alreadySuggested, setAlreadySuggested] = useState<string[]>([]);   // To prevent AI to suggest the same expression many times in a row
+  const { status } = useSession();
 
+  const [showMenu, setShowMenu] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
 
   async function suggestTranslation() {
-    // Make the dices roll!
     setIsRolling(true);
-    setTimeout(() => setIsRolling(false), 600); // Match animation duration
+    setTimeout(() => setIsRolling(false), 600); // animation
 
     setShowMenu(false);
 
-    // Blur the active element (input) immediately on submit to close mobile keyboard
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    };
+    if (!expressionPool.length) {
+      const promises = [
+        suggestExpressionHelper({
+          detectedLang,
+          outputLang,
+          setTranslatedText,
+          setInputTextLang,
+          setTranslatedTextLang,
+          setExplanation,
+          setError,
+          setIsLoading,
+        }),
+      ];
 
-    // Set loading state to true
-    setIsLoading(true);
+      if (status === "authenticated") {
+        promises.push(
+          fetchExpressionPoolHelper({
+            setError,
+            detectedLang,
+            setExpressionPool,
+          })
+        );
+      }
 
-    // Reset error, translatedText, explanation and inputText states
-    setError("");
-    setTranslatedText([]);
-    setExplanation("");
-    setInputText("");
+      await Promise.all(promises);
+      return;
+    }
 
-    // Since suggesting from output to input, set translatedTextLang to detectedLang (input or browser default if on "auto")
-    setTranslatedTextLang(detectedLang);
+    // Find first expression NOT in history
+    const newExpression = expressionPool.find(
+      (expression) => !translationHistory.some(t => t.inputText === expression)
+    );
 
-    const prompt = getSuggestionPrompt({ detectedLang, outputLang, alreadySuggested });
+    if (!newExpression) {
+      // No new expressions left, clear pool and optionally fetch again or show message
+      setExpressionPool([]);
+      // Optionally: await suggestTranslation() to retry, or return
+      return;
+    }
 
-    // Gemini API request
-    const res = await fetch('/api/gemini/complete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
+    // Request translation for the new expression
+    await translationHelper({
+      inputText: newExpression,
+      inputLang: detectedLang,
+      outputLang,
+      setInputText,
+      setInputTextLang,
+      setTranslatedTextLang,
+      setTranslatedText,
+      setExplanation,
+      setError,
+      setIsLoading,
     });
 
-    // Set an error message to display then to user if 429 error is returned (quota exceeded)
-    if (res.status === 429) {
-      const { error } = await res.json();
-      setError(error);
-      setIsLoading(false)
-      return
-    };
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-
-    const { text } = await res.json();
-
-    const cleanedText = text
-      .replace(/```json\s*/, '')  // remove opening ```json and any whitespace
-      .replace(/[\s\n\r]*```+[\s\n\r]*$/, '')  // Remove trailing backticks with optional whitespace/newlines around
-
-    const translationArray = JSON.parse(cleanedText);
-
-    setInputTextLang(outputLang);   // Set inputTextLang to outputLang since suggesting from output to input language
-
-    setTranslatedText(translationArray);
-    setIsLoading(false);
-
-    // Keep suggestion history < 20
-    if (alreadySuggested.length >= 20) {
-      setAlreadySuggested(prev => prev.slice(1));
-    };
-    // Add suggestion to alreadySuggested to prevent having the same one on next request
-    setAlreadySuggested(prev => [...prev, translationArray[0]]);
+    // Remove the used expression from pool to avoid repeating
+    setExpressionPool(prev => prev.filter(expr => expr !== newExpression));
   }
+
 
   return (
     <header className="w-full h-full flex justify-center">
@@ -105,7 +113,7 @@ function AppHeader() {
           <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
         </button>
 
-       <Logo />
+        <Logo />
 
         <div>
           <button

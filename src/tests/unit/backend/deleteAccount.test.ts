@@ -12,11 +12,6 @@ function createMockContext() {
   };
 }
 
-// ------ Clear mocks before each tests ------
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
 describe("deleteAccount", () => {
   // ------ Test 1️⃣ ------
   it("returns 401 if session is missing or email not present", async () => {

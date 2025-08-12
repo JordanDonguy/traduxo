@@ -15,10 +15,8 @@ function createMockRequest(body: unknown) {
 }
 
 describe("updatePassword", () => {
-  // ------ Reset mocks before each tests and set default mocks ------
+  // ------ Reapply default mock return values for a clean test baseline ------
   beforeEach(() => {
-    jest.clearAllMocks();
-
     // Default session returns valid user email
     mockGetSession.mockResolvedValue({ user: { email: "user@example.com" } });
 
@@ -34,6 +32,7 @@ describe("updatePassword", () => {
 
     // Default prisma update mock
     mockPrisma.user.update.mockResolvedValue({});
+
   });
 
   // ------ Test 1️⃣ ------

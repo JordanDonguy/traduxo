@@ -14,9 +14,8 @@ describe("authorizeUser", () => {
   const mockBcryptCompare = bcrypt.compare as jest.Mock;
   const mockSanitize = sanitizeHtml as unknown as jest.Mock;
 
-  // ------ Clear mocks before each tests ------
+  // ------ Add a mock implementation for sanitizing input ------
   beforeEach(() => {
-    jest.clearAllMocks();
     mockSanitize.mockImplementation((str) => str); // Bypass the real sanitization logic
   });
 

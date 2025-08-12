@@ -10,11 +10,6 @@ jest.mock("sanitize-html", () => jest.fn((str) => str)); // simple passthrough m
 const mockBcryptHash = bcrypt.hash as jest.Mock;
 
 describe("signupHandler", () => {
-  // ------ Clear mocks before each tests ------
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it("creates a new user and returns 201 on success", async () => {
     const body = { email: "test@example.com", password: "password123" };

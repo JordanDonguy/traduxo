@@ -11,11 +11,6 @@ function createRequestWithBody(body: unknown) {
 }
 
 describe("deleteTranslation handler", () => {
-  // ------ Clear mocks before each tests ------
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it("should reject unauthorized users", async () => {
     mockGetSessionFn.mockResolvedValue(null);

@@ -11,6 +11,7 @@ type TranslationState = {
   explanation: string;
   isLoading: boolean;
   error: string;
+  expressionPool: string[];
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
@@ -18,7 +19,21 @@ type TranslationState = {
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  setLoadingFromHistory: (value: boolean) => void;
+  loadTranslationFromHistory: (t: TranslationHistory) => void;
+  translationHistory: TranslationHistory[];
+  setTranslationHistory: React.Dispatch<React.SetStateAction<TranslationHistory[]>>;
+  setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+type TranslationHistory = {
+  id: string;
+  inputText: string;
+  translation: string;
+  inputLang: string;
+  outputLang: string;
+  alt1: string | null;
+  alt2: string | null;
+  alt3: string | null;
 };
 
 // We use `TranslationState | undefined` as the type, and set the default value to `undefined`.
@@ -29,11 +44,17 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const { status } = useSession();
   const [inputText, setInputText] = useState<string>("");
   const [translatedText, setTranslatedText] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
   const [explanation, setExplanation] = useState<string>("");
+
+  const [translationHistory, setTranslationHistory] = useState<TranslationHistory[]>([]);
+  const [expressionPool, setExpressionPool] = useState<string[]>([]);
 
   // This useRef is to skip saving translation to db if translation is loaded from history
   const isLoadingFromHistoryRef = useRef(false);
@@ -92,6 +113,15 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [translationSnapshot, inputTextLang, translatedTextLang, status]);
 
+  // Load a translation from user's history to main display
+  function loadTranslationFromHistory(t: TranslationHistory) {
+    setLoadingFromHistory(true)
+    setExplanation("");
+    setTranslatedText([t.inputText, t.translation, t.alt1 ?? "", t.alt2 ?? "", t.alt3 ?? ""]);
+    setInputTextLang(t.inputLang);
+    setTranslatedTextLang(t.outputLang);
+  };
+
   return (
     <TranslationContext.Provider
       value={{
@@ -102,6 +132,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         explanation,
         isLoading,
         error,
+        expressionPool,
         setInputText,
         setTranslatedText,
         setInputTextLang,
@@ -109,7 +140,10 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         setExplanation,
         setIsLoading,
         setError,
-        setLoadingFromHistory
+        loadTranslationFromHistory,
+        translationHistory,
+        setTranslationHistory,
+        setExpressionPool,
       }}
     >
       {children}

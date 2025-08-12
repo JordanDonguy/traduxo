@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useTranslationContext } from "./TranslationContext";
 
 type LanguageState = {
   inputLang: string;
@@ -13,6 +14,8 @@ type LanguageState = {
 const LanguageContext = createContext<LanguageState | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const { setExpressionPool } = useTranslationContext();
+
   const [inputLang, setInputLang] = useState<string>("auto");
   const [outputLang, setOutputLang] = useState<string>("en");
 
@@ -22,6 +25,13 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
         : "en")
       : inputLang;
+
+  // Whenever inputLang or outputLang changes, clear the expression pool
+  useEffect(() => {
+    setExpressionPool([]);
+    console.log("pool reset")
+  }, [inputLang, outputLang, setExpressionPool]);
+
 
   return (
     <LanguageContext.Provider

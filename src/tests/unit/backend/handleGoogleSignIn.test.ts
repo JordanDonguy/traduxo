@@ -2,11 +2,6 @@ import { handleGoogleSignIn } from "@/lib/server/auth/handleGoogleSignIn";
 import { mockPrisma } from "@/tests/jest.setup";
 
 describe("handleGoogleSignIn", () => {
-  // Clear call history & results before each test so mocks don't leak between tests
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it("throws error if email is missing", async () => {
     await expect(handleGoogleSignIn(""))

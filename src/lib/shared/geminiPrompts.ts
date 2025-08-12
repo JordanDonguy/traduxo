@@ -13,7 +13,6 @@ type ExplanationPromptParams = {
 type SuggestionPromptParams = {
   detectedLang: string
   outputLang: string;
-  alreadySuggested: string[];
 };
 
 // ------------------------------------- Translation Prompt -------------------------------------
@@ -106,19 +105,25 @@ Translation (${translatedTextLang}): "${translations}"
 export function getSuggestionPrompt({
   detectedLang,
   outputLang,
-  alreadySuggested
 }: SuggestionPromptParams): string {
   return `
 You are a native-speaking language teacher and idiom expert.
 
 Your task:
-Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${outputLang}. Then translate it into a **natural, equivalent** expression in ${detectedLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
+Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
 
 **Output**
 Return EXACTLY this JSON array (no markdown, no explanation):
-["original expression in ${outputLang}", "best equivalent translation in ${detectedLang}", "alternative 1", "alternative 2", "alternative 3"]
-
-**IMPORTANT:**
-${alreadySuggested.length ? `- Do not use any of these previously suggested expressions: ${alreadySuggested.join(", ")}.` : ""}
+["original expression in ${detectedLang}", "best equivalent translation in ${outputLang}", "alternative 1", "alternative 2", "alternative 3"]
   `
 };
+
+// ------------------------------------- Pool Prompt -------------------------------------
+export function getPoolPrompt(lang: string) {
+  return `
+Give me 50 diverse and natural idiomatic expressions or phrases in ${lang} that native speakers use in everyday casual conversation. 
+Exclude very literal or polite requests like "Could you pass the salt, please?". 
+Focus on colorful, idiomatic, or colloquial expressions that convey emotions, reactions, or common situations. 
+Output the result as a JSON array of unique strings.
+`;
+}

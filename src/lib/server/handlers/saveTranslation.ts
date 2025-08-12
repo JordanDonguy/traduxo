@@ -17,15 +17,12 @@ export async function saveTranslation(
   }
 ) {
   try {
-    // Get user session from NextAuth
     const session = await getSessionFn(authOptions);
 
-    // Reject if user is not authenticated
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Input validation with Zod
     const validation = translationRequestSchema.safeParse(await req.json());
     if (!validation.success) {
       const errors = validation.error.issues.map(issue => ({
@@ -37,22 +34,7 @@ export async function saveTranslation(
 
     const { translations, inputLang, outputLang } = validation.data;
 
-    // Count user's current history entries
-    const count = await prismaClient.history.count({
-      where: { userId: session.user.id },
-    });
-
-    // If limit reached, delete oldest record(s) to make space
-    if (count >= MAX_HISTORY) {
-      const toDelete = count - MAX_HISTORY + 1; // number of records to delete
-      await prismaClient.history.deleteMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "asc" },
-        take: toDelete,
-      });
-    }
-
-    // Save the new translation record to user history
+    // Add new translation first
     await prismaClient.history.create({
       data: {
         userId: session.user.id,
@@ -66,6 +48,24 @@ export async function saveTranslation(
       },
     });
 
+    // Count total history after insert
+    const count = await prismaClient.history.count({
+      where: { userId: session.user.id },
+    });
+
+    // If count exceeded, delete oldest record
+    if (count > MAX_HISTORY) {
+      await prismaClient.$queryRaw`
+        DELETE FROM "History"
+        WHERE id = (
+          SELECT id FROM "History"
+          WHERE "userId" = CAST(${session.user.id} AS uuid)
+          ORDER BY "createdAt" ASC
+          LIMIT 1
+        )
+      `;
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("saveTranslation error:", error);
@@ -75,3 +75,4 @@ export async function saveTranslation(
     );
   }
 }
+

@@ -50,11 +50,6 @@ function createRequest(body: unknown) {
 
 // ------ Tests ------
 describe('geminiStream', () => {
-  // ------ Clear mocks before each tests ------
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it('returns 400 if validation fails', async () => {
     const req = createRequest({ prompt: '' }); // empty prompt invalid

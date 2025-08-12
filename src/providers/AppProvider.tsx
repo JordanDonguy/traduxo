@@ -19,8 +19,8 @@ export default function AppProvider({
     >
 
       <SessionProvider>
-        <LanguageProvider>
-          <TranslationProvider>
+        <TranslationProvider>
+          <LanguageProvider>
             {children}
             <ToastContainer
               position="top-right"
@@ -28,8 +28,8 @@ export default function AppProvider({
               toastClassName="pointer-events-auto"
               className="!top-[70px] !z-10"
             />
-          </TranslationProvider>
-        </LanguageProvider>
+          </LanguageProvider>
+        </TranslationProvider>
       </SessionProvider>
 
     </ThemeProvider>

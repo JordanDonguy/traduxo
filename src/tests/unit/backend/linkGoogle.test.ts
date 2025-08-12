@@ -13,11 +13,6 @@ function createMockContext() {
 }
 
 describe("linkGoogle", () => {
-  // ------ Clear mocks before each tests ------
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it("returns 401 if session is missing or email not present", async () => {
     mockGetSession.mockResolvedValue(null);

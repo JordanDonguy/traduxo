@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslationContext } from '@/context/TranslationContext';
 import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
-import { getTranslationPrompt } from "@/lib/shared/geminiPrompts";
+import { translationHelper } from "@/lib/client/utils/translate";
 import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRight } from "lucide-react";
 
@@ -39,53 +39,19 @@ function TranslatorInput() {
   async function handleTranslate(e: React.FormEvent) {
     e.preventDefault();
 
-    // Blur the active element (input) immediately on submit to close mobile keyboard
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    };
-
-    setIsLoading(true);
-    setError("");
-    setTranslatedText([]);
-    setExplanation("");
-
-    const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
-
-    setInputText("");
-
-    const res = await fetch('/api/gemini/complete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
-
-    // Set an error message to display then to user if 429 error is returned (quota exceeded)
-    if (res.status === 429) {
-      const { error } = await res.json();
-      setError(error);
-      setIsLoading(false)
-      return
-    };
-
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-
-    const { text } = await res.json();
-    const cleanedText = text
-      .replace(/```json\s*/, '')  // remove opening ```json and any whitespace
-      .replace(/[\s\n\r]*```+[\s\n\r]*$/, '')  // Remove trailing backticks with optional whitespace/newlines around
-
-    const translationArray = JSON.parse(cleanedText);
-
-    if (inputLang === "auto") {
-      setInputTextLang(translationArray[translationArray.length - 1]);
-    } else {
-      setInputTextLang(inputLang)
-    };
-    setTranslatedTextLang(outputLang);
-
-    setTranslatedText(translationArray);
-    setIsLoading(false);
-  }
+    translationHelper({
+      inputText,
+      inputLang,
+      outputLang,
+      setInputText,
+      setInputTextLang,
+      setTranslatedTextLang,
+      setTranslatedText,
+      setExplanation,
+      setError,
+      setIsLoading,
+    })
+  };
 
   // Handle voice input
   function handleVoice() {

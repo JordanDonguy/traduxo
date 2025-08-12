@@ -4,11 +4,6 @@ import { mockPrisma } from "@/tests/jest.setup";
 const mockGetSession = jest.fn();
 
 describe("getTranslations", () => {
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("returns 401 if user is not authenticated", async () => {
     mockGetSession.mockResolvedValue(null);
 

@@ -22,11 +22,6 @@ const makeRequest = (body: unknown) =>
 
 // ------ Tests------
 describe('geminiComplete', () => {
-  // ------ Clear mocks before each tests ------
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   // ------ Test 1️⃣ ------
   it('returns 400 if prompt is missing', async () => {
     const req = makeRequest({});

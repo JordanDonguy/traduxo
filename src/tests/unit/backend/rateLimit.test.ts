@@ -10,7 +10,7 @@ function createRequest(ip?: string, headerName = "cf-connecting-ip") {
 describe("rateLimiter", () => {
   let store: typeof import("@/lib/server/middlewares/rateLimit").rateLimitStore;
 
-  // ------ Reset store values and clear mocks before each tests ------
+  // ------ Reset store values before each tests ------
   beforeEach(() => {
     store = {
       WINDOW: 60_000,
@@ -18,7 +18,6 @@ describe("rateLimiter", () => {
       buckets: new Map(),
     };
     resetRateLimiterStore(store);
-    jest.clearAllMocks();
   });
 
   // ------ Stop auto limiter cleanup when test ends to prevent timer leaks -------

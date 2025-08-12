@@ -8,11 +8,11 @@ const makeReq = (body: unknown) => ({
 } as unknown as Request);
 
 describe("saveTranslation handler", () => {
-  // ------ Clear mocks before each tests ------
+  // ------ Reset mocks before each tests ------
   beforeEach(() => {
-    jest.clearAllMocks();
     mockPrisma.history.count.mockReset();
-    mockPrisma.history.deleteMany.mockReset();
+    mockPrisma.history.create.mockReset();
+    mockPrisma.$queryRaw.mockReset();
   });
 
   // ------ Test 1️⃣ ------
@@ -57,7 +57,7 @@ describe("saveTranslation handler", () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     const req = makeReq({
       translations: ["hello", "bonjour"],
-      inputLang: "english", // invalid length
+      inputLang: "english",
       outputLang: "fr",
     });
 
@@ -80,7 +80,7 @@ describe("saveTranslation handler", () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     const req = makeReq({
       translations: ["hello", "bonjour"],
-      inputLang: "1n", // length 2 but invalid chars
+      inputLang: "1n",
       outputLang: "fr",
     });
 
@@ -102,6 +102,7 @@ describe("saveTranslation handler", () => {
   it("creates history record successfully and returns success", async () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     mockPrisma.history.create.mockResolvedValue({ id: "record1" });
+    mockPrisma.history.count.mockResolvedValue(50); // Below limit, no deletion
 
     const req = makeReq({
       translations: ["hello", "bonjour", "salut", "coucou", "bonsoir"],
@@ -127,21 +128,25 @@ describe("saveTranslation handler", () => {
       },
     });
 
+    expect(mockPrisma.history.count).toHaveBeenCalledWith({
+      where: { userId: "user1" },
+    });
+
+    // No deletion expected here because count < MAX_HISTORY
+    expect(mockPrisma.$queryRaw).not.toHaveBeenCalled();
+
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual({ success: true });
   });
 
   // ------ Test 6️⃣ ------
-  it("deletes oldest history records when user exceeds max history limit", async () => {
+  it("deletes oldest history record when user exceeds max history limit", async () => {
     const userId = "user1";
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: userId } });
 
-    // Simulate user already has MAX_HISTORY + 3 records
-    mockPrisma.history.count.mockResolvedValue(103);
-
-    mockPrisma.history.deleteMany.mockResolvedValue({ count: 3 });
     mockPrisma.history.create.mockResolvedValue({ id: "record2" });
+    mockPrisma.history.count.mockResolvedValue(101); // Over limit triggers deletion
 
     const req = makeReq({
       translations: ["hello", "bonjour", "salut", "coucou", "bonsoir"],
@@ -154,26 +159,30 @@ describe("saveTranslation handler", () => {
       prismaClient: mockPrisma,
     });
 
-    // It should call count once
-    expect(mockPrisma.history.count).toHaveBeenCalledWith({ where: { userId } });
-
-    // It should delete exactly (103 - 100 + 1) = 4 oldest records (adjust if you want to keep 200 total)
-    expect(mockPrisma.history.deleteMany).toHaveBeenCalledWith({
-      where: { userId },
-      orderBy: { createdAt: "asc" },
-      take: 4,
-    });
-
-    // It should still create the new history record
     expect(mockPrisma.history.create).toHaveBeenCalledWith(expect.objectContaining({
       data: expect.objectContaining({ userId }),
     }));
+
+    expect(mockPrisma.history.count).toHaveBeenCalledWith({
+      where: { userId },
+    });
+
+    expect(mockPrisma.$queryRaw).toHaveBeenCalledTimes(1);
+
+    const callArg = mockPrisma.$queryRaw.mock.calls[0];
+
+    // callArg is an array: [strings[], ...substitutions]
+    const [strings, ...substitutions] = callArg;
+
+    expect(strings.join('')).toEqual(expect.stringContaining(`DELETE FROM "History"`));
+
+    // check if userId is in substitutions
+    expect(substitutions).toContain(userId);
 
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json).toEqual({ success: true });
   });
-
 
   // ------ Test 7️⃣ ------
   it("returns 500 on prisma error", async () => {

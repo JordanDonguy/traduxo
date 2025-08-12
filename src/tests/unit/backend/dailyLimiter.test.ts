@@ -29,10 +29,6 @@ function createRequest(ip: string, headerKey = 'cf-connecting-ip'): NextRequest 
 
 // ------ Tests ------
 describe('createQuotaChecker', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  });
-
   // ------ Test 1️⃣ ------
   it('allows requests under quota and increments count', async () => {
     const req = createRequest('1.2.3.4');
