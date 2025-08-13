@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client/extension";
 import authOptions from "../auth/authOptions";
 import { NextResponse } from "next/server";
 
-export async function getTranslations(
+export async function getHistory(
   {
     getSessionFn,
     prismaClient

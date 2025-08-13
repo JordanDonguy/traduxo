@@ -19,6 +19,8 @@ function AppHeader() {
     setTranslatedTextLang,
     setExplanation,
     setIsLoading,
+    setIsFavorite,
+    setTranslationId,
     setError,
     expressionPool,
     setExpressionPool,
@@ -52,6 +54,8 @@ function AppHeader() {
           setExplanation,
           setError,
           setIsLoading,
+          setIsFavorite,
+          setTranslationId,
         }),
       ];
 
@@ -91,8 +95,10 @@ function AppHeader() {
       setTranslatedTextLang,
       setTranslatedText,
       setExplanation,
-      setError,
       setIsLoading,
+      setIsFavorite,
+      setTranslationId,
+      setError,
     });
 
     // Remove the used expression from pool to avoid repeating

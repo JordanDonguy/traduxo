@@ -6,7 +6,7 @@ import { translationRequestSchema } from "@/lib/shared/schemas";
 
 const MAX_HISTORY = 100;
 
-export async function saveTranslation(
+export async function saveToHistory(
   req: Request,
   {
     getSessionFn,
@@ -68,7 +68,7 @@ export async function saveTranslation(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("saveTranslation error:", error);
+    console.error("saveToHistory error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

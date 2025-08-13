@@ -8,8 +8,10 @@ type SuggestionHelperArgs = {
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
-  setError: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
+  setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
 // Get one normal suggestion with translation
@@ -20,8 +22,10 @@ export async function suggestExpressionHelper({
   setInputTextLang,
   setTranslatedTextLang,
   setExplanation,
-  setError,
   setIsLoading,
+  setIsFavorite,
+  setTranslationId,
+  setError,
 }: SuggestionHelperArgs) {
 
   // Blur the active element (input) immediately on submit to close mobile keyboard
@@ -33,6 +37,8 @@ export async function suggestExpressionHelper({
   setError("");
   setTranslatedText([]);
   setExplanation("");
+  setIsFavorite(false);
+  setTranslationId(undefined);
 
   setInputTextLang(detectedLang);
   setTranslatedTextLang(outputLang);

@@ -7,9 +7,25 @@ import LoadingAnimation from "./LoadingAnimation";
 import { getExplanationPrompt } from "@/lib/shared/geminiPrompts";
 import { useRouter } from "next/navigation";
 import { showAuthToasts } from "@/lib/client/utils/authToasts";
+import { Star } from "lucide-react";
+import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
+import { toast } from "react-toastify";
 
 function MainDisplay() {
-  const { translatedText, setTranslatedText, inputTextLang, translatedTextLang, explanation, setExplanation, isLoading, error } = useTranslationContext();
+  const {
+    translatedText,
+    setTranslatedText,
+    inputTextLang,
+    translatedTextLang,
+    explanation,
+    setExplanation,
+    isLoading,
+    isFavorite,
+    setIsFavorite,
+    translationId,
+    setTranslationId,
+    error
+  } = useTranslationContext();
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const router = useRouter();
@@ -17,6 +33,7 @@ function MainDisplay() {
   const [fading, setFading] = useState<number[]>([]);                 // To be used when switching translations (fading effect)
   const [isExpLoading, setIsExpLoading] = useState<boolean>(false);   // To display a loading animation when explanation's loading
   const [explanationError, setExplanationError] = useState<string>(""); // Display error message if any when requesting explanation
+  const [isFavLoading, setIsFavLoading] = useState<boolean>(false);   // To prevent user spamming add to favorite button
 
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {
@@ -117,12 +134,34 @@ function MainDisplay() {
       const chunk = decoder.decode(value, { stream: true });
       setExplanation(prev => prev + chunk);
     }
-    setIsExpLoading(false);
+    setIsExpLoading(false)
+  };
+
+  // Add or delete a translation from favorite
+  async function handleFavorite() {
+    if (isFavLoading) return; // prevent double click
+    setIsFavLoading(true);
+
+    try {
+      if (isFavorite) {
+        await deleteFromFavorite(translationId, setTranslationId, setIsFavorite);
+      } else {
+        const res = await addToFavorite(
+          translatedText,
+          inputTextLang,
+          translatedTextLang,
+          setTranslationId,
+          setIsFavorite
+        );
+        if (res) toast.error(res);
+      }
+    } finally {
+      setIsFavLoading(false);
+    }
   }
 
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
-
       {error.length ? (
         <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">{error}</p>
       ) : isLoading ? (
@@ -133,6 +172,7 @@ function MainDisplay() {
         </h2>
       ) : (
         <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 10 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
+
           <article className={`flex gap-4 pr-4 bg-[var(--bg-2)] mb-8 rounded-md duration-500 ease-in-out transform font-semibold ${mounted ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}>
             <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">{inputTextLang.length <= 2 ? inputTextLang?.toUpperCase() : ""}</p>
             <p className="text-xl min-h-8 flex items-center">{capitalizeFirstLetter(translatedText[0])}</p>
@@ -144,8 +184,18 @@ function MainDisplay() {
               : "-translate-x-full opacity-0"}`}
           >
             <div className="flex gap-4 pr-4 mb-2 font-semibold">
+              <button
+                onClick={handleFavorite}
+                disabled={isFavLoading}
+                className={`absolute right-4 mt-1 text-[var(--input-placeholder)]
+                  hover:cursor-pointer hover:text-[var(--text)]
+                  ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
+                `}
+              >
+                <Star fill={isFavorite ? "currentColor" : "transparent"} />
+              </button>
               <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">{translatedTextLang.length <= 2 ? translatedTextLang?.toUpperCase() : ""}</p>
-              <p className={`text-xl min-h-8 flex items-center duration-200 ${fading.includes(1) ? "opacity-0" : "opacity-100"}`}>{capitalizeFirstLetter(translatedText[1])}</p>
+              <p className={`text-xl max-w-3/4 min-h-8 flex items-center duration-200 ${fading.includes(1) ? "opacity-0" : "opacity-100"}`}>{capitalizeFirstLetter(translatedText[1])}</p>
             </div>
             <ul className="pl-18 pr-4 pb-4 flex flex-col gap-2">
               {translatedText.slice(2).map((alt, idx) => (
@@ -153,7 +203,7 @@ function MainDisplay() {
                   <li
                     key={idx}
                     onClick={() => switchTranslations(idx)}
-                    className={`list-disc duration-200 ${fading.includes(idx + 2) ? "opacity-0" : "opacity-100"} hover:text-zinc-400 hover:cursor-pointer`}
+                    className={`list-disc w-fit duration-200 ${fading.includes(idx + 2) ? "opacity-0" : "opacity-100"} hover:text-zinc-400 hover:cursor-pointer`}
                   >
                     {capitalizeFirstLetter(alt)}
                   </li>

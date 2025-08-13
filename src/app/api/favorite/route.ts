@@ -1,27 +1,27 @@
 import { NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from "@/lib/server/prisma";
-import { saveToHistory } from "@/lib/server/handlers/saveToHistory";
-import { getHistory } from "@/lib/server/handlers/getHistory";
-import { deleteFromHistory } from "@/lib/server/handlers/deleteFromHistory";
+import { saveToFavorite } from "@/lib/server/handlers/saveToFavorite";
+import { getFavorites } from "@/lib/server/handlers/getFavorites";
+import { deleteFromFavorite } from "@/lib/server/handlers/deleteFromFavorite";
 
 // -------------- Route handler --------------
 export async function POST(req: NextRequest) {
-  return saveToHistory(req, {
+  return saveToFavorite(req, {
     getSessionFn: getServerSession,
     prismaClient: prisma,
   });
 }
 
 export async function GET() {
-  return getHistory({
+  return getFavorites({
     getSessionFn: getServerSession,
     prismaClient: prisma,
   });
 }
 
 export async function DELETE(req: NextRequest) {
-  return deleteFromHistory(
+  return deleteFromFavorite(
     req, {
       getSessionFn: getServerSession,
       prismaClient: prisma

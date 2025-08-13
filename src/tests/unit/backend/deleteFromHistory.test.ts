@@ -1,4 +1,4 @@
-import { deleteTranslation } from "@/lib/server/handlers/deleteTranslation";
+import { deleteFromHistory } from "@/lib/server/handlers/deleteFromHistory";
 import { mockPrisma } from "@/tests/jest.setup";
 
 const mockGetSessionFn = jest.fn();
@@ -10,14 +10,14 @@ function createRequestWithBody(body: unknown) {
   } as Request;
 }
 
-describe("deleteTranslation handler", () => {
+describe("deleteFromHistory handler", () => {
   // ------ Test 1️⃣ ------
   it("should reject unauthorized users", async () => {
     mockGetSessionFn.mockResolvedValue(null);
 
     const req = createRequestWithBody({ id: "some-id" });
 
-    const res = await deleteTranslation(req, {
+    const res = await deleteFromHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -34,7 +34,7 @@ describe("deleteTranslation handler", () => {
 
     // missing id
     const req1 = createRequestWithBody({});
-    const res1 = await deleteTranslation(req1, {
+    const res1 = await deleteFromHistory(req1, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -44,7 +44,7 @@ describe("deleteTranslation handler", () => {
 
     // invalid id type
     const req2 = createRequestWithBody({ id: 123 });
-    const res2 = await deleteTranslation(req2, {
+    const res2 = await deleteFromHistory(req2, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -59,7 +59,7 @@ describe("deleteTranslation handler", () => {
 
     const req = createRequestWithBody({ id: "trans1" });
 
-    const res = await deleteTranslation(req, {
+    const res = await deleteFromHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -81,7 +81,7 @@ describe("deleteTranslation handler", () => {
 
     const req = createRequestWithBody({ id: "trans1" });
 
-    const res = await deleteTranslation(req, {
+    const res = await deleteFromHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -104,7 +104,7 @@ describe("deleteTranslation handler", () => {
 
     const req = createRequestWithBody({ id: "trans1" });
 
-    const res = await deleteTranslation(req, {
+    const res = await deleteFromHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -121,7 +121,7 @@ describe("deleteTranslation handler", () => {
 
     const req = createRequestWithBody({ id: "trans1" });
 
-    const res = await deleteTranslation(req, {
+    const res = await deleteFromHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });

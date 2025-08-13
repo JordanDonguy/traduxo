@@ -17,6 +17,8 @@ function TranslatorInput() {
     setTranslatedTextLang,
     setExplanation,
     setIsLoading,
+    setIsFavorite,
+    setTranslationId,
     setError,
   } = useTranslationContext();
 
@@ -48,8 +50,10 @@ function TranslatorInput() {
       setTranslatedTextLang,
       setTranslatedText,
       setExplanation,
-      setError,
       setIsLoading,
+      setIsFavorite,
+      setTranslationId,
+      setError,
     })
   };
 

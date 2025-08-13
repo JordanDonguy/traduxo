@@ -1,4 +1,4 @@
-import { saveTranslation } from "@/lib/server/handlers/saveTranslation";
+import { saveToHistory } from "@/lib/server/handlers/saveToHistory";
 import { mockPrisma } from "@/tests/jest.setup";
 
 const mockGetSessionFn = jest.fn();
@@ -7,7 +7,7 @@ const makeReq = (body: unknown) => ({
   json: jest.fn().mockResolvedValue(body),
 } as unknown as Request);
 
-describe("saveTranslation handler", () => {
+describe("saveToHistory handler", () => {
   // ------ Reset mocks before each tests ------
   beforeEach(() => {
     mockPrisma.history.count.mockReset();
@@ -20,7 +20,7 @@ describe("saveTranslation handler", () => {
     mockGetSessionFn.mockResolvedValue(null);
     const req = makeReq({});
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -39,7 +39,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -61,7 +61,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -84,7 +84,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -110,7 +110,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -154,7 +154,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });
@@ -195,7 +195,7 @@ describe("saveTranslation handler", () => {
       outputLang: "fr",
     });
 
-    const res = await saveTranslation(req, {
+    const res = await saveToHistory(req, {
       getSessionFn: mockGetSessionFn,
       prismaClient: mockPrisma,
     });

@@ -10,6 +10,8 @@ type TranslationState = {
   translatedTextLang: string;
   explanation: string;
   isLoading: boolean;
+  isFavorite: boolean;
+  translationId: string | undefined;
   error: string;
   expressionPool: string[];
   setInputText: React.Dispatch<React.SetStateAction<string>>;
@@ -18,8 +20,10 @@ type TranslationState = {
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
+  setTranslationId : React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  loadTranslationFromHistory: (t: TranslationHistory) => void;
+  loadTranslationFromMenu: (t: TranslationHistory, fromFavorite: boolean) => void;
   translationHistory: TranslationHistory[];
   setTranslationHistory: React.Dispatch<React.SetStateAction<TranslationHistory[]>>;
   setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
@@ -49,6 +53,8 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [translationId, setTranslationId] = useState<string | undefined>();;
   const [error, setError] = useState<string>("");
 
   const [explanation, setExplanation] = useState<string>("");
@@ -58,7 +64,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
   // This useRef is to skip saving translation to db if translation is loaded from history
   const isLoadingFromHistoryRef = useRef(false);
-  function setLoadingFromHistory(value: boolean) {
+  function setLoadingFromMenu(value: boolean) {
     isLoadingFromHistoryRef.current = value;
   }
 
@@ -114,9 +120,16 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   }, [translationSnapshot, inputTextLang, translatedTextLang, status]);
 
   // Load a translation from user's history to main display
-  function loadTranslationFromHistory(t: TranslationHistory) {
-    setLoadingFromHistory(true)
+  function loadTranslationFromMenu(t: TranslationHistory, fromFavorite: boolean) {
+    setLoadingFromMenu(true)
     setExplanation("");
+    if (fromFavorite) {
+      setIsFavorite(true);
+      setTranslationId(t.id)
+    } else {
+      setIsFavorite(false);
+      setTranslationId(undefined);
+    };
     setTranslatedText([t.inputText, t.translation, t.alt1 ?? "", t.alt2 ?? "", t.alt3 ?? ""]);
     setInputTextLang(t.inputLang);
     setTranslatedTextLang(t.outputLang);
@@ -131,6 +144,8 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         translatedTextLang,
         explanation,
         isLoading,
+        isFavorite,
+        translationId,
         error,
         expressionPool,
         setInputText,
@@ -139,8 +154,10 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         setTranslatedTextLang,
         setExplanation,
         setIsLoading,
+        setIsFavorite,
+        setTranslationId,
         setError,
-        loadTranslationFromHistory,
+        loadTranslationFromMenu,
         translationHistory,
         setTranslationHistory,
         setExpressionPool,

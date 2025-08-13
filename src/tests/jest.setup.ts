@@ -28,9 +28,17 @@ const history = {
   delete: jest.fn(),
 };
 
+const favorite = {
+  create: jest.fn(),
+  findMany: jest.fn(),
+  findUnique: jest.fn(),
+  delete: jest.fn(),
+};
+
 const prisma = {
   user,
   history,
+  favorite,
   $queryRaw: jest.fn(),
 };
 
@@ -48,6 +56,12 @@ export type MockPrismaClient = Partial<PrismaClient> & {
   history: {
     create: jest.Mock;
     count: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    delete: jest.Mock;
+  };
+  favorite: {
+    create: jest.Mock;
     findMany: jest.Mock;
     findUnique: jest.Mock;
     delete: jest.Mock;

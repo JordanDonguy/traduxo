@@ -1,13 +1,14 @@
-import { getTranslations } from "@/lib/server/handlers/getTranslations";
+import { getHistory } from "@/lib/server/handlers/getHistory";
 import { mockPrisma } from "@/tests/jest.setup";
 
 const mockGetSession = jest.fn();
 
-describe("getTranslations", () => {
+describe("getHistory", () => {
+  // ------ Test 1️⃣ ------
   it("returns 401 if user is not authenticated", async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const res = await getTranslations({
+    const res = await getHistory({
       getSessionFn: mockGetSession,
       prismaClient: mockPrisma,
     });
@@ -20,11 +21,12 @@ describe("getTranslations", () => {
     expect(mockGetSession).toHaveBeenCalled();
   });
 
+  // ------ Test 2️⃣ ------
   it("returns 204 if history is empty", async () => {
     mockGetSession.mockResolvedValue({ user: { id: "123", email: "test@example.com" } });
     mockPrisma.history.findMany.mockResolvedValue([]);
 
-    const res = await getTranslations({
+    const res = await getHistory({
       getSessionFn: mockGetSession,
       prismaClient: mockPrisma,
     });
@@ -36,12 +38,13 @@ describe("getTranslations", () => {
     });
   });
 
+  // ------ Test 3️⃣ ------
   it("returns history with status 200", async () => {
     const mockHistory = [{ id: 1, text: "Hello" }];
     mockGetSession.mockResolvedValue({ user: { id: "123", email: "test@example.com" } });
     mockPrisma.history.findMany.mockResolvedValue(mockHistory);
 
-    const res = await getTranslations({
+    const res = await getHistory({
       getSessionFn: mockGetSession,
       prismaClient: mockPrisma,
     });
@@ -51,11 +54,12 @@ describe("getTranslations", () => {
     expect(data).toEqual(mockHistory);
   });
 
+  // ------ Test 4️⃣ ------
   it("returns 500 if an error occurs", async () => {
     mockGetSession.mockResolvedValue({ user: { id: "123", email: "test@example.com" } });
     mockPrisma.history.findMany.mockRejectedValue(new Error("DB error"));
 
-    const res = await getTranslations({
+    const res = await getHistory({
       getSessionFn: mockGetSession,
       prismaClient: mockPrisma,
     });

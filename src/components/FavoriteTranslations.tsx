@@ -7,13 +7,25 @@ import { useSession } from "next-auth/react";
 import { CircleX } from "lucide-react";
 import { toast } from "react-toastify";
 
-type TranslationHistoryProps = {
+type FavoriteTranslationProps = {
   showMenu: boolean;
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) {
-  const { translationHistory, setTranslationHistory, loadTranslationFromMenu } = useTranslationContext();
+type FavoriteTranslation = {
+  id: string;
+  inputText: string;
+  translation: string;
+  inputLang: string;
+  outputLang: string;
+  alt1: string | null;
+  alt2: string | null;
+  alt3: string | null;
+};
+
+function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps) {
+  const { loadTranslationFromMenu } = useTranslationContext();
+  const [favoriteTranslations, setFavoriteTranslations] = useState<FavoriteTranslation[]>([]);
   const { setInputLang, setOutputLang } = useLanguageContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -21,7 +33,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
 
   async function deleteTranslation(id: string) {
     try {
-      const res = await fetch("/api/history", {
+      const res = await fetch("/api/favorite", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -36,7 +48,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
       }
 
       // Remove the deleted translation from the state
-      setTranslationHistory((prev) => prev.filter((t) => t.id !== id));
+      setFavoriteTranslations((prev) => prev.filter((t) => t.id !== id));
     } catch (error: unknown) {
       let message = "An error occurred";
       if (error instanceof Error) {
@@ -49,19 +61,19 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
 
   // Fetch user's translation history on mount
   useEffect(() => {
-    async function fetchData() {
-      if (status === "loading") return;
-      if (status !== "authenticated") return setIsLoading(false);
+    if (status === "loading") return;
+    if (status !== "authenticated") return setIsLoading(false);
 
+    async function fetchData() {
       try {
-        const res = await fetch("/api/history");
+        const res = await fetch("/api/favorite");
 
         if (res.status === 204) {
           // No history — just set empty list
-          setTranslationHistory([]);
+          setFavoriteTranslations([]);
         } else if (res.ok) {
           const data = await res.json();
-          setTranslationHistory(data);
+          setFavoriteTranslations(data);
         } else {
           console.error("Failed to fetch history:", res.statusText);
         }
@@ -73,7 +85,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
     }
 
     fetchData();
-  }, [setTranslationHistory, status]);
+  }, [setFavoriteTranslations, status]);
 
   return (
     <div
@@ -83,7 +95,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
         `}>
       <div className="flex flex-col gap-6">
 
-        <h1 className="text-2xl text-center font-bold">History</h1>
+        <h1 className="text-2xl text-center font-bold">Favorites</h1>
 
         {/* -------------- Loading spinner -------------- */}
         {isLoading ? (
@@ -94,11 +106,11 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
 
           <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide">
 
-            {translationHistory.map((t, idx) => (
+            {favoriteTranslations.map((t, idx) => (
               <article
                 key={idx}
                 onClick={() => {
-                  loadTranslationFromMenu(t, false);
+                  loadTranslationFromMenu(t, true);
                   setInputLang(t.inputLang);
                   setOutputLang(t.outputLang);
                   setShowMenu(false);
@@ -131,10 +143,10 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
 
             {/* Display a message if user is not logged in or if favoriteTranslations is empty */}
             {(status !== "authenticated" && !isLoading) ? (
-              <p className="text-xl pt-10 text-center">You need to log in to have access to your translation history</p>
-            ) : !translationHistory.length && !isLoading ? (
-              <p className="text-xl pt-10 text-center">No translations found in history...</p>
-            ) : null}
+              <p className="text-xl pt-10 text-center">You need to log in to have access to your favorite translations</p>
+            ) : (!favoriteTranslations.length && !isLoading) ? (
+                <p className="text-xl pt-10 text-center">No favorite translations found...</p>
+              ) : null}
           </div>
         )}
       </div>
@@ -142,4 +154,4 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
   )
 }
 
-export default TranslationHistory
+export default FavoriteTranslation

@@ -10,8 +10,10 @@ type TranslateHelperArgs = {
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
-  setError: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
+  setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
 };
 
 // Handle a translation request to Gemini
@@ -25,8 +27,10 @@ export async function translationHelper({
   setTranslatedTextLang,
   setTranslatedText,
   setExplanation,
-  setError,
   setIsLoading,
+  setIsFavorite,
+  setTranslationId,
+  setError,
 }: TranslateHelperArgs) {
   // Blur active element to close mobile keyboard
   if (document.activeElement instanceof HTMLElement) {
@@ -37,6 +41,8 @@ export async function translationHelper({
   setError("");
   setTranslatedText([]);
   setExplanation("");
+  setIsFavorite(false);
+  setTranslationId(undefined);
 
   const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
   setInputText("");

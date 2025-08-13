@@ -187,7 +187,7 @@ select:-webkit-autofill:focus {
   width: 140px;
   height: 140px;
   border: 8px solid #b1b1b1;
-  border-top: 8px solid rgb(47, 47, 47);
+  border-top: 8px solid var(--hover);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
