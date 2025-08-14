@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { useSession } from "next-auth/react";
+import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { CircleX } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -49,30 +50,14 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
 
   // Fetch user's translation history on mount
   useEffect(() => {
-    async function fetchData() {
-      if (status === "loading") return;
-      if (status !== "authenticated") return setIsLoading(false);
-
-      try {
-        const res = await fetch("/api/history");
-
-        if (res.status === 204) {
-          // No history — just set empty list
-          setTranslationHistory([]);
-        } else if (res.ok) {
-          const data = await res.json();
-          setTranslationHistory(data);
-        } else {
-          console.error("Failed to fetch history:", res.statusText);
-        }
-      } catch (err) {
-        console.error("Error fetching history:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchData();
+    const loadHistory = async () => {
+      await fetchHistory({
+        status,
+        setTranslationHistory
+      });
+    };
+    loadHistory();
+    setIsLoading(false);
   }, [setTranslationHistory, status]);
 
   return (

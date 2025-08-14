@@ -121,9 +121,12 @@ Return EXACTLY this JSON array (no markdown, no explanation):
 // ------------------------------------- Pool Prompt -------------------------------------
 export function getPoolPrompt(lang: string) {
   return `
-Give me 50 diverse and natural idiomatic expressions or phrases in ${lang} that native speakers use in everyday casual conversation. 
-Exclude very literal or polite requests like "Could you pass the salt, please?". 
-Focus on colorful, idiomatic, or colloquial expressions that convey emotions, reactions, or common situations. 
-Output the result as a JSON array of unique strings.
+Give me 50 diverse, natural, idiomatic expressions in ${lang} that native speakers use in casual conversation. 
+They must be figurative, colorful, or slang-based — avoid any greetings, farewells, or small-talk phrases 
+(e.g., “What’s up?”, “How’s it going?”). 
+Do not include overly polite or literal requests like “Could you pass the salt, please?”. 
+Ensure at least 50% use metaphors or imagery. 
+Vary across regions where ${lang} is spoken. 
+Output only as a JSON array of unique strings, no explanations.
 `;
 }

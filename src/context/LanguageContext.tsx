@@ -29,9 +29,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   // Whenever inputLang or outputLang changes, clear the expression pool
   useEffect(() => {
     setExpressionPool([]);
-    console.log("pool reset")
   }, [inputLang, outputLang, setExpressionPool]);
-
 
   return (
     <LanguageContext.Provider

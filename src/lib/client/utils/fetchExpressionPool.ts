@@ -32,5 +32,7 @@ export async function fetchExpressionPoolHelper({
   const { text } = await res.json();
   const poolArray: string[] = JSON.parse(cleanGeminiResponse(text));
 
-  setExpressionPool(poolArray);
+  setExpressionPool(
+    poolArray.map(expr => expr.replace(/\.+$/, "")) // remove trailing dots
+  );
 }

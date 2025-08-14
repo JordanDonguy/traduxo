@@ -24,7 +24,7 @@ type FavoriteTranslation = {
 };
 
 function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps) {
-  const { loadTranslationFromMenu } = useTranslationContext();
+  const { loadTranslationFromMenu, translationId, setTranslationId, setIsFavorite } = useTranslationContext();
   const [favoriteTranslations, setFavoriteTranslations] = useState<FavoriteTranslation[]>([]);
   const { setInputLang, setOutputLang } = useLanguageContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -32,6 +32,13 @@ function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps
   const { status } = useSession();
 
   async function deleteTranslation(id: string) {
+    // If the deleted translation is currently shown in the main view,
+    // reset its favorite state in the UI.
+    if (translationId === id) {
+      setTranslationId(undefined);
+      setIsFavorite(false)
+    }
+
     try {
       const res = await fetch("/api/favorite", {
         method: "DELETE",
@@ -145,8 +152,8 @@ function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps
             {(status !== "authenticated" && !isLoading) ? (
               <p className="text-xl pt-10 text-center">You need to log in to have access to your favorite translations</p>
             ) : (!favoriteTranslations.length && !isLoading) ? (
-                <p className="text-xl pt-10 text-center">No favorite translations found...</p>
-              ) : null}
+              <p className="text-xl pt-10 text-center">No favorite translations found...</p>
+            ) : null}
           </div>
         )}
       </div>

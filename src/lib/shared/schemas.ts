@@ -27,7 +27,7 @@ export const authEnvSchema = z.object({
 export const translationsSchema = z
   .array(z.string())
   .min(2, "At least two translations required") // original + main translation
-  .max(5, "No more than five translations allowed"); // original + main + alt1 + alt2 + alt3
+  .max(6, "No more than five translations allowed"); // original + main + alt1 + alt2 + alt3
 
 export const langSchema = z
   .string()

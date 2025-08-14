@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from "react";
+import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { useSession } from "next-auth/react";
 
 type TranslationState = {
@@ -21,7 +22,7 @@ type TranslationState = {
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
-  setTranslationId : React.Dispatch<React.SetStateAction<string | undefined>>;
+  setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
   loadTranslationFromMenu: (t: TranslationHistory, fromFavorite: boolean) => void;
   translationHistory: TranslationHistory[];
@@ -87,10 +88,8 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       inputTextLang.length === 2 &&
       translatedTextLang.length === 2
     ) {
-      const saveTranslation = async () => {
-        setIsLoading(true);
-        setError("");
 
+      const saveTranslation = async () => {
         try {
           const res = await fetch("/api/history", {
             method: "POST",
@@ -107,12 +106,14 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
           if (!res.ok) {
             const data = await res.json();
             setError(data.error || "Failed to save translation");
-          }
+          };
+          await fetchHistory({
+            status,
+            setTranslationHistory
+          })
         } catch (err) {
           console.error(err);
           setError("Network error while saving translation");
-        } finally {
-          setIsLoading(false);
         }
       };
       saveTranslation();
@@ -134,6 +135,18 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
     setInputTextLang(t.inputLang);
     setTranslatedTextLang(t.outputLang);
   };
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      const loadHistory = async () => {
+        await fetchHistory({
+          status,
+          setTranslationHistory
+        })
+      };
+      loadHistory();
+    }
+  }, [status])
 
   return (
     <TranslationContext.Provider

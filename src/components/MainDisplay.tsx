@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { showAuthToasts } from "@/lib/client/utils/authToasts";
 import { Star } from "lucide-react";
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
+import { useCooldown } from "@/lib/client/hooks/useCooldown";
 import { toast } from "react-toastify";
 
 function MainDisplay() {
@@ -24,7 +25,8 @@ function MainDisplay() {
     setIsFavorite,
     translationId,
     setTranslationId,
-    error
+    error,
+    setError
   } = useTranslationContext();
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
@@ -34,6 +36,17 @@ function MainDisplay() {
   const [isExpLoading, setIsExpLoading] = useState<boolean>(false);   // To display a loading animation when explanation's loading
   const [explanationError, setExplanationError] = useState<string>(""); // Display error message if any when requesting explanation
   const [isFavLoading, setIsFavLoading] = useState<boolean>(false);   // To prevent user spamming add to favorite button
+
+
+  const cooldown = useCooldown(error.startsWith("Too many requests"));  // Starts a cooldown if rateLimiter error
+
+  // Reset error state when cooldown arrives at 0 if rateLimiting error
+  useEffect(() => {
+    if (cooldown === 0 && error.startsWith("Too many requests")) {
+      setError("")
+    }
+  }, [cooldown, error, setError]);
+
 
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {
@@ -163,7 +176,16 @@ function MainDisplay() {
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
       {error.length ? (
-        <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">{error}</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">
+            {error}
+          </p>
+          {cooldown ? (
+            <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">
+              Try again in 0:{String(cooldown).padStart(2, "0")} 🙏
+            </p>
+          ) : null}
+        </div>
       ) : isLoading ? (
         <LoadingAnimation />
       ) : translatedText.length === 0 ? (
@@ -171,7 +193,7 @@ function MainDisplay() {
           What do you need to translate today?
         </h2>
       ) : (
-        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 10 ? "mt-20 md:mt-24" : "mt-8 md:mt-12"}`}>
+        <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 10 ? "mt-20 md:mt-24" : "mt-12"}`}>
 
           <article className={`flex gap-4 pr-4 bg-[var(--bg-2)] mb-8 rounded-md duration-500 ease-in-out transform font-semibold ${mounted ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"}`}>
             <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">{inputTextLang.length <= 2 ? inputTextLang?.toUpperCase() : ""}</p>

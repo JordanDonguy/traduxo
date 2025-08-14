@@ -32,7 +32,7 @@ export function rateLimiter(
   // Increase request count
   if (++b.count > LIMIT) {
     return NextResponse.json(
-      { error: "Too many requests... Try again in a minute 🙏" },
+      { error: "Too many requests..." },
       { status: 429 }
     );
   }

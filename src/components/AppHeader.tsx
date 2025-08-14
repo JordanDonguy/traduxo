@@ -75,13 +75,13 @@ function AppHeader() {
 
     // Find first expression NOT in history
     const newExpression = expressionPool.find(
-      (expression) => !translationHistory.some(t => t.inputText === expression)
+      (expression) => !translationHistory.some(t => t.inputText.toLowerCase() === expression.toLowerCase())
     );
 
     if (!newExpression) {
-      // No new expressions left, clear pool and optionally fetch again or show message
+      // No new expressions left, clear pool and try again
       setExpressionPool([]);
-      // Optionally: await suggestTranslation() to retry, or return
+      await suggestTranslation();
       return;
     }
 

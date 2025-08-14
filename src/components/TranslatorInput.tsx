@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslationContext } from '@/context/TranslationContext';
 import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
 import { translationHelper } from "@/lib/client/utils/translate";
 import ISO6391 from "iso-639-1";
-import { Mic, CircleStop, ArrowRight } from "lucide-react";
+import { Mic, CircleStop, ArrowRightLeft } from "lucide-react";
 
 function TranslatorInput() {
   const {
@@ -26,13 +26,17 @@ function TranslatorInput() {
     inputLang,
     outputLang,
     setInputLang,
-    setOutputLang
+    setOutputLang,
+    detectedLang
   } = useLanguageContext();
 
   // showWarning state to show a message if user tries to voice input with inputLand set to "auto"
   const [showWarning, setShowWarning] = useState<boolean>(false);
   // isListening state to show a different icon whether speechRecognition is on or not
   const [isListening, setIsListening] = useState<boolean>(false);
+
+  // isSwitching state to trigger an animation when switching input/output languages
+  const [isSwitching, setIsSwitching] = useState<boolean>(false);
 
   // Get all language codes supported by ISO6391
   const languageCodes = ISO6391.getAllCodes();
@@ -95,6 +99,37 @@ function TranslatorInput() {
     }
   };
 
+  // Set a timeout ref to use for languages switching animation
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Trigger switching animation
+  const switchLanguage = () => {
+    setIsSwitching(true);
+
+    const temporaryLang = outputLang;
+    if (inputLang === "auto") {
+      setOutputLang(detectedLang);
+    } else {
+      setOutputLang(inputLang);
+    }
+    setInputLang(temporaryLang);
+  };
+
+  // Reset timeout after 80ms
+  useEffect(() => {
+    if (!isSwitching) return;
+
+    timeoutRef.current = setTimeout(() => {
+      setIsSwitching(false);
+    }, 80);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [isSwitching]);
+
   return (
     <div className="fixed z-20 bottom-0 lg:bottom-8 w-full max-w-xl lg:max-w-3xl h-40 sm:h-48 bg-[var(--bg-2)] shadow-sm rounded-t-4xl lg:rounded-4xl flex flex-col justify-between items-center py-4">
 
@@ -110,7 +145,9 @@ function TranslatorInput() {
           value={inputLang}
           onChange={(e) => setInputLang(e.target.value)}
           onClick={() => setShowWarning(false)}
-          className="appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none"
+          className={`appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center
+          hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none duration-100 origin-right ease-in-out
+          ${isSwitching ? "translate-x-full  pointer-events-none" : "translate-x-0 opacity-100"}`}
         >
           <option value="auto">✨ Auto</option>
           {languageCodes.map((code) => (
@@ -120,13 +157,20 @@ function TranslatorInput() {
           ))}
         </select>
 
-        <ArrowRight />
+        <button
+          onClick={switchLanguage}
+          className="hover:cursor-pointer hover:text-[var(--input-placeholder)] active:scale-80 duration-100"
+        >
+          <ArrowRightLeft className="filter invert-15" />
+        </button>
 
         {/* Output language select */}
         <select
           value={outputLang}
           onChange={(e) => setOutputLang(e.target.value)}
-          className="appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none"
+          className={`appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center
+          hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none duration-100 origin-left  ease-in-out
+          ${isSwitching ? "-translate-x-full  pointer-events-none" : "translate-x-0 opacity-100"}`}
         >
           {languageCodes.map((code) => (
             <option key={code} value={code}>
@@ -148,7 +192,7 @@ function TranslatorInput() {
             onChange={(e) => setInputText(e.target.value)}
             value={inputText}
             autoComplete="off"
-            maxLength={200}
+            maxLength={100}
           />
 
           <button type="submit" className="sr-only">
@@ -163,8 +207,8 @@ function TranslatorInput() {
             {!isListening ? <Mic /> : <CircleStop />}
           </button>
         </form>
-        {inputText.length === 200 ? (
-          <p className="text-sm absolute bottom-0 left-[5%] text-neutral-400 italic">200 characters max allowed</p>
+        {inputText.length === 100 ? (
+          <p className="text-sm absolute bottom-1 left-[5%] text-neutral-400 italic">100 characters max allowed</p>
         ) : ""}
       </section>
     </div>
