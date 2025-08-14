@@ -2,7 +2,7 @@ import { getPoolPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
 
 type PoolHelperArgs = {
-  detectedLang: string;
+  suggestionLang: string;
   setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -10,10 +10,10 @@ type PoolHelperArgs = {
 // Get a pool of raw expressions (no translations)
 export async function fetchExpressionPoolHelper({
   setError,
-  detectedLang,
+  suggestionLang,
   setExpressionPool,
 }: PoolHelperArgs) {
-  const poolPrompt = getPoolPrompt(detectedLang);
+  const poolPrompt = getPoolPrompt(suggestionLang);
 
   const res = await fetch("/api/gemini/complete", {
     method: "POST",

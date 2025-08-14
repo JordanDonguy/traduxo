@@ -34,6 +34,7 @@ function createMockSession(overrides?: Partial<Session>): Session {
       email: "test@example.com",
       id: "1234",
       providers: undefined,
+      systemLang: "en",
       ...overrides?.user,
     },
     ...overrides,
@@ -118,15 +119,15 @@ describe('createAuthOptions', () => {
         email: 'test@example.com',
         password: null,
         providers: ['credentials'],
-        systemLang: null,
+        systemLang: "en",
         createdAt: new Date(),
         google_linking: null,
       });
     });
 
     // ------ Test 6️⃣ ------
-    it('adds user id and providers to session when found', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'user-id', providers: ['google'] });
+    it('adds user id, providers and systemLang to session when found', async () => {
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'user-id', providers: ['google'], systemLang: "en" });
       const session = createMockSession()
       const result = await options.callbacks!.session!({
         session,
@@ -138,15 +139,16 @@ describe('createAuthOptions', () => {
 
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: 'test@example.com' },
-        select: { id: true, providers: true },
+        select: { id: true, providers: true, systemLang: true },
       });
 
-      if (result.user && 'id' in result.user && 'providers' in result.user) {
+      if (result.user && 'id' in result.user && 'providers' in result.user && result.user && "systemLang" in result.user) {
         expect(result.user.id).toBe('user-id');
         expect(result.user.providers).toEqual(['google']);
+        expect(result.user.systemLang).toEqual("en");
       } else {
         // Fail the test explicitly if user shape is unexpected
-        throw new Error('User does not have id and providers');
+        throw new Error('User does not have id, providers and system language');
       }
     });
 

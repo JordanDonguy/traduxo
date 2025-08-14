@@ -62,12 +62,13 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
           // Fetch the custom user ID and providers from Prisma using the email
           const data = await prisma.user.findUnique({
             where: { email: session.user.email },
-            select: { id: true, providers: true },
+            select: { id: true, providers: true, systemLang: true },
           });
 
           if (data) {
             session.user.id = data.id;
             session.user.providers = data.providers;
+            session.user.systemLang = data.systemLang;
           }
         }
         return session;

@@ -7,6 +7,7 @@ declare module "next-auth" {
       id: string;
       email?: string | null;
       providers?: string[];
+      systemLang: string | null;
     };
   }
 }

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useTranslationContext } from "./TranslationContext";
+import { useSession } from "next-auth/react";
 
 type LanguageState = {
   inputLang: string;
@@ -9,27 +10,42 @@ type LanguageState = {
   setInputLang: React.Dispatch<React.SetStateAction<string>>;
   setOutputLang: React.Dispatch<React.SetStateAction<string>>;
   detectedLang: string;
+  systemLang: string;
+  setSystemLang: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const LanguageContext = createContext<LanguageState | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const { setExpressionPool } = useTranslationContext();
+  const { data: session, status } = useSession();
 
   const [inputLang, setInputLang] = useState<string>("auto");
   const [outputLang, setOutputLang] = useState<string>("en");
 
+  const browserLang = (typeof window !== "undefined"
+    ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
+    : "en");
+
+  const [systemLang, setSystemLang] = useState<string>(browserLang);
+
   const detectedLang =
     inputLang === "auto"
-      ? (typeof window !== "undefined"
-        ? (navigator.language || navigator.languages?.[0] || "en").split("-")[0]
-        : "en")
+      ? systemLang
       : inputLang;
 
   // Whenever inputLang or outputLang changes, clear the expression pool
   useEffect(() => {
     setExpressionPool([]);
-  }, [inputLang, outputLang, setExpressionPool]);
+  }, [inputLang, outputLang, systemLang, setExpressionPool]);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      if(session.user.systemLang) {
+        setSystemLang(session.user.systemLang)
+      }
+    }
+  }, [status, session?.user.systemLang])
 
   return (
     <LanguageContext.Provider
@@ -39,6 +55,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         setInputLang,
         setOutputLang,
         detectedLang,
+        systemLang,
+        setSystemLang,
       }}
     >
       {children}

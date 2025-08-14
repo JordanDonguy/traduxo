@@ -7,6 +7,7 @@ import ChangePassword from "./ChangePassword";
 import DeleteAccount from "./DeleteAccount";
 import TranslationHistory from "./TranslationHistory";
 import FavoriteTranslation from "./FavoriteTranslations";
+import ExplanationLanguage from "./explanationLanguage";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -22,7 +23,8 @@ import {
   CircleX,
   BadgeMinus,
   History,
-  Star
+  Star,
+  Languages,
 } from "lucide-react";
 
 type UserMenuProps = {
@@ -39,6 +41,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
   const [showDeleteAccount, setShowDeleteAccount] = useState<boolean>(false);
   const [showHistory, setShowHistory] = useState<boolean>(false);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
+  const [showExplanationLang, setShowExplanationLang] = useState<boolean>(false);
 
   const { status, data: session } = useSession();
   const isCredentials = session?.user.providers?.includes("Credentials");
@@ -56,6 +59,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
         setShowDeleteAccount(false);
         setShowHistory(false);
         setShowFavorites(false);
+        setShowExplanationLang(false);
       }, 500)
     }
   }, [showMenu])
@@ -75,6 +79,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
     setShowDeleteAccount(false);
     setShowHistory(false);
     setShowFavorites(false);
+    setShowExplanationLang(false);
   };
 
   const handleGoogleButton = async () => {
@@ -119,11 +124,11 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
       ) : (
         <>
           <div className={`absolute w-full flex max-w-2xl mx-auto px-6 xl:px-0 pt-1 
-        ${showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites ? "justify-between" : "justify-end"}`}
+        ${showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang ? "justify-between" : "justify-end"}`}
           >
 
             {/* -------------- Back to Menu button -------------- */}
-            {showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites ? (
+            {showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang ? (
               <button
                 onClick={backToMenu}
                 className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
@@ -147,35 +152,36 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
               : showDeleteAccount ? <DeleteAccount showMenu={showMenu} setShowMenu={setShowMenu} setShowDeleteAccount={setShowDeleteAccount} />
                 : showHistory ? <TranslationHistory showMenu={showMenu} setShowMenu={setShowMenu} />
                   : showFavorites ? <FavoriteTranslation showMenu={showMenu} setShowMenu={setShowMenu} />
-                    : (
-                      <div className="max-w-2xl w-full h-full flex flex-col gap-6 items-center">
-                        <div className="flex justify-between w-full">
-                          <h2 className="text-2xl">User Settings</h2>
-                        </div>
+                    : showExplanationLang ? <ExplanationLanguage showMenu={showMenu} />
+                      : (
+                        <div className="max-w-2xl w-full h-full flex flex-col gap-6 items-center">
+                          <div className="flex justify-between w-full">
+                            <h2 className="text-2xl">User Settings</h2>
+                          </div>
 
-                        {/* -------------- Theme button -------------- */}
-                        <button
-                          onClick={() => setTheme(isDark ? "light" : "dark")}
-                          aria-label="Toggle colour scheme"
-                          className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
-                        >
-                          {isDark ? <Sun /> : <Moon />}
-                          <span className="pl-6 text-xl">Theme ({theme})</span>
-                        </button>
-
-                        {/* -------------- Login button -------------- */}
-                        {status === "authenticated" ? null : (
+                          {/* -------------- Theme button -------------- */}
                           <button
-                            onClick={() => setShowLogin(true)}
-                            aria-label="Login button"
-                            className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            onClick={() => setTheme(isDark ? "light" : "dark")}
+                            aria-label="Toggle colour scheme"
+                            className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
                           >
-                            <User />
-                            <span className="pl-6 text-xl">Login</span>
+                            {isDark ? <Sun /> : <Moon />}
+                            <span className="pl-6 text-xl">Theme ({theme})</span>
                           </button>
-                        )}
 
-                        {/* -------------- History button -------------- */}
+                          {/* -------------- Login button -------------- */}
+                          {status === "authenticated" ? null : (
+                            <button
+                              onClick={() => setShowLogin(true)}
+                              aria-label="Login button"
+                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            >
+                              <User />
+                              <span className="pl-6 text-xl">Login</span>
+                            </button>
+                          )}
+
+                          {/* -------------- History button -------------- */}
                           <button
                             onClick={() => setShowHistory(true)}
                             aria-label="History button"
@@ -185,73 +191,83 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
                             <span className="pl-6 text-xl">History</span>
                           </button>
 
-                        {/* -------------- Favorites button -------------- */}
-                        <button
-                          onClick={() => setShowFavorites(true)}
-                          aria-label="History button"
-                          className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
-                        >
-                          <Star />
-                          <span className="pl-6 text-xl">Favorites</span>
-                        </button>
-
-                        {/* -------------- Log Out button -------------- */}
-                        {status === "authenticated" ? (
+                          {/* -------------- Favorites button -------------- */}
                           <button
-                            onClick={() => {
-                              signOut({ callbackUrl: "/?logout=true" });
-                              setShowMenu(false)
-                            }}
-                            aria-label="Log Out button"
+                            onClick={() => setShowFavorites(true)}
+                            aria-label="History button"
                             className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
                           >
-                            <LogOut />
-                            <span className="pl-6 text-xl">Log Out</span>
+                            <Star />
+                            <span className="pl-6 text-xl">Favorites</span>
                           </button>
-                        ) : null}
 
-                        {/* -------------- Change password button -------------- */}
-                        {status === "authenticated" ? (
+                          {/* -------------- Explanation language button -------------- */}
                           <button
-                            onClick={() => setShowChangePassword(true)}
-                            aria-label="Change password button"
+                            onClick={() => setShowExplanationLang(true)}
+                            aria-label="History button"
                             className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
                           >
-                            <Lock />
-                            <span className="pl-6 text-xl">{isCredentials ? "Change password" : "Create password"}</span>
+                            <Languages />
+                            <span className="pl-6 text-xl">Explanation language</span>
                           </button>
-                        ) : null}
 
-                        {/* -------------- Google account linking button -------------- */}
-                        {(status === "authenticated" && !isGoogle) ? (
-                          <button
-                            onClick={handleGoogleButton}
-                            aria-label="Google account linking button"
-                            className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
-                          >
-                            <Image
-                              src="/google-logo.webp"
-                              alt="google-logo"
-                              width={24}
-                              height={24}
-                            />
-                            <span className="pl-6 text-xl">Link Google account</span>
-                          </button>
-                        ) : null}
+                          {/* -------------- Log Out button -------------- */}
+                          {status === "authenticated" ? (
+                            <button
+                              onClick={() => {
+                                signOut({ callbackUrl: "/?logout=true" });
+                                setShowMenu(false)
+                              }}
+                              aria-label="Log Out button"
+                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            >
+                              <LogOut />
+                              <span className="pl-6 text-xl">Log Out</span>
+                            </button>
+                          ) : null}
 
-                        {/* -------------- Delete account button -------------- */}
-                        {status === "authenticated" ? (
-                          <button
-                            onClick={() => setShowDeleteAccount(true)}
-                            aria-label="Delete account button"
-                            className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
-                          >
-                            <BadgeMinus />
-                            <span className="pl-6 text-xl">Delete account</span>
-                          </button>
-                        ) : null}
-                      </div>
-                    )}
+                          {/* -------------- Change password button -------------- */}
+                          {status === "authenticated" ? (
+                            <button
+                              onClick={() => setShowChangePassword(true)}
+                              aria-label="Change password button"
+                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            >
+                              <Lock />
+                              <span className="pl-6 text-xl">{isCredentials ? "Change password" : "Create password"}</span>
+                            </button>
+                          ) : null}
+
+                          {/* -------------- Google account linking button -------------- */}
+                          {(status === "authenticated" && !isGoogle) ? (
+                            <button
+                              onClick={handleGoogleButton}
+                              aria-label="Google account linking button"
+                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            >
+                              <Image
+                                src="/google-logo.webp"
+                                alt="google-logo"
+                                width={24}
+                                height={24}
+                              />
+                              <span className="pl-6 text-xl">Link Google account</span>
+                            </button>
+                          ) : null}
+
+                          {/* -------------- Delete account button -------------- */}
+                          {status === "authenticated" ? (
+                            <button
+                              onClick={() => setShowDeleteAccount(true)}
+                              aria-label="Delete account button"
+                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)]"
+                            >
+                              <BadgeMinus />
+                              <span className="pl-6 text-xl">Delete account</span>
+                            </button>
+                          ) : null}
+                        </div>
+                      )}
         </>)}
     </div>
   )

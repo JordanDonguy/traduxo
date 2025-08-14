@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslationContext } from "@/context/TranslationContext";
+import { useLanguageContext } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
 import LoadingAnimation from "./LoadingAnimation";
@@ -28,6 +29,7 @@ function MainDisplay() {
     error,
     setError
   } = useTranslationContext();
+  const { systemLang } = useLanguageContext();
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const router = useRouter();
@@ -117,7 +119,7 @@ function MainDisplay() {
     setIsExpLoading(true);
     setExplanationError("");
 
-    const prompt = getExplanationPrompt({ inputTextLang, translatedTextLang, translatedText });
+    const prompt = getExplanationPrompt({ inputTextLang, translatedTextLang, translatedText, systemLang });
 
     const res = await fetch('/api/gemini/stream', {
       method: 'POST',

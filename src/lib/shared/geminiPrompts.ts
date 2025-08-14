@@ -8,6 +8,7 @@ type ExplanationPromptParams = {
   inputTextLang: string;
   translatedTextLang: string;
   translatedText: string[];
+  systemLang: string;
 };
 
 type SuggestionPromptParams = {
@@ -56,6 +57,7 @@ export function getExplanationPrompt({
   inputTextLang,
   translatedTextLang,
   translatedText,
+  systemLang,
 }: ExplanationPromptParams): string {
   if (translatedText.length < 2) {
     throw new Error("translatedText must include at least the original and one translation.");
@@ -70,12 +72,12 @@ You are a professional bilingual translator and language teacher.
 
 Your tasks:
 1. Explain the meaning, origin, nuance, and tone of the original expression.
-2. Provide 2 or 3 clear, natural usage examples for the translation.
+2. Provide 2 or 3 clear, natural usage example phrases for the translation.
 
 Important instructions:
 - Do not write any introductory sentences.
-- Respond entirely in ${translatedTextLang}.
-- Translate all headings and list labels into ${translatedTextLang}.
+- Respond entirely in ${systemLang}.
+- Translate all headings into ${systemLang}.
 - For each example, bold **only** the original expression and its translation. Do not bold any other text or entire phrases.
 
 Format:
@@ -89,9 +91,9 @@ Write 3 very short paragraphs with level-3 headings (###) including emojis.
 For each example, use this structure:
 
 ### 💬 Example 1:
-- **Original:** {original}
-- **Translation:** {translation}
-- **Explanation:** (short explanation)
+- **${inputTextLang.toUpperCase()}:** Full sentence in ${inputTextLang} containing **${original}**
+- **${translatedTextLang.toUpperCase()}:** Full sentence in ${translatedTextLang} containing **${translations}**
+- short explanation in ${systemLang}
 
 USER  
 Original*** (${inputTextLang}): "${original}"

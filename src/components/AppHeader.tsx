@@ -8,6 +8,7 @@ import { translationHelper } from "@/lib/client/utils/translate";
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
 import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
 import { useSession } from "next-auth/react";
+import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
 import { User, Dices } from "lucide-react";
 import Logo from "./Logo";
 
@@ -38,15 +39,19 @@ function AppHeader() {
   const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
 
   async function suggestTranslation() {
+    
     setIsRolling(true);
     setTimeout(() => setIsRolling(false), 600); // animation
-
+    
     setShowMenu(false);
+    
+    // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
+    const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
 
     if (!expressionPool.length) {
       const promises = [
         suggestExpressionHelper({
-          detectedLang,
+          detectedLang: suggestionLang,
           outputLang,
           setTranslatedText,
           setInputTextLang,
@@ -63,7 +68,7 @@ function AppHeader() {
         promises.push(
           fetchExpressionPoolHelper({
             setError,
-            detectedLang,
+            suggestionLang,
             setExpressionPool,
           })
         );
@@ -88,7 +93,7 @@ function AppHeader() {
     // Request translation for the new expression
     await translationHelper({
       inputText: newExpression,
-      inputLang: detectedLang,
+      inputLang: suggestionLang,
       outputLang,
       setInputText,
       setInputTextLang,
