@@ -36,31 +36,30 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
         `}>
       <div className="flex flex-col gap-6">
 
-        <h1 className="text-2xl text-center font-bold">Explanation Language</h1>
+        <h1 className="text-2xl text-center font-medium">Explanation Language</h1>
 
-          <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide">
+        <div className="flex flex-col gap-6 overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide">
 
-            {sortedLanguageCodes.map(code => (
-              <article
-                key={code}
-                onClick={() => {
-                  changeSystemLang(code);
-                }}
-                className="
-              relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4
-              border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer
-              "
-              >
-                {systemLang === code ? (
-                  <Check className="absolute right-6 rounded-full border p-0.5" />
-                ) : null}
-                <span className="w-full flex items-center justify-center">
-                  {ISO6391.getName(code) || code} ({code.toUpperCase()})
-                </span>
-              </article>
-            ))}
+          {sortedLanguageCodes.map(code => (
+            <article
+              key={code}
+              onClick={() => {
+                changeSystemLang(code);
+              }}
+              className="
+                relative w-full flex items-center gap-2 md:gap-4 bg-[var(--bg-2)] rounded-xl p-2 md:p-4 h-16 shrink-0
+                border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer"
+            >
+              {systemLang === code ? (
+                <Check className="absolute right-6 rounded-full border p-0.5" />
+              ) : null}
+              <span className="w-full flex items-center justify-center text-lg">
+                {ISO6391.getName(code) || code} ({code.toUpperCase()})
+              </span>
+            </article>
+          ))}
 
-          </div>
+        </div>
       </div>
     </div>
   )

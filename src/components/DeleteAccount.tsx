@@ -46,7 +46,7 @@ function DeleteAccount({ showMenu, setShowMenu, setShowDeleteAccount }: DeleteAc
 
       <div className={`w-full flex flex-col gap-8 px-2 md:px-8 rounded-lg ${isLoading ? "opacity-60" : "opacity-100"}`}>
 
-        <h1 className="text-2xl text-center font-bold">Delete Account</h1>
+        <h1 className="text-2xl text-center font-medium">Delete Account</h1>
         <p className="text-center text-xl py-8">Are you sure you want to delete your account?</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-8 w-full">

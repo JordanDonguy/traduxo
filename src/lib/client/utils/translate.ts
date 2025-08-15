@@ -37,6 +37,8 @@ export async function translationHelper({
     document.activeElement.blur();
   }
 
+  if (!inputText.length) return;
+
   setIsLoading(true);
   setError("");
   setTranslatedText([]);

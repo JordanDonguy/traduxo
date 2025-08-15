@@ -11,6 +11,7 @@ import { showAuthToasts } from "@/lib/client/utils/authToasts";
 import { Star } from "lucide-react";
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
 import { useCooldown } from "@/lib/client/hooks/useCooldown";
+import LandingDisplay from "./LandingDisplay";
 import { toast } from "react-toastify";
 
 function MainDisplay() {
@@ -191,9 +192,7 @@ function MainDisplay() {
       ) : isLoading ? (
         <LoadingAnimation />
       ) : translatedText.length === 0 ? (
-        <h2 className="text-4xl text-center w-[85%]">
-          What do you need to translate today?
-        </h2>
+        <LandingDisplay />
       ) : (
         <div className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${explanation.length > 10 ? "mt-20 md:mt-24" : "mt-12"}`}>
 
@@ -256,7 +255,7 @@ function MainDisplay() {
             >
               <button
                 onClick={handleButton}
-                className={`w-full max-w-xl py-4 rounded-full border border-zinc-400 bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100`}
+                className={`w-full max-w-xl py-4 rounded-full border border-[var(--input-placeholder)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100`}
               >
                 ✨ AI explanations
               </button>

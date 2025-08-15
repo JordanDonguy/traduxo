@@ -102,7 +102,7 @@ function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps
         `}>
       <div className="flex flex-col gap-6">
 
-        <h1 className="text-2xl text-center font-bold">Favorites</h1>
+        <h1 className="text-2xl text-center font-medium">Favorites</h1>
 
         {/* -------------- Loading spinner -------------- */}
         {isLoading ? (

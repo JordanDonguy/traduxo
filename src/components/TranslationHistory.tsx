@@ -68,7 +68,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
         `}>
       <div className="flex flex-col gap-6">
 
-        <h1 className="text-2xl text-center font-bold">History</h1>
+        <h1 className="text-2xl text-center font-medium">History</h1>
 
         {/* -------------- Loading spinner -------------- */}
         {isLoading ? (

@@ -97,7 +97,7 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
 
       <div className={`flex flex-col gap-6 ${isLoading ? "opacity-60" : "opacity-100"}`}>
 
-        <h1 className="text-2xl text-center font-bold">{isCredentials ? "Change password" : "Create password"}</h1>
+        <h1 className="text-2xl text-center font-medium">{isCredentials ? "Change password" : "Create password"}</h1>
 
         {/* -------------- Display error if any -------------- */}
         {error && <p className="text-red-500 text-center">{error}</p>}
