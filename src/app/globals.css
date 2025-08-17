@@ -8,6 +8,7 @@
   --input: #dee5e7;
   --input-placeholder: #8b8b8b;
   --input-border: #a6a6a6;
+  --border: #a6a6a6;
   --hover: #cacacf;
   --hover-2: #cacacf;
   --btn: #dbe0e1;
@@ -23,7 +24,8 @@
   --menu: #1a1a1e;
   --input: #0f0f11;
   --input-placeholder: #a3a3a3;
-  --input-border: #404040;
+  --input-border: #424242;
+  --border: #7d7d7d;
   --hover: #3f3f46;
   --hover-2: #29292e;
   --btn: #1b1b1d;
@@ -37,7 +39,8 @@
     --menu: #151617;
     --input: #0f0f11;
     --input-placeholder: #a3a3a3;
-    --input-border: #404040;
+    --input-border: #424242;
+    --border: #696969;
     --hover: #3f3f46;
     --hover-2: #29292d;
     --btn: #1b1b1d;
@@ -196,6 +199,7 @@ select:-webkit-autofill:focus {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -207,8 +211,10 @@ select:-webkit-autofill:focus {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 ::-webkit-scrollbar {

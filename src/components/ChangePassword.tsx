@@ -161,7 +161,7 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
         {/* -------------- Submit button -------------- */}
         <button
           type="submit"
-          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-zinc-400 bg-[var(--btn)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
+          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
         >
           {isCredentials ? "Change password" : "Create password"}
         </button>

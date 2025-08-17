@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // Shared rate limiter store
 export const rateLimitStore = {
   WINDOW: 60_000, // 1 minute
-  LIMIT: 25,
+  LIMIT: 30,
   buckets: new Map<string, { count: number; reset: number }>(),
 };
 

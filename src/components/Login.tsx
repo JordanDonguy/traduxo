@@ -177,7 +177,7 @@ export default function Login({ showMenu, setShowMenu }: LoginProps) {
         {/* -------------- Submit button -------------- */}
         <button
           type="submit"
-          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-zinc-400 bg-[var(--btn)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
+          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
         >
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
@@ -187,7 +187,7 @@ export default function Login({ showMenu, setShowMenu }: LoginProps) {
           id="google-btn"
           type="button"
           onClick={handleGoogleButton}
-          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-zinc-400 bg-[var(--btn)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
+          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--border)] bg-[var(--menu)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
         >
           <Image
             src="/google-logo.webp"

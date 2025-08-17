@@ -255,7 +255,7 @@ function MainDisplay() {
             >
               <button
                 onClick={handleButton}
-                className={`w-full max-w-xl py-4 rounded-full border border-[var(--input-placeholder)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100`}
+                className={`w-full max-w-xl py-4 rounded-full border border-[var(--border)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100`}
               >
                 ✨ AI explanations
               </button>
