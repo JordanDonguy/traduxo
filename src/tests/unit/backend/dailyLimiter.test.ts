@@ -32,14 +32,14 @@ describe('createQuotaChecker', () => {
   // ------ Test 1️⃣ ------
   it('allows requests under quota and increments count', async () => {
     const req = createRequest('1.2.3.4');
-    mockRedisClient.get.mockResolvedValue(10);
+    mockRedisClient.get.mockResolvedValue(2);
 
     const result = await quotaChecker.checkQuota(req);
 
     expect(mockRedisClient.get).toHaveBeenCalledWith('rl:1.2.3.4');
     expect(mockRedisClient.incr).toHaveBeenCalledWith('rl:1.2.3.4');
     expect(mockRedisClient.expire).not.toHaveBeenCalled();
-    expect(result).toEqual({ allowed: true, remaining: QUOTA - 10 - 1 });
+    expect(result).toEqual({ allowed: true, remaining: QUOTA - 2 - 1 });
   });
 
   // ------ Test 2️⃣ ------

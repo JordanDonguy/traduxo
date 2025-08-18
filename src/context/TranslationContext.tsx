@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from "react";
+import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { useSession } from "next-auth/react";
 
@@ -10,20 +11,16 @@ type TranslationState = {
   inputTextLang: string;
   translatedTextLang: string;
   explanation: string;
-  isLoading: boolean;
   isFavorite: boolean;
   translationId: string | undefined;
-  error: string;
   expressionPool: string[];
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  setError: React.Dispatch<React.SetStateAction<string>>;
   loadTranslationFromMenu: (t: TranslationHistory, fromFavorite: boolean) => void;
   translationHistory: TranslationHistory[];
   setTranslationHistory: React.Dispatch<React.SetStateAction<TranslationHistory[]>>;
@@ -46,6 +43,7 @@ type TranslationHistory = {
 const TranslationContext = createContext<TranslationState | undefined>(undefined);
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
+  const { setError } = useApp();
   const { status } = useSession();
   const [inputText, setInputText] = useState<string>("");
   const [translatedText, setTranslatedText] = useState<string[]>([]);
@@ -53,10 +51,8 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [translationId, setTranslationId] = useState<string | undefined>();;
-  const [error, setError] = useState<string>("");
 
   const [explanation, setExplanation] = useState<string>("");
 
@@ -118,7 +114,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       };
       saveTranslation();
     }
-  }, [translationSnapshot, inputTextLang, translatedTextLang, status]);
+  }, [translationSnapshot, inputTextLang, translatedTextLang, status, setError]);
 
   // Load a translation from user's history to main display
   function loadTranslationFromMenu(t: TranslationHistory, fromFavorite: boolean) {
@@ -156,20 +152,16 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         inputTextLang,
         translatedTextLang,
         explanation,
-        isLoading,
         isFavorite,
         translationId,
-        error,
         expressionPool,
         setInputText,
         setTranslatedText,
         setInputTextLang,
         setTranslatedTextLang,
         setExplanation,
-        setIsLoading,
         setIsFavorite,
         setTranslationId,
-        setError,
         loadTranslationFromMenu,
         translationHistory,
         setTranslationHistory,

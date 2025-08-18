@@ -2,14 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 import { checkQuota } from '@/lib/server/dailyLimiter';
+import authOptions from "../auth/authOptions";
+import { getServerSession } from 'next-auth';
 
 // -------------- Config --------------
-export const runtime = 'nodejs';  // switch to 'edge' for lower latency
+export const runtime = 'nodejs';
 
-// Schema to validate input and keep handler tidy
+// Schema to validate input
 const BodySchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
   model: z.string().optional().default('gemini-2.5-flash-lite-preview-06-17'),
+  isSuggestion: z.boolean().optional(),
 });
 
 // -------------- Inner handler --------------
@@ -18,33 +21,43 @@ export async function geminiComplete(
   {
     checkQuotaFn,
     genai,
+    getSessionFn = getServerSession,
   }: {
     checkQuotaFn: typeof checkQuota;
     genai: InstanceType<typeof GoogleGenAI>;
+    getSessionFn?: typeof getServerSession;
   }
 ) {
-  // 1. Parse and validate input using Zod schema
+  // 1. Parse & validate input
   const parse = BodySchema.safeParse(await req.json());
   if (!parse.success) {
     return NextResponse.json({ error: parse.error.flatten() }, { status: 400 });
   }
 
-  const { prompt, model } = parse.data;
+  const { prompt, model, isSuggestion } = parse.data;
 
-  // 2. Check rate limiting quotas and return a 429 error if quota exceeded
-  const { allowed, remaining } = await checkQuotaFn(req as NextRequest);
-  if (!allowed) {
-    return NextResponse.json(
-      {
-        error:
-          "Sorry, you've reached your translation limit for today... 😥\nPlease come again tomorrow 🙏",
-      },
-      { status: 429 }
-    );
+  // 2. Check auth status
+  const session = await getSessionFn(authOptions);
+  const isLoggedIn = !!session?.user;
+
+  // 3. Quota only for guest + suggestion mode
+  let remaining: number | undefined;
+  if (!isLoggedIn && isSuggestion) {
+    const quota = await checkQuotaFn(req as NextRequest);
+    if (!quota.allowed) {
+      return NextResponse.json(
+        {
+          error:
+            "To continue using the suggestion feature, please log in 🙏\nDon't worry, it only takes less than a minute 😉",
+        },
+        { status: 429 }
+      );
+    }
+    remaining = quota.remaining;
   }
 
   try {
-    // 3. Call Gemini API with prompt and model
+    // 4. Call Gemini API
     const result = await genai.models.generateContent({
       model,
       contents: prompt,
@@ -55,9 +68,13 @@ export async function geminiComplete(
       },
     });
 
-    // 4. Build response and add remaining‑quota header
+    // 5. Build response
     const res = NextResponse.json({ text: result.text });
-    res.headers.set('X-RateLimit-Remaining', remaining.toString());
+
+    if (remaining !== undefined) {
+      res.headers.set('X-RateLimit-Remaining', remaining.toString());
+    }
+
     return res;
   } catch (err) {
     console.error(err);

@@ -7,7 +7,10 @@ export function useCooldown(start: boolean) {
   const [count, setCount] = useState(60);
 
   useEffect(() => {
-    if (!start) return;
+    if (!start) {
+      setCount(0);
+      return;
+    }
     if (count === 0) setCount(60);
 
     const interval = setInterval(() => {

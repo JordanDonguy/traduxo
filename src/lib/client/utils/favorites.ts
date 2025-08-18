@@ -8,6 +8,8 @@ export async function addToFavorite(
   setIsFavorite: SetState<boolean>
 ) {
   try {
+    setIsFavorite(true);
+
     const res = await fetch("/api/favorite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -15,15 +17,18 @@ export async function addToFavorite(
     });
 
     if (res.status === 401) {
+      setIsFavorite(false);
       return "You need to log in to add translation to favorites"
     }
 
-    if (!res.ok) throw new Error("Failed to add favorite");
+    if (!res.ok) {
+      setIsFavorite(false);
+      throw new Error("Failed to add favorite");
+    }
 
     const data = await res.json();
     // Assume backend returns { id: "favoriteId" }
     setTranslationId(data.id);
-    setIsFavorite(true);
   } catch (error) {
     console.error("Error adding favorite:", error);
   }

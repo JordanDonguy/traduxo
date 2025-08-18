@@ -1,24 +1,26 @@
 "use client"
 
 import { useState } from "react";
+import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
 import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
 import { useSession } from "next-auth/react";
+import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
 import { Dices, Languages } from "lucide-react";
 
 function LandingDisplay() {
+  const { setIsLoading, setError } = useApp();
+
   const {
     setTranslatedText,
     setInputTextLang,
     setTranslatedTextLang,
     setExplanation,
-    setIsLoading,
     setIsFavorite,
     setTranslationId,
-    setError,
     expressionPool,
     setExpressionPool,
   } = useTranslationContext();
@@ -26,6 +28,7 @@ function LandingDisplay() {
   const { detectedLang, outputLang } = useLanguageContext();
 
   const { status } = useSession();
+  const { waitForStatus } = useWaitForAuthStatus();
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
 
@@ -33,6 +36,11 @@ function LandingDisplay() {
   async function suggestExpression() {
     // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
     const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
+
+    setIsLoading(true);   // Trigger loading animation
+
+    // Wait for session status to be defined (authenticated or not)
+    await waitForStatus();
 
     if (!expressionPool.length) {
       const promises = [

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from '@/context/TranslationContext';
 import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
@@ -9,6 +10,8 @@ import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRightLeft } from "lucide-react";
 
 function TranslatorInput() {
+  const { setIsLoading, setError } = useApp();
+
   const {
     inputText,
     setInputText,
@@ -16,10 +19,8 @@ function TranslatorInput() {
     setInputTextLang,
     setTranslatedTextLang,
     setExplanation,
-    setIsLoading,
     setIsFavorite,
     setTranslationId,
-    setError,
   } = useTranslationContext();
 
   const {

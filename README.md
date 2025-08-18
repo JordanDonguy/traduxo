@@ -76,8 +76,7 @@ traduxo/
 │   └── shared/              # Shared code: Gemini prompts & Zod schemas
 ├── types/                   # TypeScript type definitions
 ├── context/                 # React context for global state
-├── tests/                   # Jest unit tests
-└── providers/               # React context providers
+└── tests/                   # Jest unit tests
 ```
 
 

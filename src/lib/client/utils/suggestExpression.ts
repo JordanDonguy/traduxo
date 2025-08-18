@@ -48,7 +48,7 @@ export async function suggestExpressionHelper({
   const res = await fetch("/api/gemini/complete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify({ prompt, isSuggestion: true }),
   });
 
   if (res.status === 429) {

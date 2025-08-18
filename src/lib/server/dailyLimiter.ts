@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 import type { NextRequest } from "next/server";
 
-export const QUOTA = 500;            // 50 requests
+export const QUOTA = 3;            // 3 requests
 export const WINDOW = 24 * 60 * 60;  // 1 day
 
 // Extract IP from request headers

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
-import AppProvider from "@/providers/AppProvider";
+import AppProvider from "@/context/AppContext";
 
 const openSans = Open_Sans({
   variable: "--font-open_sans",

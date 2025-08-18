@@ -112,7 +112,8 @@ export function getSuggestionPrompt({
 You are a native-speaking language teacher and idiom expert.
 
 Your task:
-Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
+Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Focus on diversity.
+Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
 
 **Output**
 Return EXACTLY this JSON array (no markdown, no explanation):

@@ -2,27 +2,29 @@
 
 import { useState } from "react";
 import UserMenu from "./UserMenu";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
+import { useLanguageContext } from "@/context/LanguageContext";
 import { translationHelper } from "@/lib/client/utils/translate";
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
 import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
 import { useSession } from "next-auth/react";
+import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
 import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
 import { User, Dices } from "lucide-react";
 import Logo from "./Logo";
 
 function AppHeader() {
+  const { setIsLoading, setError } = useApp();
+
   const {
     setInputText,
     setTranslatedText,
     setInputTextLang,
     setTranslatedTextLang,
     setExplanation,
-    setIsLoading,
     setIsFavorite,
     setTranslationId,
-    setError,
     expressionPool,
     setExpressionPool,
     translationHistory,
@@ -34,6 +36,7 @@ function AppHeader() {
   } = useLanguageContext();
 
   const { status } = useSession();
+  const { waitForStatus } = useWaitForAuthStatus();  // A function that resolve a promise once session status is set
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
@@ -47,6 +50,11 @@ function AppHeader() {
     
     // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
     const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
+
+    setIsLoading(true);   // Trigger loading animation
+
+    // Wait for session status to be defined (authenticated or not)
+    await waitForStatus();
 
     if (!expressionPool.length) {
       const promises = [

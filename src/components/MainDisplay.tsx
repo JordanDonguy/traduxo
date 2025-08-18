@@ -1,5 +1,6 @@
 "use client"
 
+import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
@@ -15,6 +16,8 @@ import LandingDisplay from "./LandingDisplay";
 import { toast } from "react-toastify";
 
 function MainDisplay() {
+  const { isLoading, error, setError, setShowLoginForm } = useApp();
+
   const {
     translatedText,
     setTranslatedText,
@@ -22,15 +25,14 @@ function MainDisplay() {
     translatedTextLang,
     explanation,
     setExplanation,
-    isLoading,
     isFavorite,
     setIsFavorite,
     translationId,
     setTranslationId,
-    error,
-    setError
   } = useTranslationContext();
+
   const { systemLang } = useLanguageContext();
+
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const router = useRouter();
@@ -179,16 +181,29 @@ function MainDisplay() {
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
       {error.length ? (
-        <div className="flex flex-col gap-2">
+        <div className={`flex flex-col ${error.startsWith("To continue using the suggestion feature") ? "gap-8" : 'gap-2'}`}>
           <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">
             {error}
           </p>
+
+          {error.startsWith("To continue using the suggestion feature") && (
+            <button
+              className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
+              onClick={() => {
+                setShowLoginForm(true);
+              }}
+            >
+              Login
+            </button>
+          )}
+
           {cooldown ? (
             <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">
               Try again in 0:{String(cooldown).padStart(2, "0")} 🙏
             </p>
           ) : null}
         </div>
+
       ) : isLoading ? (
         <LoadingAnimation />
       ) : translatedText.length === 0 ? (

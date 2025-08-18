@@ -2,6 +2,7 @@ import { geminiComplete } from "@/lib/server/handlers/geminiComplete";
 import { checkQuota } from '@/lib/server/dailyLimiter';
 import { GoogleGenAI } from '@google/genai';
 
+
 type GenerateContentFn = typeof GoogleGenAI.prototype.models.generateContent;
 
 // ------ Mock config ------
@@ -13,6 +14,8 @@ const mockGenai = {
   },
 };
 
+const mockGetSession = jest.fn();
+
 const makeRequest = (body: unknown) =>
   new Request('http://localhost', {
     method: 'POST',
@@ -20,51 +23,55 @@ const makeRequest = (body: unknown) =>
     headers: { 'Content-Type': 'application/json' },
   });
 
-// ------ Tests------
+// ------ Tests ------
 describe('geminiComplete', () => {
+  beforeEach(() => {
+     mockGetSession.mockResolvedValue({ user: { email: "user@example.com" } });
+  });
+
   // ------ Test 1️⃣ ------
   it('returns 400 if prompt is missing', async () => {
     const req = makeRequest({});
 
-    // We cast our partial mock to `GoogleGenAI` instance to satisfy the handler's type,
-    // even though the mock only implements some methods. This is a common pattern
-    // to trick TypeScript while keeping type safety on mocked methods.
     const res = await geminiComplete(req, {
       checkQuotaFn: mockCheckQuotaFn,
       genai: mockGenai as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: async () => null, // guest
     });
 
     expect(res.status).toBe(400);
   });
 
   // ------ Test 2️⃣ ------
-  it('returns 429 if quota exceeded', async () => {
+  it('returns 429 if guest exceeds quota on suggestion', async () => {
     mockCheckQuotaFn.mockResolvedValue({ allowed: false, remaining: 0 });
 
-    const req = makeRequest({ prompt: 'hello' });
+    const req = makeRequest({ prompt: 'hello', isSuggestion: true });
 
     const res = await geminiComplete(req, {
       checkQuotaFn: mockCheckQuotaFn,
       genai: mockGenai as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: async () => null, // guest
     });
 
     expect(res.status).toBe(429);
     const data = await res.json();
-    expect(data.error).toMatch(/translation limit/i);
+    expect(data.error).toMatch(/please log in/i);
   });
 
   // ------ Test 3️⃣ ------
-  it('calls Gemini API and returns text on success', async () => {
+  it('calls Gemini API and returns text on success for guest', async () => {
     mockCheckQuotaFn.mockResolvedValue({ allowed: true, remaining: 42 });
     mockGenai.models.generateContent.mockResolvedValue(
       { text: 'fake-response' } as Awaited<ReturnType<GenerateContentFn>>
     );
 
-    const req = makeRequest({ prompt: 'translate this' });
+    const req = makeRequest({ prompt: 'translate this', isSuggestion: true });
 
     const res = await geminiComplete(req, {
       checkQuotaFn: mockCheckQuotaFn,
       genai: mockGenai as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: async () => null, // guest
     });
 
     expect(mockGenai.models.generateContent).toHaveBeenCalledWith({
@@ -81,15 +88,38 @@ describe('geminiComplete', () => {
   });
 
   // ------ Test 4️⃣ ------
-  it('handles Gemini API errors', async () => {
-    mockCheckQuotaFn.mockResolvedValue({ allowed: true, remaining: 10 });
-    mockGenai.models.generateContent.mockRejectedValue(new Error('API failed'));
+  it('skips quota when logged in even if isSuggestion', async () => {
+    mockGenai.models.generateContent.mockResolvedValue(
+      { text: 'logged-in-response' } as Awaited<ReturnType<GenerateContentFn>>
+    );
 
-    const req = makeRequest({ prompt: 'something' });
+    const req = makeRequest({ prompt: 'translate this', isSuggestion: true });
 
     const res = await geminiComplete(req, {
       checkQuotaFn: mockCheckQuotaFn,
       genai: mockGenai as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: mockGetSession,
+    });
+
+    // Quota should not be called
+    expect(mockCheckQuotaFn).not.toHaveBeenCalled();
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.text).toBe('logged-in-response');
+  });
+
+  // ------ Test 5️⃣ ------
+  it('handles Gemini API errors', async () => {
+    mockCheckQuotaFn.mockResolvedValue({ allowed: true, remaining: 10 });
+    mockGenai.models.generateContent.mockRejectedValue(new Error('API failed'));
+
+    const req = makeRequest({ prompt: 'something', isSuggestion: true });
+
+    const res = await geminiComplete(req, {
+      checkQuotaFn: mockCheckQuotaFn,
+      genai: mockGenai as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: async () => null, // guest
     });
 
     expect(res.status).toBe(500);

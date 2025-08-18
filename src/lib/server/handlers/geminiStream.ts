@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
-import { checkQuota } from '@/lib/server/dailyLimiter';
 
 // -------------- Config --------------
 export const runtime = 'nodejs'; // switch to 'edge' for lower latency
@@ -16,10 +15,8 @@ const BodySchema = z.object({
 export async function geminiStream(
   req: Request,
   {
-    checkQuotaFn,
     genai,
   }: {
-    checkQuotaFn: typeof checkQuota;
     genai: InstanceType<typeof GoogleGenAI>;
   }
 ) {
@@ -30,25 +27,13 @@ export async function geminiStream(
   }
   const { prompt, model } = parse.data;
 
-  // 2. Check rate limiting quotas and return a 429 error if quota is exceeded
-  const { allowed, remaining } = await checkQuotaFn(req as NextRequest);
-  if (!allowed) {
-    return NextResponse.json(
-      {
-        error:
-          "Sorry, you've reached your translation limit for today... 😥\nPlease come again tomorrow 🙏",
-      },
-      { status: 429 }
-    );
-  }
-
-  // 3. Stream Gemini response
+  // 2. Stream Gemini response
   const stream = await genai.models.generateContentStream({
     model,
     contents: prompt,
   });
 
-  // 4. Create a ReadableStream for chunked output
+  // 3. Create a ReadableStream for chunked output
   const encoder = new TextEncoder();
   const readableStream = new ReadableStream({
     async start(controller) {
@@ -65,11 +50,6 @@ export async function geminiStream(
     },
   });
 
-  // 5. Return a streaming response with quota header
-  return new Response(readableStream, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'X-RateLimit-Remaining': remaining.toString(),
-    },
-  });
+  // 4. Return a streaming response
+  return new Response(readableStream);
 }

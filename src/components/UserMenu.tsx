@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react";
+import { useApp } from "@/context/AppContext";
 import { useTheme } from "next-themes";
 import Login from "./Login";
 import ChangePassword from "./ChangePassword";
@@ -33,6 +34,8 @@ type UserMenuProps = {
 };
 
 function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
+  const { showLoginForm, setShowLoginForm } = useApp();
+
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -49,6 +52,15 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
 
   // avoid React‑server‑component → client hydration mismatch
   useEffect(() => setMounted(true), []);
+
+  // Open menu and login submenu if global showLoginForm state is true
+  useEffect(() => {
+    if (showLoginForm) {
+      setShowMenu(true);
+      setShowLogin(true);
+      setShowLoginForm(false);
+    }
+  }, [showLoginForm, setShowLoginForm, setShowMenu, setShowLogin])
 
   // When closing menu, reset submenus state (so that menu reopens on main page next time)
   useEffect(() => {
