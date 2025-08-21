@@ -4,9 +4,7 @@ import { mockPrisma } from "@/tests/jest.setup";
 describe("handleGoogleSignIn", () => {
   // ------ Test 1️⃣ ------
   it("throws error if email is missing", async () => {
-    await expect(handleGoogleSignIn(""))
-      .rejects
-      .toThrow("Missing email");
+    await expect(handleGoogleSignIn("")).rejects.toThrow("Missing email");
   });
 
   // ------ Test 2️⃣ ------
@@ -37,7 +35,7 @@ describe("handleGoogleSignIn", () => {
   });
 
   // ------ Test 4️⃣ ------
-  it("blocks sign-in if credentials account exists without Google provider and no linking", async () => {
+  it("blocks sign-in if credentials account exists without Google provider", async () => {
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "123",
       email: "test@example.com",
@@ -45,62 +43,29 @@ describe("handleGoogleSignIn", () => {
       google_linking: null,
     });
 
-    const result = await handleGoogleSignIn("test@example.com");
-
-    expect(result).toEqual({ success: false, reason: "NeedGoogleLinking" });
-  });
-
-  // ------ Test 5️⃣ ------
-  it("allows sign-in and updates providers if linking initiated within 60s", async () => {
-    const recentLinkingDate = new Date(Date.now() - 30 * 1000);
-
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "123",
-      email: "test@example.com",
-      providers: ["Credentials"],
-      google_linking: recentLinkingDate.toISOString(),
-    });
-    mockPrisma.user.update.mockResolvedValue({});
+    mockPrisma.user.update.mockResolvedValue({}); // simulate linking timestamp update
 
     const result = await handleGoogleSignIn("test@example.com");
 
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { id: "123" },
-      data: { providers: ["Credentials", "Google"], google_linking: null },
+      data: { google_linking: expect.any(String) },
     });
-    expect(result).toEqual({ success: true });
+    expect(result).toEqual({ success: false, reason: "NeedGoogleLinking" });
   });
 
-  // ------ Test 6️⃣ ------
-  it("returns UpdateFailed if updating providers throws error", async () => {
-    const recentLinkingDate = new Date(Date.now() - 30 * 1000);
-
+  // ------ Test 5️⃣ ------
+  it("returns UpdateFailed if updating google_linking fails", async () => {
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "123",
       email: "test@example.com",
       providers: ["Credentials"],
-      google_linking: recentLinkingDate.toISOString(),
+      google_linking: null,
     });
     mockPrisma.user.update.mockRejectedValue(new Error("DB error"));
 
     const result = await handleGoogleSignIn("test@example.com");
 
     expect(result).toEqual({ success: false, reason: "UpdateFailed" });
-  });
-
-  // ------ Test 7️⃣ ------
-  it("blocks if linking time is more than 60s ago", async () => {
-    const oldLinkingDate = new Date(Date.now() - 2 * 60 * 1000);
-
-    mockPrisma.user.findUnique.mockResolvedValue({
-      id: "123",
-      email: "test@example.com",
-      providers: ["Credentials"],
-      google_linking: oldLinkingDate.toISOString(),
-    });
-
-    const result = await handleGoogleSignIn("test@example.com");
-
-    expect(result).toEqual({ success: false, reason: "NeedGoogleLinking" });
   });
 });

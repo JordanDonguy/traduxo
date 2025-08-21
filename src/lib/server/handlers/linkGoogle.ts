@@ -1,38 +1,83 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import authOptions from "@/lib/server/auth/authOptions";
 import type { PrismaClient } from "@prisma/client/extension";
+import bcrypt from "bcrypt";
+import sanitizeHtml from "sanitize-html";
+import { loginSchema } from "@/lib/shared/schemas";
 
 export async function linkGoogle(
-  {
-    getSessionFn,
-    prismaClient,
-  }: {
-    getSessionFn: typeof getServerSession;
-    prismaClient: Partial<PrismaClient>;
-  }
-) {
-  // 1. Get user session
-  const session = await getSessionFn(authOptions);
-
-  // 2. If no session, return 401 Unauthorized
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+    req: Request,
+    {
+      prismaClient,
+    }: {
+      prismaClient: Partial<PrismaClient>;
+    }) {
   try {
-    // 3. Insert a Date in the google_linking column
-    await prismaClient.user.update({
-      where: { email: session.user.email },
-      data: { google_linking: new Date().toISOString() },
+    const body = await req.json();
+
+    // 1. Validate input with Zod
+    const parsed = loginSchema.safeParse({
+      email: sanitizeHtml(body.email),
+      password: sanitizeHtml(body.password),
     });
 
-    // 4. Respond with success
-    return NextResponse.json({ message: "Google linking started" }, { status: 200 });
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid email or password." },
+        { status: 400 }
+      );
+    }
 
+    const { email, password } = parsed.data;
+
+    // 2. Fetch user from DB
+    const user = await prismaClient.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    // 3. Check password
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) {
+      return NextResponse.json(
+        { error: "Incorrect password." },
+        { status: 401 }
+      );
+    }
+
+    // 4. Check google_linking timestamp
+    const now = new Date();
+    const linkingDate = user.google_linking ? new Date(user.google_linking) : null;
+
+    if (!linkingDate || now.getTime() - linkingDate.getTime() > 10 * 60 * 1000) {
+      return NextResponse.json(
+        { error: "For security, Google linking requests expire after 10 minutes. Please sign in with Google again to restart the process." },
+        { status: 400 }
+      );
+    }
+
+    // 5. Add Google provider
+    await prismaClient.user.update({
+      where: { email },
+      data: {
+        providers: {
+          push: "Google",
+        },
+        google_linking: null, // reset linking timestamp
+      },
+    });
+
+    return NextResponse.json(
+      { message: "Google account linked successfully" },
+      { status: 200 }
+    );
   } catch (err) {
-    // 5. Handle unexpected Prisma/database errors
-    console.error("Prisma update error:", err);
-    return NextResponse.json({ error: "Database update failed" }, { status: 500 });
+    console.error("Error linking Google account:", err);
+    return NextResponse.json(
+      { error: "Internal server error." },
+      { status: 500 }
+    );
   }
 }

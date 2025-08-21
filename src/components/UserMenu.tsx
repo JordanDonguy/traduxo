@@ -11,9 +11,6 @@ import ExplanationLanguage from "./ExplanationLanguage";
 import FavoriteTranslation from "./FavoriteTranslations";
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
-import { toast } from "react-toastify";
-import { signIn } from "next-auth/react";
-import Image from "next/image";
 import {
   Moon,
   Sun,
@@ -35,7 +32,6 @@ type UserMenuProps = {
 
 function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
   const { showLoginForm, setShowLoginForm } = useApp();
-
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
 
@@ -48,9 +44,8 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
 
   const { status, data: session } = useSession();
   const isCredentials = session?.user.providers?.includes("Credentials");
-  const isGoogle = session?.user.providers?.includes("Google");
 
-  // avoid React‑server‑component → client hydration mismatch
+  // Avoid hydration mismatch
   useEffect(() => setMounted(true), []);
 
   // Open menu and login submenu if global showLoginForm state is true
@@ -60,7 +55,7 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
       setShowLogin(true);
       setShowLoginForm(false);
     }
-  }, [showLoginForm, setShowLoginForm, setShowMenu, setShowLogin])
+  }, [showLoginForm, setShowLoginForm, setShowMenu, setShowLogin]);
 
   // When closing menu, reset submenus state (so that menu reopens on main page next time)
   useEffect(() => {
@@ -72,19 +67,17 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
         setShowHistory(false);
         setShowFavorites(false);
         setShowExplanationLang(false);
-      }, 500)
+      }, 500);
     }
-  }, [showMenu])
+  }, [showMenu]);
 
-  // Fetch user theme preference
+  // Theme detection
   const isDark = useMemo(() => {
     if (!mounted) return false;
-    return theme === 'dark' || (
-      theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches
-    );
+    return theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   }, [theme, mounted]);
 
-  // Back to menu (left arrow button)
+  // Back to main menu
   const backToMenu = () => {
     setShowLogin(false);
     setShowChangePassword(false);
@@ -92,31 +85,6 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
     setShowHistory(false);
     setShowFavorites(false);
     setShowExplanationLang(false);
-  };
-
-  const handleGoogleButton = async () => {
-    try {
-      // Call API route to mark start of google linking
-      const res = await fetch("/api/auth/google-linking", {
-        method: "POST",
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        toast.error(data.error || "Failed to start Google linking");
-        setShowMenu(false)
-        return
-      }
-
-      // Proceed with Google sign-in and callback to your linking page
-      await signIn("google", {
-        callbackUrl: "/?linked=google"
-      });
-    } catch (err) {
-      toast.error(`Google account linking failed: ${err}`)
-      console.error("Google account linking failed:", err);
-      setShowMenu(false);
-    }
   };
 
   if (!mounted) return null;
@@ -248,23 +216,6 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
                               >
                                 <Lock />
                                 <span className="pl-6 text-xl">{isCredentials ? "Change password" : "Create password"}</span>
-                              </button>
-                            ) : null}
-
-                            {/* -------------- Google account linking button -------------- */}
-                            {(status === "authenticated" && !isGoogle) ? (
-                              <button
-                                onClick={handleGoogleButton}
-                                aria-label="Google account linking button"
-                                className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                              >
-                                <Image
-                                  src="/google-logo.webp"
-                                  alt="google-logo"
-                                  width={24}
-                                  height={24}
-                                />
-                                <span className="pl-6 text-xl">Link Google account</span>
                               </button>
                             ) : null}
 

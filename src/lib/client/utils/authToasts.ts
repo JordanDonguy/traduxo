@@ -11,8 +11,7 @@ const errorMessages: Record<string, string> = {
   NoUserFound: "User not found, please sign up",
   NeedToCreatePassword: "This account uses Google sign-in. Log in with Google first, then set a password in your profile.",
   PasswordIncorrect: "Password incorrect",
-  NeedGoogleLinking: "Email already registered. Log in with password, then link Google from your profile.",
-  InvalidInput: "Invalid form input. Please check and try again."
+  InvalidInput: "Invalid form input. Please check and try again.",
 };
 
 export function showAuthToasts(router: Router) {
@@ -23,7 +22,6 @@ export function showAuthToasts(router: Router) {
   const error = params.get('error');
   const login = params.get('login');
   const logout = params.get('logout');
-  const linked = params.get('linked');
   const accountDeleted = params.get('delete');
   let shouldClean = false;
 
@@ -46,12 +44,7 @@ export function showAuthToasts(router: Router) {
     shouldClean = true;
   }
 
-  // Display logout toast
-  if (linked === 'google') {
-    toast.success('Google account successfully linked.');
-    shouldClean = true;
-  }
-
+  // Display account deleted toast
   if (accountDeleted === 'true') {
     toast.success('Accound successfully deleted.');
     shouldClean = true

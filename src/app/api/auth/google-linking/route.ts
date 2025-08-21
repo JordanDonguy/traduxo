@@ -1,11 +1,10 @@
-import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/server/prisma";
 import { linkGoogle } from "@/lib/server/handlers/linkGoogle";
+import { NextRequest } from "next/server";
 
 // -------------- Route handler --------------
-export async function POST() {
-  return linkGoogle({
-    getSessionFn: getServerSession,
+export async function POST(req: NextRequest) {
+  return linkGoogle(req, {
     prismaClient: prisma,
   });
 }

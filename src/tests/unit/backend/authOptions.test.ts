@@ -104,6 +104,17 @@ describe('createAuthOptions', () => {
     });
 
     // ------ Test 5️⃣ ------
+    it('redirects to /link-google if NeedGoogleLinking', async () => {
+      (handleGoogleSignIn as jest.Mock).mockResolvedValue({ success: false, reason: 'NeedGoogleLinking' });
+      const user = createMockUser();
+      const account = createMockAccount();
+
+      const res = await options.callbacks!.signIn!({ user, account });
+
+      expect(res).toBe('/link-google');
+    });
+
+    // ------ Test 6️⃣ ------
     it('returns true for other providers', async () => {
       const user = createMockUser();
       const account = createMockAccount({ provider: 'credentials', type: 'credentials' });
@@ -125,7 +136,7 @@ describe('createAuthOptions', () => {
       });
     });
 
-    // ------ Test 6️⃣ ------
+    // ------ Test 7️⃣ ------
     it('adds user id, providers and systemLang to session when found', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'user-id', providers: ['google'], systemLang: "en" });
       const session = createMockSession()
@@ -152,7 +163,7 @@ describe('createAuthOptions', () => {
       }
     });
 
-    // ------ Test 7️⃣ ------
+    // ------ Test 8️⃣ ------
     it('returns session unchanged if no user found', async () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
       const session = createMockSession();
@@ -168,7 +179,7 @@ describe('createAuthOptions', () => {
   });
 
   describe('callbacks.jwt', () => {
-    // ------ Test 8️⃣ ------
+    // ------ Test 9️⃣ ------
     it('sets token.sub to user.id on first sign in', async () => {
       const token = mockToken;
       const user = createMockUser();
@@ -180,7 +191,7 @@ describe('createAuthOptions', () => {
       expect(result.sub).toBe('user1');
     });
 
-    // ------ Test 9️⃣ ------
+    // ------ Test 🔟 ------
     it('returns token unchanged if no user', async () => {
       const token = { sub: 'abc' };
       const user = createMockUser();
@@ -193,31 +204,6 @@ describe('createAuthOptions', () => {
         account: null,
       });
       expect(result).toEqual(token);
-    });
-  });
-
-  describe('callbacks.redirect', () => {
-    const baseUrl = 'https://myapp.com';
-
-    // ------ Test 1️⃣0️⃣ ------
-    it('returns url if it starts with baseUrl', async () => {
-      const url = `${baseUrl}/dashboard`;
-      const result = await options.callbacks!.redirect!({ url, baseUrl });
-      expect(result).toBe(url);
-    });
-
-    // ------ Test 1️⃣1️⃣ ------
-    it('returns baseUrl + url if url starts with /', async () => {
-      const url = '/profile';
-      const result = await options.callbacks!.redirect!({ url, baseUrl });
-      expect(result).toBe(`${baseUrl}/profile`);
-    });
-
-    // ------ Test 1️⃣2️⃣ ------
-    it('returns baseUrl otherwise', async () => {
-      const url = 'https://other.com/page';
-      const result = await options.callbacks!.redirect!({ url, baseUrl });
-      expect(result).toBe(baseUrl);
     });
   });
 });

@@ -28,7 +28,7 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
         },
 
         // Called when user tries to login with credentials
-        authorize: async(credentials) => {
+        authorize: async (credentials) => {
           return await authorizeUser(credentials);
         }
       }),
@@ -45,10 +45,16 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
       async signIn({ user, account }) {
         // Ensure the sign-in request includes provider/account info; otherwise, reject the sign-in
         if (!account) return false;
-
         // Google sign in method here
         if (account.provider === "google") {
           const result = await handleGoogleSignIn(user.email!);
+
+          // Redirect to Google linking page if logging with Google on a credentials only account
+          if (!result.success && result.reason === "NeedGoogleLinking") {
+            return "/link-google";
+          }
+
+          // Else throw error if another error happens
           if (!result.success) {
             throw new Error(result.reason);
           }
@@ -81,22 +87,6 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
           token.sub = user.id;
         }
         return token;
-      },
-
-      // After Google linking, redirect to profile page with success flag
-      async redirect({ url, baseUrl }) {
-        // Allow absolute URLs within same origin
-        if (url.startsWith(baseUrl)) {
-          return url;
-        }
-
-        // Allow relative URLs
-        if (url.startsWith("/")) {
-          return `${baseUrl}${url}`;
-        }
-
-        // Otherwise fallback to base
-        return baseUrl;
       },
     },
 
