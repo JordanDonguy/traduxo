@@ -1,19 +1,19 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
-import { useSession } from "next-auth/react";
 import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { CircleX } from "lucide-react";
 import { toast } from "react-toastify";
 
-type TranslationHistoryProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
-}
+function TranslationHistory() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
 
-function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) {
   const { translationHistory, setTranslationHistory, loadTranslationFromMenu } = useTranslationContext();
   const { setInputLang, setOutputLang } = useLanguageContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -44,7 +44,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
         message = error.message;
       }
       toast.error(message);
-      setShowMenu(false);
+      router.push("/");
     }
   }
 
@@ -86,7 +86,7 @@ function TranslationHistory({ showMenu, setShowMenu }: TranslationHistoryProps) 
                   loadTranslationFromMenu(t, false);
                   setInputLang(t.inputLang);
                   setOutputLang(t.outputLang);
-                  setShowMenu(false);
+                  router.push("/");
                 }}
                 className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4

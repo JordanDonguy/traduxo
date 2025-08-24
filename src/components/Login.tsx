@@ -1,16 +1,16 @@
 'use client';
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { Mail, Lock } from "lucide-react";
+import { Lock, Mail } from "lucide-react";
 
-type LoginProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>
-}
+export default function Login() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
 
-export default function Login({ showMenu, setShowMenu }: LoginProps) {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
@@ -35,11 +35,11 @@ export default function Login({ showMenu, setShowMenu }: LoginProps) {
     });
 
     if (res?.error) {
-      setError(res.error);
+      setError(res.error)
     } else {
-      setShowMenu(false)
+      router.push("/")
     };
-    setIsLoading(false);
+    setIsLoading(false)
   };
 
   // -------------- Google OAuth login --------------
@@ -86,7 +86,7 @@ export default function Login({ showMenu, setShowMenu }: LoginProps) {
       password
     });
 
-    setShowMenu(false);
+    router.push("/");
     setIsSignup(false);
   };
 

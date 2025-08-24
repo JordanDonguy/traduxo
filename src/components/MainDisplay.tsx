@@ -1,19 +1,19 @@
 "use client"
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
-import { useState, useEffect } from "react";
-import ReactMarkdown from 'react-markdown';
-import LoadingAnimation from "./LoadingAnimation";
-import { getExplanationPrompt } from "@/lib/shared/geminiPrompts";
-import { useRouter } from "next/navigation";
-import { showAuthToasts } from "@/lib/client/utils/authToasts";
-import { Star } from "lucide-react";
-import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
 import { useCooldown } from "@/lib/client/hooks/useCooldown";
-import LandingDisplay from "./LandingDisplay";
+import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
+import { getExplanationPrompt } from "@/lib/shared/geminiPrompts";
+import { showAuthToasts } from "@/lib/client/utils/authToasts";
+import ReactMarkdown from "react-markdown";
+import { Star } from "lucide-react";
 import { toast } from "react-toastify";
+import LandingDisplay from "./LandingDisplay";
+import LoadingAnimation from "./LoadingAnimation";
 
 function MainDisplay() {
   const { isLoading, error, setError, setShowLoginForm } = useApp();

@@ -1,16 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
-import { useSession } from "next-auth/react";
 import { CircleX } from "lucide-react";
 import { toast } from "react-toastify";
-
-type FavoriteTranslationProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 type FavoriteTranslation = {
   id: string;
@@ -23,7 +19,11 @@ type FavoriteTranslation = {
   alt3: string | null;
 };
 
-function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps) {
+function FavoriteTranslation() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
+
   const { loadTranslationFromMenu, translationId, setTranslationId, setIsFavorite } = useTranslationContext();
   const [favoriteTranslations, setFavoriteTranslations] = useState<FavoriteTranslation[]>([]);
   const { setInputLang, setOutputLang } = useLanguageContext();
@@ -62,7 +62,7 @@ function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps
         message = error.message;
       }
       toast.error(message);
-      setShowMenu(false);
+      router.push("/");
     }
   }
 
@@ -120,7 +120,7 @@ function FavoriteTranslation({ showMenu, setShowMenu }: FavoriteTranslationProps
                   loadTranslationFromMenu(t, true);
                   setInputLang(t.inputLang);
                   setOutputLang(t.outputLang);
-                  setShowMenu(false);
+                  router.push("/");
                 }}
                 className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4

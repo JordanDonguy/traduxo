@@ -1,20 +1,26 @@
 "use client"
 
-import { useState } from "react";
-import UserMenu from "./UserMenu";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { User, Dices } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
+import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
 import { translationHelper } from "@/lib/client/utils/translate";
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
 import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
-import { useSession } from "next-auth/react";
-import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
 import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
-import { User, Dices } from "lucide-react";
+import UserMenu from "./UserMenu";
 import Logo from "./Logo";
 
+
 function AppHeader() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
+
   const { setIsLoading, setError } = useApp();
 
   const {
@@ -38,16 +44,15 @@ function AppHeader() {
   const { status } = useSession();
   const { waitForStatus } = useWaitForAuthStatus();  // A function that resolve a promise once session status is set
 
-  const [showMenu, setShowMenu] = useState<boolean>(false);
   const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
 
   async function suggestTranslation() {
-    
+
     setIsRolling(true);
     setTimeout(() => setIsRolling(false), 600); // animation
-    
-    setShowMenu(false);
-    
+
+    router.push("/");
+
     // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
     const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
 
@@ -116,13 +121,28 @@ function AppHeader() {
 
     // Remove the used expression from pool to avoid repeating
     setExpressionPool(prev => prev.filter(expr => expr !== newExpression));
-  }
+  };
 
+  // If the menu is open but no submenu is active, close the menu on back
+  // -> Prevents the double-back issue where the menu would otherwise require two back presses to close
+  useEffect(() => {
+    const handlePopState = () => {
+      const menuOpen = searchParams.get("menu") === "open";
+      const submenuOpen = Boolean(searchParams.get("submenu"));
+
+      if (menuOpen && !submenuOpen) {
+        router.replace("/");
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [searchParams, router]);
 
   return (
     <header className="w-full h-full flex justify-center">
 
-      <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} />
+      <UserMenu />
 
       <div className="z-50 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
@@ -142,7 +162,13 @@ function AppHeader() {
             <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
           </button>
           <button
-            onClick={() => setShowMenu(!showMenu)}
+            onClick={() => {
+              if (showMenu) {
+                router.push("/")
+              } else {
+                router.push("/?menu=open")
+              }
+            }}
             className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
           >
             <User />

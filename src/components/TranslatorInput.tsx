@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from '@/context/TranslationContext';
+import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
 import { translationHelper } from "@/lib/client/utils/translate";
-import ISO6391 from "iso-639-1";
 import { Mic, CircleStop, ArrowRightLeft } from "lucide-react";
+import ISO6391 from "iso-639-1";
 
 function TranslatorInput() {
   const { setIsLoading, setError } = useApp();

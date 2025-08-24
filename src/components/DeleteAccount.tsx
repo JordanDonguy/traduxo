@@ -1,16 +1,15 @@
 "use client"
 
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { toast } from "react-toastify";
 
-type DeleteAccountProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  setShowDeleteAccount: React.Dispatch<React.SetStateAction<boolean>>;
-}
+function DeleteAccount() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
 
-function DeleteAccount({ showMenu, setShowMenu, setShowDeleteAccount }: DeleteAccountProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const deleteAccount = async () => {
@@ -26,12 +25,12 @@ function DeleteAccount({ showMenu, setShowMenu, setShowDeleteAccount }: DeleteAc
     const data = await res.json();
     if (!res.ok) {
       toast.error(data.message || "Failed to delete account");
-      setShowMenu(false);
+      router.push("/")
     };
 
     await signOut({ callbackUrl: "/?delete=true" });    // Sign out after account's deleted
     setIsLoading(false);
-    setShowMenu(false);
+    router.push("/")
   }
 
   return (
@@ -54,7 +53,7 @@ function DeleteAccount({ showMenu, setShowMenu, setShowDeleteAccount }: DeleteAc
           {/* -------------- Cancel button -------------- */}
           <button
             type="button"
-            onClick={() => setShowDeleteAccount(false)}
+            onClick={() => router.push("/?menu=open")}
             className="h-16 text-center col-span-1 border rounded-full hover:cursor-pointer hover:bg-[var(--hover-2)]"
           >
             Cancel

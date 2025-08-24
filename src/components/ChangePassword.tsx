@@ -1,17 +1,19 @@
 'use client';
-
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Lock } from "lucide-react";
 import { toast } from "react-toastify";
-import { useSession } from "next-auth/react";
 
 type ChangePasswordProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
   isCredentials: boolean | undefined;
 }
 
-export default function ChangePassword({ showMenu, setShowMenu, isCredentials }: ChangePasswordProps) {
+export default function ChangePassword({ isCredentials }: ChangePasswordProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const showMenu = searchParams.get("menu") === "open";
+
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
@@ -70,7 +72,7 @@ export default function ChangePassword({ showMenu, setShowMenu, isCredentials }:
     toast.success(`Your password has been ${isCredentials ? "updated" : "created"}`);
 
     // Close menu and reset loading state
-    setShowMenu(false)
+    router.push("/");
     setIsLoading(false);
 
     // Update next auth session state

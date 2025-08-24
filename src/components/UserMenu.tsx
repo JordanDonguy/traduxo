@@ -1,6 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { useApp } from "@/context/AppContext";
 import { useTheme } from "next-themes";
 import Login from "./Login";
@@ -9,8 +11,6 @@ import DeleteAccount from "./DeleteAccount";
 import TranslationHistory from "./TranslationHistory";
 import ExplanationLanguage from "./ExplanationLanguage";
 import FavoriteTranslation from "./FavoriteTranslations";
-import { signOut } from "next-auth/react";
-import { useSession } from "next-auth/react";
 import {
   Moon,
   Sun,
@@ -25,25 +25,27 @@ import {
   Languages,
 } from "lucide-react";
 
-type UserMenuProps = {
-  showMenu: boolean;
-  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
+function UserMenu() {
   const { showLoginForm, setShowLoginForm } = useApp();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
-
-  const [showLogin, setShowLogin] = useState<boolean>(false);
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-  const [showDeleteAccount, setShowDeleteAccount] = useState<boolean>(false);
-  const [showHistory, setShowHistory] = useState<boolean>(false);
-  const [showFavorites, setShowFavorites] = useState<boolean>(false);
-  const [showExplanationLang, setShowExplanationLang] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
 
   const { status, data: session } = useSession();
   const isCredentials = session?.user.providers?.includes("Credentials");
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read menu state from URL
+  const showMenu = searchParams.get("menu") === "open";
+  const submenu = searchParams.get("submenu"); // "login", "history", etc.
+
+  const showLogin = submenu === "login";
+  const showChangePassword = submenu === "changePassword";
+  const showDeleteAccount = submenu === "deleteAccount";
+  const showHistory = submenu === "history";
+  const showFavorites = submenu === "favorites";
+  const showExplanationLang = submenu === "explanationLang";
 
   // Avoid hydration mismatch
   useEffect(() => setMounted(true), []);
@@ -51,41 +53,20 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
   // Open menu and login submenu if global showLoginForm state is true
   useEffect(() => {
     if (showLoginForm) {
-      setShowMenu(true);
-      setShowLogin(true);
+      router.push("/?menu=open&submenu=login");
       setShowLoginForm(false);
     }
-  }, [showLoginForm, setShowLoginForm, setShowMenu, setShowLogin]);
-
-  // When closing menu, reset submenus state (so that menu reopens on main page next time)
-  useEffect(() => {
-    if (!showMenu) {
-      setTimeout(() => {
-        setShowLogin(false);
-        setShowChangePassword(false);
-        setShowDeleteAccount(false);
-        setShowHistory(false);
-        setShowFavorites(false);
-        setShowExplanationLang(false);
-      }, 500);
-    }
-  }, [showMenu]);
+  }, [showLoginForm, setShowLoginForm, router]);
 
   // Theme detection
   const isDark = useMemo(() => {
     if (!mounted) return false;
-    return theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    return (
+      theme === "dark" ||
+      (theme === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    );
   }, [theme, mounted]);
-
-  // Back to main menu
-  const backToMenu = () => {
-    setShowLogin(false);
-    setShowChangePassword(false);
-    setShowDeleteAccount(false);
-    setShowHistory(false);
-    setShowFavorites(false);
-    setShowExplanationLang(false);
-  };
 
   if (!mounted) return null;
 
@@ -93,24 +74,25 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
     <div
       className={`
         z-40 fixed w-full h-full flex justify-center pt-20 px-6 xl:px-0
-        inset-0  max-h-screen duration-400 origin-top
+        inset-0 max-h-screen duration-400 origin-top
         ${showMenu ? "scale-y-100 bg-[var(--menu)]" : "scale-y-0 bg-[var(--bg)]"}`}
     >
-      {/* -------------- Loading spinner -------------- */}
       {status === "loading" ? (
-        < div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
       ) : (
         <>
-          <div className={`absolute w-full flex max-w-2xl mx-auto px-6 xl:px-0 pt-1 
-        ${showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang ? "justify-between" : "justify-end"}`}
+          <div
+            className={`absolute w-full flex max-w-2xl mx-auto px-6 xl:px-0 pt-1 ${submenu
+                ? "justify-between"
+                : "justify-end"
+              }`}
           >
-
             {/* -------------- Back to Menu button -------------- */}
-            {showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang ? (
+            {submenu ? (
               <button
-                onClick={backToMenu}
+                onClick={() => router.replace("/?menu=open")}
                 className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
               >
                 <CircleArrowLeft />
@@ -119,123 +101,136 @@ function UserMenu({ showMenu, setShowMenu }: UserMenuProps) {
 
             {/* -------------- Close Menu button -------------- */}
             <button
-              onClick={() => setShowMenu(false)}
+              onClick={() => router.replace("/")}
               className="right-0 hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
             >
               <CircleX />
             </button>
           </div>
-          {showLogin ?
-            <Login showMenu={showMenu} setShowMenu={setShowMenu} />
-            : showChangePassword ?
-              <ChangePassword showMenu={showMenu} setShowMenu={setShowMenu} isCredentials={isCredentials} />
-              : showDeleteAccount ? <DeleteAccount showMenu={showMenu} setShowMenu={setShowMenu} setShowDeleteAccount={setShowDeleteAccount} />
-                : showHistory ? <TranslationHistory showMenu={showMenu} setShowMenu={setShowMenu} />
-                  : showFavorites ? <FavoriteTranslation showMenu={showMenu} setShowMenu={setShowMenu} />
-                    : showExplanationLang ? <ExplanationLanguage showMenu={showMenu} />
-                      : (
-                        <div className={`max-w-2xl w-full flex flex-col gap-6 items-center duration-400 ${showMenu ? "opacity-100" : "opacity-0"}`}>
-                          <div className="flex justify-between w-full">
-                            <h2 className="text-2xl font-medium">User Settings</h2>
-                          </div>
 
-                          <div className="flex flex-col gap-6 items-center w-full max-h-[calc(100dvh-8rem)] pb-8 overflow-y-scroll scrollbar-hide">
-                            {/* -------------- Theme button -------------- */}
-                            <button
-                              onClick={() => setTheme(isDark ? "light" : "dark")}
-                              aria-label="Toggle colour scheme"
-                              className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                            >
-                              {isDark ? <Sun /> : <Moon />}
-                              <span className="pl-6 text-xl">Theme ({theme})</span>
-                            </button>
+          {/* -------------- Render submenus -------------- */}
+          {showLogin ? (
+            <Login />
+          ) : showChangePassword ? (
+            <ChangePassword isCredentials={isCredentials} />
+          ) : showDeleteAccount ? (
+            <DeleteAccount />
+          ) : showHistory ? (
+            <TranslationHistory />
+          ) : showFavorites ? (
+            <FavoriteTranslation />
+          ) : showExplanationLang ? (
+            <ExplanationLanguage />
+          ) : (
+            // Top-level menu
+            <div
+              className={`max-w-2xl w-full flex flex-col gap-6 items-center duration-400 ${showMenu ? "opacity-100" : "opacity-0"
+                }`}
+            >
+              <div className="flex justify-between w-full">
+                <h2 className="text-2xl font-medium">User Settings</h2>
+              </div>
 
-                            {/* -------------- Login button -------------- */}
-                            {status === "authenticated" ? null : (
-                              <button
-                                onClick={() => setShowLogin(true)}
-                                aria-label="Login button"
-                                className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                              >
-                                <User />
-                                <span className="pl-6 text-xl">Login</span>
-                              </button>
-                            )}
+              <div className="flex flex-col gap-6 items-center w-full max-h-[calc(100dvh-8rem)] pb-8 overflow-y-scroll scrollbar-hide">
+                {/* -------------- Theme toggle -------------- */}
+                <button
+                  onClick={() => setTheme(isDark ? "light" : "dark")}
+                  className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                >
+                  {isDark ? <Sun /> : <Moon />}
+                  <span className="pl-6 text-xl">Theme ({theme})</span>
+                </button>
 
-                            {/* -------------- History button -------------- */}
-                            <button
-                              onClick={() => setShowHistory(true)}
-                              aria-label="History button"
-                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                            >
-                              <History />
-                              <span className="pl-6 text-xl">History</span>
-                            </button>
+                {/* -------------- Login button -------------- */}
+                {status !== "authenticated" && (
+                  <button
+                    onClick={() =>
+                      router.push("/?menu=open&submenu=login")
+                    }
+                    className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                  >
+                    <User />
+                    <span className="pl-6 text-xl">Login</span>
+                  </button>
+                )}
 
-                            {/* -------------- Favorites button -------------- */}
-                            <button
-                              onClick={() => setShowFavorites(true)}
-                              aria-label="History button"
-                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                            >
-                              <Star />
-                              <span className="pl-6 text-xl">Favorites</span>
-                            </button>
+                {/* -------------- History -------------- */}
+                <button
+                  onClick={() =>
+                    router.push("/?menu=open&submenu=history")
+                  }
+                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                >
+                  <History />
+                  <span className="pl-6 text-xl">History</span>
+                </button>
 
-                            {/* -------------- Explanation language button -------------- */}
-                            <button
-                              onClick={() => setShowExplanationLang(true)}
-                              aria-label="History button"
-                              className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                            >
-                              <Languages />
-                              <span className="pl-6 text-xl">Explanation language</span>
-                            </button>
+                {/* -------------- Favorites -------------- */}
+                <button
+                  onClick={() =>
+                    router.push("/?menu=open&submenu=favorites")
+                  }
+                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                >
+                  <Star />
+                  <span className="pl-6 text-xl">Favorites</span>
+                </button>
 
-                            {/* -------------- Log Out button -------------- */}
-                            {status === "authenticated" ? (
-                              <button
-                                onClick={() => {
-                                  signOut({ callbackUrl: "/?logout=true" });
-                                  setShowMenu(false)
-                                }}
-                                aria-label="Log Out button"
-                                className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                              >
-                                <LogOut />
-                                <span className="pl-6 text-xl">Log Out</span>
-                              </button>
-                            ) : null}
+                {/* -------------- Explanation language -------------- */}
+                <button
+                  onClick={() =>
+                    router.push("/?menu=open&submenu=explanationLang")
+                  }
+                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                >
+                  <Languages />
+                  <span className="pl-6 text-xl">Explanation language</span>
+                </button>
 
-                            {/* -------------- Change password button -------------- */}
-                            {status === "authenticated" ? (
-                              <button
-                                onClick={() => setShowChangePassword(true)}
-                                aria-label="Change password button"
-                                className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                              >
-                                <Lock />
-                                <span className="pl-6 text-xl">{isCredentials ? "Change password" : "Create password"}</span>
-                              </button>
-                            ) : null}
+                {/* Authenticated actions */}
+                {status === "authenticated" && (
+                  <>
+                    {/* Log Out */}
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/?logout=true" })}
+                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                    >
+                      <LogOut />
+                      <span className="pl-6 text-xl">Log Out</span>
+                    </button>
 
-                            {/* -------------- Delete account button -------------- */}
-                            {status === "authenticated" ? (
-                              <button
-                                onClick={() => setShowDeleteAccount(true)}
-                                aria-label="Delete account button"
-                                className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                              >
-                                <BadgeMinus />
-                                <span className="pl-6 text-xl">Delete account</span>
-                              </button>
-                            ) : null}
-                          </div>
-                        </div>
-                      )}
-        </>)}
+                    {/* -------------- Change password -------------- */}
+                    <button
+                      onClick={() =>
+                        router.push("/?menu=open&submenu=changePassword")
+                      }
+                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                    >
+                      <Lock />
+                      <span className="pl-6 text-xl">
+                        {isCredentials ? "Change password" : "Create password"}
+                      </span>
+                    </button>
+
+                    {/* -------------- Delete account -------------- */}
+                    <button
+                      onClick={() =>
+                        router.push("/?menu=open&submenu=deleteAccount")
+                      }
+                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                    >
+                      <BadgeMinus />
+                      <span className="pl-6 text-xl">Delete account</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
-  )
+  );
 }
 
-export default UserMenu
+export default UserMenu;
