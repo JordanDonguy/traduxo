@@ -108,27 +108,52 @@ export function getSuggestionPrompt({
   detectedLang,
   outputLang,
 }: SuggestionPromptParams): string {
+  // Initialize a promptVariant array to avoid returning the same expression every time
+  const promptVariants = [
+    // Variant 1
+    `Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Avoid overused internet clichés.`,
+
+    // Variant 2
+    `Suggest one fresh, less common idiom or everyday expression in ${detectedLang} that native speakers actually use in daily life. Avoid clichés or overused expressions.`,
+
+    // Variant 3
+    `Suggest one contemporary idiom or phrase in ${detectedLang} that is actively used by younger or modern speakers today. Avoid overused internet clichés.`,
+
+    // Variant 4
+    `Suggest one idiom or phrase in ${detectedLang} that differs from typical textbook examples. Choose something diverse or regionally popular but still understandable to most native speakers.`,
+
+    // Variant 5
+    `Suggest one culturally natural idiom or phrase in ${detectedLang} that feels authentic and commonly used in casual conversations, not a literal or formal one.`,
+
+    // Variant 6
+    `Suggest one idiom or phrase in ${detectedLang} that is interesting and adds variety. Prioritize novelty and ensure it would sound natural to a native speaker.`
+  ];
+
+  // Select a random variant
+  const randomVariant = promptVariants[Math.floor(Math.random() * promptVariants.length)];
+
   return `
 You are a native-speaking language teacher and idiom expert.
 
 Your task:
-Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Focus on diversity.
-Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. If no exact idiom exists, choose the closest equivalent used in similar situations.
+${randomVariant}
+Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. 
+If no exact idiom exists, choose the closest equivalent used in similar situations.
 
 **Output**
 Return EXACTLY this JSON array (no markdown, no explanation):
-["original expression in ${detectedLang}", "best equivalent translation in ${outputLang}", "alternative 1", "alternative 2", "alternative 3"]
-  `
+["original expression in \${detectedLang}", "best equivalent translation in \${outputLang}", "alternative 1", "alternative 2", "alternative 3"]
+`;
 };
 
 // ------------------------------------- Pool Prompt -------------------------------------
 export function getPoolPrompt(lang: string) {
   return `
 Give me 50 diverse, natural, idiomatic expressions in ${lang} that native speakers use in casual conversation. 
-They must be figurative, colorful, or slang-based — avoid any greetings, farewells, or small-talk phrases 
-(e.g., “What’s up?”, “How’s it going?”). 
-Do not include overly polite or literal requests like “Could you pass the salt, please?”. 
-Ensure at least 50% use metaphors or imagery. 
+They must be figurative, colorful, or slang - based — avoid any greetings, farewells, or small - talk phrases
+    (e.g., “What’s up ?”, “How’s it going ?”). 
+Do not include overly polite or literal requests like “Could you pass the salt, please ?”. 
+Ensure at least 50 % use metaphors or imagery. 
 Vary across regions where ${lang} is spoken. 
 Output only as a JSON array of unique strings, no explanations.
 `;

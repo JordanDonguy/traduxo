@@ -45,23 +45,28 @@ export async function suggestExpressionHelper({
 
   const prompt = getSuggestionPrompt({ detectedLang, outputLang });
 
-  const res = await fetch("/api/gemini/complete", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, isSuggestion: true }),
-  });
-
-  if (res.status === 429) {
-    const { error } = await res.json();
-    setError(error);
+  try {
+    const res = await fetch("/api/gemini/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, isSuggestion: true }),
+    });
+  
+    if (res.status === 429) {
+      const { error } = await res.json();
+      setError(error);
+      setIsLoading(false);
+      return;
+    }
+    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+  
+    const { text } = await res.json();
+    const translationArray = JSON.parse(cleanGeminiResponse(text));
+  
+    setTranslatedText(translationArray);
     setIsLoading(false);
-    return;
+  } catch (error) {
+    console.log(error);
+    setError("Internal server error... please try again 🙏");
   }
-  if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-
-  const { text } = await res.json();
-  const translationArray = JSON.parse(cleanGeminiResponse(text));
-
-  setTranslatedText(translationArray);
-  setIsLoading(false);
 }
