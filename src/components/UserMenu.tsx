@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useApp } from "@/context/AppContext";
 import { useTheme } from "next-themes";
@@ -25,7 +25,12 @@ import {
   Languages,
 } from "lucide-react";
 
-function UserMenu() {
+interface UserMenuProps {
+  showMenu: boolean;
+  submenu: string | null;
+}
+
+function UserMenu({ showMenu, submenu }: UserMenuProps) {
   const { showLoginForm, setShowLoginForm } = useApp();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -34,11 +39,6 @@ function UserMenu() {
   const isCredentials = session?.user.providers?.includes("Credentials");
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  // Read menu state from URL
-  const showMenu = searchParams.get("menu") === "open";
-  const submenu = searchParams.get("submenu"); // "login", "history", etc.
 
   const showLogin = submenu === "login";
   const showChangePassword = submenu === "changePassword";
@@ -110,17 +110,17 @@ function UserMenu() {
 
           {/* -------------- Render submenus -------------- */}
           {showLogin ? (
-            <Login />
+            <Login showMenu={showMenu}  />
           ) : showChangePassword ? (
-            <ChangePassword isCredentials={isCredentials} />
+            <ChangePassword isCredentials={isCredentials} showMenu={showMenu} />
           ) : showDeleteAccount ? (
-            <DeleteAccount />
+            <DeleteAccount showMenu={showMenu} />
           ) : showHistory ? (
-            <TranslationHistory />
+            <TranslationHistory showMenu={showMenu} />
           ) : showFavorites ? (
-            <FavoriteTranslation />
+            <FavoriteTranslation showMenu={showMenu} />
           ) : showExplanationLang ? (
-            <ExplanationLanguage />
+            <ExplanationLanguage showMenu={showMenu} />
           ) : (
             // Top-level menu
             <div

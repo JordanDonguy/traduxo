@@ -1,18 +1,18 @@
-'use client';
+"use client";
+
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
 import { toast } from "react-toastify";
 
 type ChangePasswordProps = {
   isCredentials: boolean | undefined;
+  showMenu: boolean
 }
 
-export default function ChangePassword({ isCredentials }: ChangePasswordProps) {
+export default function ChangePassword({ isCredentials, showMenu }: ChangePasswordProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
 
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");

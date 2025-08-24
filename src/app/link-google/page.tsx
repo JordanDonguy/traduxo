@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useApp } from "@/context/AppContext";
-import AppHeader from "@/components/AppHeader";
+import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
 import { Mail, Lock } from "lucide-react";
 
 export default function Home() {
@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)]">
 
-      <AppHeader />
+       <AppHeaderSuspenseWrapper />
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (

@@ -1,14 +1,16 @@
 "use client"
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
 
-function DeleteAccount() {
+interface DeleteAccountProps {
+  showMenu: boolean
+}
+
+function DeleteAccount({ showMenu }: DeleteAccountProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 

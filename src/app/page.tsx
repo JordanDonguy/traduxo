@@ -1,4 +1,4 @@
-import AppHeader from "@/components/AppHeader";
+import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
 import MainDisplay from "@/components/MainDisplay";
 import TranslatorInput from "@/components/TranslatorInput";
 
@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)]">
 
-      <AppHeader />
+      <AppHeaderSuspenseWrapper />
 
       <main className="flex flex-col justify-center items-center w-full flex-1">
         <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>

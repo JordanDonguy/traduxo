@@ -1,16 +1,16 @@
 "use client"
 
-import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { sortedLanguageCodes } from "@/lib/client/utils/sortedLanguageCodes";
 import { Check } from "lucide-react";
 import ISO6391 from "iso-639-1";
 
-function ExplanationLanguage() {
-  const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
+interface ExplanationLanguageProps {
+  showMenu: boolean
+}
 
+function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
   const { systemLang, setSystemLang } = useLanguageContext();
   const { status } = useSession();
 

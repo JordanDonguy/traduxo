@@ -20,6 +20,7 @@ function AppHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const showMenu = searchParams.get("menu") === "open";
+  const submenu = searchParams.get("submenu"); // "login", "history", etc.
 
   const { setIsLoading, setError } = useApp();
 
@@ -142,7 +143,9 @@ function AppHeader() {
   return (
     <header className="w-full h-full flex justify-center">
 
-      <UserMenu />
+
+      <UserMenu showMenu={showMenu} submenu={submenu} />
+
 
       <div className="z-50 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button

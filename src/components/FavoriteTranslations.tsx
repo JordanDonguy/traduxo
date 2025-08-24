@@ -1,12 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 import { CircleX } from "lucide-react";
 import { toast } from "react-toastify";
+
+interface FavoriteTranslationProps {
+  showMenu: boolean
+};
 
 type FavoriteTranslation = {
   id: string;
@@ -19,10 +23,8 @@ type FavoriteTranslation = {
   alt3: string | null;
 };
 
-function FavoriteTranslation() {
+function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
 
   const { loadTranslationFromMenu, translationId, setTranslationId, setIsFavorite } = useTranslationContext();
   const [favoriteTranslations, setFavoriteTranslations] = useState<FavoriteTranslation[]>([]);

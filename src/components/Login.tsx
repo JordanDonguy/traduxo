@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
 
-export default function Login() {
+interface LoginProps {
+  showMenu: boolean
+}
+
+export default function Login({ showMenu }: LoginProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
