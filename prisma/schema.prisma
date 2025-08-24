@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  email         String    @unique
-  password      String?
-  providers     String[]  @default([])
-  systemLang    String?   @default("en")
-  createdAt     DateTime  @default(now())
-  google_linking DateTime? 
-  histories     History[]
+  id             String     @id @default(uuid()) @db.Uuid
+  email          String     @unique
+  password       String?
+  providers      String[]   @default([])
+  systemLang     String?    @default("en")
+  createdAt      DateTime   @default(now())
+  google_linking DateTime?
+  histories      History[]
   favoriteItems  Favorite[]
+
+  passwordResets PasswordReset[]
 }
 
-
 model History {
-  id          String    @id @default(uuid()) @db.Uuid
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String    @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @db.Uuid
   inputText   String
   translation String
   alt1        String?
@@ -31,15 +32,15 @@ model History {
   alt3        String?
   inputLang   String
   outputLang  String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
   @@unique([id, userId])
 }
 
 model Favorite {
-  id          String    @id @default(uuid()) @db.Uuid
-  user        User      @relation(fields: [userId], references: [id])
-  userId      String    @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @db.Uuid
   inputText   String
   translation String
   alt1        String?
@@ -47,7 +48,17 @@ model Favorite {
   alt3        String?
   inputLang   String
   outputLang  String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
   @@unique([id, userId])
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
 }

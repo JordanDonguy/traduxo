@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { toast } from "react-toastify";
 
@@ -15,45 +15,52 @@ const errorMessages: Record<string, string> = {
 };
 
 export function showAuthToasts(router: Router) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   // Get url params
   const params = new URLSearchParams(window.location.search);
-  const error = params.get('error');
-  const login = params.get('login');
-  const logout = params.get('logout');
-  const accountDeleted = params.get('delete');
+  const error = params.get("error");
+  const login = params.get("login");
+  const logout = params.get("logout");
+  const accountDeleted = params.get("delete");
+  const resetPassword = params.get("reset-password");
   let shouldClean = false;
 
   // Display error toast
-  if (typeof error === 'string') {
-    const message = errorMessages[error] || 'Unknown authentication error.';
+  if (typeof error === "string") {
+    const message = errorMessages[error] || "Unknown authentication error.";
     toast.error(message);
     shouldClean = true;
   }
 
   // Display login toast
-  if (login === 'true') {
-    toast.success('Successfully logged in!');
+  if (login === "true") {
+    toast.success("Successfully logged in!");
     shouldClean = true;
   }
 
   // Display logout toast
-  if (logout === 'true') {
-    toast.success('Successfully logged out.');
+  if (logout === "true") {
+    toast.success("Successfully logged out.");
     shouldClean = true;
   }
 
   // Display account deleted toast
-  if (accountDeleted === 'true') {
-    toast.success('Accound successfully deleted.');
+  if (accountDeleted === "true") {
+    toast.success("Accound successfully deleted.");
+    shouldClean = true
+  }
+
+  // Display reset password toast
+  if (resetPassword === "true") {
+    toast.success("Your password has been updated, you can now login.");
     shouldClean = true
   }
 
   // Cleanup url
   if (shouldClean) {
     const url = new URL(window.location.href);
-    url.search = '';
+    url.search = "";
     router.replace(url.toString());
   }
 }

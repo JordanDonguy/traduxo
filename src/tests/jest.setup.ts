@@ -35,10 +35,17 @@ const favorite = {
   delete: jest.fn(),
 };
 
+const passwordReset = {
+  create: jest.fn(),
+  findUnique: jest.fn(),
+  delete: jest.fn(),
+}
+
 const prisma = {
   user,
   history,
   favorite,
+  passwordReset,
   $queryRaw: jest.fn(),
 };
 
@@ -66,6 +73,11 @@ export type MockPrismaClient = Partial<PrismaClient> & {
     findUnique: jest.Mock;
     delete: jest.Mock;
   };
+  passwordReset: {
+    create: jest.Mock;
+    findUnique: jest.Mock;
+    delete: jest.Mock;
+  }
   $executeRaw: jest.Mock;
 };
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface LoginProps {
   showMenu: boolean
@@ -90,6 +91,32 @@ export default function Login({ showMenu }: LoginProps) {
 
     router.push("/");
     setIsSignup(false);
+  };
+
+  // -------- Reset password --------
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email to reset your password");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      toast.success("If this email exists, a reset link has been sent.");
+      router.replace("/"); // navigate back to main page
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong.");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -201,13 +228,24 @@ export default function Login({ showMenu }: LoginProps) {
           <p className="text-base mx-auto">Continue with Google</p>
         </button>
 
+        {/* -------------- Forgot your password button -------------- */}
+        {!isSignup && (
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="text-blue-500 hover:underline hover:cursor-pointer"
+          >
+            Forgot your password?
+          </button>
+        )}
+
         {/* -------------- Sign Up / Login switch -------------- */}
         <p className="text-center">
           {isSignup ? "Already have an account? " : "No account? "}
           <button
             type="button"
             onClick={() => setIsSignup(!isSignup)}
-            className="text-blue-500 hover:cursor-pointer pb-10"
+            className="text-blue-500 hover:underline hover:cursor-pointer pb-10"
           >
             {isSignup ? "Login" : "Sign Up"}
           </button>

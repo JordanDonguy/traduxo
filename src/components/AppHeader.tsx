@@ -19,8 +19,7 @@ import Logo from "./Logo";
 function AppHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const showMenu = searchParams.get("menu") === "open";
-  const submenu = searchParams.get("submenu"); // "login", "history", etc.
+  const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
   const { setIsLoading, setError } = useApp();
 
@@ -47,6 +46,7 @@ function AppHeader() {
 
   const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
 
+  // --------- Suggest expression function ---------
   async function suggestTranslation() {
 
     setIsRolling(true);
@@ -124,6 +124,14 @@ function AppHeader() {
     setExpressionPool(prev => prev.filter(expr => expr !== newExpression));
   };
 
+  // -------- Menu opening / closing section --------
+  const [showMenu, setShowMenu] = useState<boolean>(searchParams.get("menu") === "open");
+  // Sync state with URL when it changes (back/forward)
+  useEffect(() => {
+    const menuOpen = searchParams.get("menu") === "open";
+    if (menuOpen !== showMenu) setShowMenu(menuOpen);
+  }, [showMenu, searchParams]);
+
   // If the menu is open but no submenu is active, close the menu on back
   // -> Prevents the double-back issue where the menu would otherwise require two back presses to close
   useEffect(() => {
@@ -143,9 +151,7 @@ function AppHeader() {
   return (
     <header className="w-full h-full flex justify-center">
 
-
       <UserMenu showMenu={showMenu} submenu={submenu} />
-
 
       <div className="z-50 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
@@ -167,9 +173,11 @@ function AppHeader() {
           <button
             onClick={() => {
               if (showMenu) {
-                router.push("/")
+                setShowMenu(false);         // close instantly
+                router.push("/");           // update URL asynchronously
               } else {
-                router.push("/?menu=open")
+                setShowMenu(true);          // open instantly
+                router.push("/?menu=open"); // update URL asynchronously
               }
             }}
             className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
