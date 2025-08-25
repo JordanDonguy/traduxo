@@ -23,14 +23,16 @@ import {
   History,
   Star,
   Languages,
+  Shield
 } from "lucide-react";
 
 interface UserMenuProps {
   showMenu: boolean;
   submenu: string | null;
+  pathname: string;
 }
 
-function UserMenu({ showMenu, submenu }: UserMenuProps) {
+function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   const { showLoginForm, setShowLoginForm } = useApp();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -53,10 +55,10 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
   // Open menu and login submenu if global showLoginForm state is true
   useEffect(() => {
     if (showLoginForm) {
-      router.push("/?menu=open&submenu=login");
+      router.push(`${pathname}/?menu=open&submenu=login`);
       setShowLoginForm(false);
     }
-  }, [showLoginForm, setShowLoginForm, router]);
+  }, [showLoginForm, setShowLoginForm, router, pathname]);
 
   // Theme detection
   const isDark = useMemo(() => {
@@ -85,14 +87,14 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
         <>
           <div
             className={`absolute w-full flex max-w-2xl mx-auto px-6 xl:px-0 pt-1 ${submenu
-                ? "justify-between"
-                : "justify-end"
+              ? "justify-between"
+              : "justify-end"
               }`}
           >
             {/* -------------- Back to Menu button -------------- */}
             {submenu ? (
               <button
-                onClick={() => router.replace("/?menu=open")}
+                onClick={() => router.replace(`${pathname}/?menu=open`)}
                 className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
               >
                 <CircleArrowLeft />
@@ -101,7 +103,7 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
 
             {/* -------------- Close Menu button -------------- */}
             <button
-              onClick={() => router.replace("/")}
+              onClick={() => router.replace(`${pathname}`)}
               className="right-0 hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
             >
               <CircleX />
@@ -110,7 +112,7 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
 
           {/* -------------- Render submenus -------------- */}
           {showLogin ? (
-            <Login showMenu={showMenu}  />
+            <Login showMenu={showMenu} />
           ) : showChangePassword ? (
             <ChangePassword isCredentials={isCredentials} showMenu={showMenu} />
           ) : showDeleteAccount ? (
@@ -141,11 +143,22 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
                   <span className="pl-6 text-xl">Theme ({theme})</span>
                 </button>
 
+                {/* -------------- Explanation language -------------- */}
+                <button
+                  onClick={() =>
+                    router.push(`${pathname}/?menu=open&submenu=explanationLang`)
+                  }
+                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                >
+                  <Languages />
+                  <span className="pl-6 text-xl">Explanation language</span>
+                </button>
+
                 {/* -------------- Login button -------------- */}
                 {status !== "authenticated" && (
                   <button
                     onClick={() =>
-                      router.push("/?menu=open&submenu=login")
+                      router.push(`${pathname}/?menu=open&submenu=login`)
                     }
                     className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                   >
@@ -157,7 +170,7 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
                 {/* -------------- History -------------- */}
                 <button
                   onClick={() =>
-                    router.push("/?menu=open&submenu=history")
+                    router.push(`/${pathname}/?menu=open&submenu=history`)
                   }
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -168,7 +181,7 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
                 {/* -------------- Favorites -------------- */}
                 <button
                   onClick={() =>
-                    router.push("/?menu=open&submenu=favorites")
+                    router.push(`${pathname}/?menu=open&submenu=favorites`)
                   }
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -176,33 +189,24 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
                   <span className="pl-6 text-xl">Favorites</span>
                 </button>
 
-                {/* -------------- Explanation language -------------- */}
+                {/* -------------- Privacy policy -------------- */}
                 <button
-                  onClick={() =>
-                    router.push("/?menu=open&submenu=explanationLang")
-                  }
+                  onClick={() => {
+                    router.push("/privacy")
+                  }}
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
-                  <Languages />
-                  <span className="pl-6 text-xl">Explanation language</span>
+                  <Shield />
+                  <span className="pl-6 text-xl">Privacy policy</span>
                 </button>
 
                 {/* Authenticated actions */}
                 {status === "authenticated" && (
                   <>
-                    {/* Log Out */}
-                    <button
-                      onClick={() => signOut({ callbackUrl: "/?logout=true" })}
-                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                    >
-                      <LogOut />
-                      <span className="pl-6 text-xl">Log Out</span>
-                    </button>
-
                     {/* -------------- Change password -------------- */}
                     <button
                       onClick={() =>
-                        router.push("/?menu=open&submenu=changePassword")
+                        router.push(`${pathname}/?menu=open&submenu=changePassword`)
                       }
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >
@@ -212,10 +216,19 @@ function UserMenu({ showMenu, submenu }: UserMenuProps) {
                       </span>
                     </button>
 
+                    {/* -------------- Log Out -------------- */}
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/?logout=true" })}
+                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                    >
+                      <LogOut />
+                      <span className="pl-6 text-xl">Log Out</span>
+                    </button>
+
                     {/* -------------- Delete account -------------- */}
                     <button
                       onClick={() =>
-                        router.push("/?menu=open&submenu=deleteAccount")
+                        router.push(`${pathname}/?menu=open&submenu=deleteAccount`)
                       }
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >

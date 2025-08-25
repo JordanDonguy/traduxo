@@ -6,7 +6,7 @@ import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function Page() {
   const { error, setError } = useApp();
   const router = useRouter();
 

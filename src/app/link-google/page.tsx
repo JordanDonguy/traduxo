@@ -6,7 +6,7 @@ import { useApp } from "@/context/AppContext";
 import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
 import { Mail, Lock } from "lucide-react";
 
-export default function Home() {
+export default function Page() {
   const { error, setError } = useApp();
 
   const [email, setEmail] = useState<string>("");

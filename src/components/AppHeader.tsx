@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { User, Dices } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
@@ -19,6 +19,7 @@ import Logo from "./Logo";
 function AppHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
   const { setIsLoading, setError } = useApp();
@@ -125,40 +126,30 @@ function AppHeader() {
   };
 
   // -------- Menu opening / closing section --------
-  const [showMenu, setShowMenu] = useState<boolean>(searchParams.get("menu") === "open");
-  // Sync state with URL when it changes (back/forward)
-  useEffect(() => {
-    const menuOpen = searchParams.get("menu") === "open";
-    if (menuOpen !== showMenu) setShowMenu(menuOpen);
-  }, [showMenu, searchParams]);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
-  // If the menu is open but no submenu is active, close the menu on back
-  // -> Prevents the double-back issue where the menu would otherwise require two back presses to close
+  // Get url params, if menu-open, open the menu, otherwise close it
   useEffect(() => {
-    const handlePopState = () => {
       const menuOpen = searchParams.get("menu") === "open";
-      const submenuOpen = Boolean(searchParams.get("submenu"));
-
-      if (menuOpen && !submenuOpen) {
-        router.replace("/");
+      console.log(menuOpen)
+      if (menuOpen) {
+        setShowMenu(true)
+      } else {
+        setShowMenu(false)
       }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   return (
     <header className="w-full h-full flex justify-center">
 
-      <UserMenu showMenu={showMenu} submenu={submenu} />
+      <UserMenu showMenu={showMenu} submenu={submenu} pathname={pathname} />
 
-      <div className="z-50 fixed w-full max-w-6xl h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
+      <div className="z-50 fixed w-full max-w-6xl h-14 md:h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
           onClick={suggestTranslation}
           className="md:hidden p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"
         >
-          <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
+          <Dices size={28} className={`${isRolling ? "animate-dice-roll" : ""}`} />
         </button>
 
         <Logo />
@@ -177,12 +168,13 @@ function AppHeader() {
                 router.push("/");           // update URL asynchronously
               } else {
                 setShowMenu(true);          // open instantly
-                router.push("/?menu=open"); // update URL asynchronously
+                router.push(`${pathname}/?menu=open`); // update URL asynchronously
               }
             }}
             className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
           >
-            <User />
+            <User size={28} className="md:hidden"/>
+            <User className="hidden md:block"/>
           </button>
         </div>
       </div>

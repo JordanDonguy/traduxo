@@ -158,9 +158,10 @@ function TranslatorInput() {
           ))}
         </select>
 
+        {/* Invert languages button */}
         <button
           onClick={switchLanguage}
-          className="hover:cursor-pointer hover:text-[var(--input-placeholder)] active:scale-80 duration-100"
+          className="w-12 h-12 flex justify-center items-center hover:cursor-pointer hover:bg-[var(--hover)] rounded-full"
         >
           <ArrowRightLeft className="filter invert-15" />
         </button>
