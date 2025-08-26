@@ -14,7 +14,7 @@ type UseExplanationArgs = {
 export function useExplanation({
   fetcher = fetch,
   getExplanationPrompt = defaultGetExplanationPrompt,
-  documentRef = document,
+  documentRef,
 }: UseExplanationArgs = {}) {
   // ---- Step 1: Local loading + error states ----
   const [isExpLoading, setIsExpLoading] = useState(false);
@@ -32,9 +32,12 @@ export function useExplanation({
 
   // ---- Step 3: Explanation handler ----
   async function handleExplanation() {
+    // Use injected document for testing, or real document in browser, or undefined during SSR
+    const doc = documentRef ?? (typeof document !== "undefined" ? document : undefined);
+
     // Blur active element to close mobile keyboard
-    if (documentRef.activeElement instanceof HTMLElement) {
-      documentRef.activeElement.blur();
+    if (doc?.activeElement instanceof HTMLElement) {
+      doc.activeElement.blur();
     }
 
     // ---- Step 3a: Start loading & reset errors ----

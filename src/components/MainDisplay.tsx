@@ -29,7 +29,10 @@ function MainDisplay() {
 
   const { handleFavorite, isFavLoading } = useFavoriteToggle();
   const { handleExplanation, isExpLoading, explanationError } = useExplanation();
-  const { switchTranslations, fading } = useSwitchTranslations(setTranslatedText);
+  const { switchTranslations, fading } = useSwitchTranslations({
+    setTranslatedText,
+    timeoutFn: setTimeout
+  });
 
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);

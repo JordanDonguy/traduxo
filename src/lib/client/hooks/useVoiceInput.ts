@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createSpeechRecognition } from "@/lib/client/utils/speechRecognition";
+import { toast } from "react-toastify";
 
 type UseVoiceInputProps = {
   inputLang: string;                          // Current input language
@@ -11,7 +12,7 @@ type UseVoiceInputProps = {
   // ---- Injected dependencies for testing ----
   speechRecognizer?: typeof createSpeechRecognition;
   timeoutFn?: typeof setTimeout;
-  alertFn?: typeof alert;
+  toastFn?: typeof toast; 
   consoleFn?: typeof console.log;
 };
 
@@ -22,7 +23,7 @@ export function useVoiceInput({
   inputText,
   speechRecognizer = createSpeechRecognition,
   timeoutFn = setTimeout,
-  alertFn = alert,
+  toastFn = toast,
   consoleFn = console.log,
 }: UseVoiceInputProps) {
   // ---- Step 1: Initialize state ----
@@ -51,7 +52,7 @@ export function useVoiceInput({
 
     // ---- Step 2c: Handle unsupported browsers ----
     if (!recognizer) {
-      alertFn(
+      toastFn.error(
         "Voice input isn't supported on this browser, please use Chrome or any other compatible browser."
       );
       return false;
