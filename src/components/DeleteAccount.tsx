@@ -1,9 +1,7 @@
 "use client"
 
-import { useState } from "react";
+import { useDeleteAccount } from "@/lib/client/hooks/useDeleteAccount";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { toast } from "react-toastify";
 
 interface DeleteAccountProps {
   showMenu: boolean
@@ -12,28 +10,7 @@ interface DeleteAccountProps {
 function DeleteAccount({ showMenu }: DeleteAccountProps) {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const deleteAccount = async () => {
-    setIsLoading(true);     // To trigger loading spinner
-
-    const res = await fetch("/api/auth/delete-account", {
-      method: "DELETE",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      toast.error(data.message || "Failed to delete account");
-      router.push("/")
-    };
-
-    await signOut({ callbackUrl: "/?delete=true" });    // Sign out after account's deleted
-    setIsLoading(false);
-    router.push("/")
-  }
+  const { deleteAccount, isLoading } = useDeleteAccount();
 
   return (
     <div className={`max-w-2xl w-full flex justify-center mx-auto ${showMenu ? "opacity-100" : "opacity-0"} duration-200`}>

@@ -1,131 +1,32 @@
-'use client';
+"use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useAuthHandlers } from "@/lib/client/hooks/useAuthForm";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
-import { toast } from "react-toastify";
 
 interface LoginProps {
   showMenu: boolean
 }
 
 export default function Login({ showMenu }: LoginProps) {
-  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { handleLogin, handleSignup, handleGoogleButton, handleForgotPassword } = useAuthHandlers();
 
-  const [isSignup, setIsSignup] = useState<boolean>(false);
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-
-  // -------------- Credentials login --------------
-  const handleLogin = async () => {
-    if (password.length < 8) {
-      setError("Password length must be at least 8 characters");
-      return
-    };
-
-    setIsLoading(true);
-
-    const res = await signIn("credentials", {
-      callbackUrl: "/?login=true",
-      email,
-      password,
-    });
-
-    if (res?.error) {
-      setError(res.error)
-    } else {
-      router.push("/")
-    };
-    setIsLoading(false)
-  };
-
-  // -------------- Google OAuth login --------------
-  const handleGoogleButton = async () => {
-    try {
-      await signIn("google", {
-        callbackUrl: "/?login=true",
-      });
-    } catch (err) {
-      console.error("Google sign-in failed:", err);
-    }
-  };
-
-  // -------------- Credentials signup --------------
-  const handleSignup = async () => {
-    if (password.length < 8 || confirmPassword.length < 8) {
-      setError("Passwords length must be at least 8 characters");
-      return
-    };
-
-    if (password !== confirmPassword) {
-      setError("Password and confirm password don't match");
-      return
-    };
-
-    // Register user to db (api call)
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setError(data.error);
-      return;
-    }
-
-    // After successful sign-up, log in user immediately
-    await signIn('credentials', {
-      callbackUrl: "/?login=true",
-      email,
-      password
-    });
-
-    router.push("/");
-    setIsSignup(false);
-  };
-
-  // -------- Reset password --------
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError("Please enter your email to reset your password");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      await fetch("/api/auth/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      toast.success("If this email exists, a reset link has been sent.");
-      router.replace("/"); // navigate back to main page
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong.");
-    }
-    setIsLoading(false);
-  };
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         setError("");
-        if (isSignup) handleSignup();
-        else handleLogin();
+        if (isSignup) handleSignup(email, password, confirmPassword, setError, setIsSignup);
+        else handleLogin(email, password, setError, setIsLoading);
       }}
       className={`
         max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
@@ -134,7 +35,7 @@ export default function Login({ showMenu }: LoginProps) {
     >
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        < div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        < div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
       ) : null}
@@ -192,7 +93,7 @@ export default function Login({ showMenu }: LoginProps) {
             </label>
             <input
               type="password"
-              id="password"
+              id="confirm-password"
               name="confirm-password"
               placeholder="********"
               className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
@@ -232,7 +133,7 @@ export default function Login({ showMenu }: LoginProps) {
         {!isSignup && (
           <button
             type="button"
-            onClick={handleForgotPassword}
+            onClick={() => handleForgotPassword(email, setError, setIsLoading)}
             className="text-blue-500 hover:underline hover:cursor-pointer"
           >
             Forgot your password?

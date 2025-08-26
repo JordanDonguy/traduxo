@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useChangePassword } from "@/lib/client/hooks/useChangePassword";
 import { Lock } from "lucide-react";
-import { toast } from "react-toastify";
 
 type ChangePasswordProps = {
   isCredentials: boolean | undefined;
@@ -12,78 +10,17 @@ type ChangePasswordProps = {
 }
 
 export default function ChangePassword({ isCredentials, showMenu }: ChangePasswordProps) {
-  const router = useRouter();
+  const { isLoading, error, handleSubmit } = useChangePassword({ isCredentials });
 
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const { update } = useSession();
-
-  // -------------- Change / create password --------------
-  const handleSubmit = async () => {
-    if (password.length < 8 || confirmPassword.length < 8) {
-      setError("Passwords length must be at least 8 characters");
-      return
-    };
-
-    if (password !== confirmPassword) {
-      setError("New password and confirm password don't match");
-      return
-    };
-
-    setIsLoading(true);           // to display a loading spinner
-
-    // Fetch either update or create password route depending if user already has a password or not
-    const res = isCredentials ? (
-      // ----------- Update password -----------
-      await fetch("/api/auth/update-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ currentPassword, password })
-      })
-    ) : (
-      // ----------- Or create password -----------
-      await fetch("/api/auth/create-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ password })
-      })
-    );
-
-    // If error, display it
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data?.error || `Error while ${isCredentials ? "udpating" : "creating"} your password`);
-      setIsLoading(false);
-      return
-    };
-
-    // If successful, reset password inputs and display toast success
-    setCurrentPassword("");
-    setPassword("");
-    setConfirmPassword("");
-    toast.success(`Your password has been ${isCredentials ? "updated" : "created"}`);
-
-    // Close menu and reset loading state
-    router.push("/");
-    setIsLoading(false);
-
-    // Update next auth session state
-    await update();
-  };
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handleSubmit();
+        handleSubmit({ currentPassword, password, confirmPassword });
       }}
       className={`
         max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
