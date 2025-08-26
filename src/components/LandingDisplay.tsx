@@ -1,77 +1,13 @@
 "use client"
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
-import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
-import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
-import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
-import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
+import { useSuggestion } from "@/lib/client/hooks/useSuggestion";
 import { Dices, Languages } from "lucide-react";
 
 function LandingDisplay() {
-  const { setIsLoading, setError } = useApp();
-
-  const {
-    setTranslatedText,
-    setInputTextLang,
-    setTranslatedTextLang,
-    setExplanation,
-    setIsFavorite,
-    setTranslationId,
-    expressionPool,
-    setExpressionPool,
-  } = useTranslationContext();
-
-  const { detectedLang, outputLang } = useLanguageContext();
-
-  const { status } = useSession();
-  const { waitForStatus } = useWaitForAuthStatus();
+  const { suggestTranslation } = useSuggestion();
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
-
-  // Suggest and expression on main view
-  async function suggestExpression() {
-    // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
-    const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
-
-    setIsLoading(true);   // Trigger loading animation
-
-    // Wait for session status to be defined (authenticated or not)
-    await waitForStatus();
-
-    if (!expressionPool.length) {
-      const promises = [
-        suggestExpressionHelper({
-          detectedLang: suggestionLang,
-          outputLang,
-          setTranslatedText,
-          setInputTextLang,
-          setTranslatedTextLang,
-          setExplanation,
-          setError,
-          setIsLoading,
-          setIsFavorite,
-          setTranslationId,
-        }),
-      ];
-
-      if (status === "authenticated") {
-        promises.push(
-          fetchExpressionPoolHelper({
-            setError,
-            suggestionLang,
-            setExpressionPool,
-          })
-        );
-      }
-
-      await Promise.all(promises);
-      return;
-    }
-  };
 
   // Focus translation input
   function focusInput() {
@@ -101,7 +37,7 @@ function LandingDisplay() {
       {/* Suggest expression button */}
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-4 w-full max-w-[85%]">
         <button
-          onClick={suggestExpression}
+          onClick={suggestTranslation}
           className="flex justify-center items-center rounded-full border w-full py-4 gap-4 border-[var(--border)]
           hover:cursor-pointer hover:bg-[var(--bg-2)] active:scale-85 duration-100"
         >
