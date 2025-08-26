@@ -1,7 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useExplanationLanguage } from "@/lib/client/hooks/useExplanationLanguage";
 import { sortedLanguageCodes } from "@/lib/client/utils/sortedLanguageCodes";
 import { Check } from "lucide-react";
 import ISO6391 from "iso-639-1";
@@ -11,22 +10,7 @@ interface ExplanationLanguageProps {
 }
 
 function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
-  const { systemLang, setSystemLang } = useLanguageContext();
-  const { status } = useSession();
-
-  // Update system language state and save it to db if user logged in
-  async function changeSystemLang(code: string) {
-    setSystemLang(code);
-    if (status === "authenticated") {
-      await fetch("/api/auth/update-language", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ code })
-      })
-    }
-  };
+  const { systemLang, changeSystemLang } = useExplanationLanguage();
 
   return (
     <div
