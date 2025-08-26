@@ -1,17 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useSuggestion } from "@/lib/client/hooks/useSuggestion";
 import { User, Dices } from "lucide-react";
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
-import { useWaitForAuthStatus } from "@/lib/client/hooks/useWaitForAuthStatus";
-import { translationHelper } from "@/lib/client/utils/translate";
-import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
-import { fetchExpressionPoolHelper } from "@/lib/client/utils/fetchExpressionPool";
-import getSuggestionLanguage from "@/lib/client/utils/getSuggestionLanguage";
 import UserMenu from "./UserMenu";
 import Logo from "./Logo";
 
@@ -22,121 +14,23 @@ function AppHeader() {
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
-  const { setIsLoading, setError } = useApp();
-
-  const {
-    setInputText,
-    setTranslatedText,
-    setInputTextLang,
-    setTranslatedTextLang,
-    setExplanation,
-    setIsFavorite,
-    setTranslationId,
-    expressionPool,
-    setExpressionPool,
-    translationHistory,
-  } = useTranslationContext();
-
-  const {
-    outputLang,
-    detectedLang
-  } = useLanguageContext();
-
-  const { status } = useSession();
-  const { waitForStatus } = useWaitForAuthStatus();  // A function that resolve a promise once session status is set
-
-  const [isRolling, setIsRolling] = useState<boolean>(false);   // To trigger dices rolling animation (on click)
-
-  // --------- Suggest expression function ---------
-  async function suggestTranslation() {
-
-    setIsRolling(true);
-    setTimeout(() => setIsRolling(false), 600); // animation
-
-    router.push("/");
-
-    // If in "auto" inputLang, check if detectedLang = outputLang and uses a fallback if it is
-    const suggestionLang = getSuggestionLanguage(detectedLang, outputLang);
-
-    setIsLoading(true);   // Trigger loading animation
-
-    // Wait for session status to be defined (authenticated or not)
-    await waitForStatus();
-
-    if (!expressionPool.length) {
-      const promises = [
-        suggestExpressionHelper({
-          detectedLang: suggestionLang,
-          outputLang,
-          setTranslatedText,
-          setInputTextLang,
-          setTranslatedTextLang,
-          setExplanation,
-          setError,
-          setIsLoading,
-          setIsFavorite,
-          setTranslationId,
-        }),
-      ];
-
-      if (status === "authenticated") {
-        promises.push(
-          fetchExpressionPoolHelper({
-            setError,
-            suggestionLang,
-            setExpressionPool,
-          })
-        );
-      }
-
-      await Promise.all(promises);
-      return;
-    }
-
-    // Find first expression NOT in history
-    const newExpression = expressionPool.find(
-      (expression) => !translationHistory.some(t => t.inputText.toLowerCase() === expression.toLowerCase())
-    );
-
-    if (!newExpression) {
-      // No new expressions left, clear pool and try again
-      setExpressionPool([]);
-      await suggestTranslation();
-      return;
-    }
-
-    // Request translation for the new expression
-    await translationHelper({
-      inputText: newExpression,
-      inputLang: suggestionLang,
-      outputLang,
-      setInputText,
-      setInputTextLang,
-      setTranslatedTextLang,
-      setTranslatedText,
-      setExplanation,
-      setIsLoading,
-      setIsFavorite,
-      setTranslationId,
-      setError,
-    });
-
-    // Remove the used expression from pool to avoid repeating
-    setExpressionPool(prev => prev.filter(expr => expr !== newExpression));
-  };
+  const { suggestTranslation, isRolling } = useSuggestion();
 
   // -------- Menu opening / closing section --------
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   // Get url params, if menu-open, open the menu, otherwise close it
   useEffect(() => {
-      const menuOpen = searchParams.get("menu") === "open";
-      console.log(menuOpen)
-      if (menuOpen) {
-        setShowMenu(true)
-      } else {
-        setShowMenu(false)
-      }
+    const menuOpen = searchParams.get("menu") === "open";
+    if (menuOpen) {
+      setShowMenu(true)
+    } else {
+      setShowMenu(false)
+      // Remove submenu param using router.replace
+      const params = new URLSearchParams(searchParams);
+      params.delete("submenu");
+      router.replace(`${pathname}?${params.toString()}`);
+    }
   }, [searchParams]);
 
   return (
@@ -173,8 +67,8 @@ function AppHeader() {
             }}
             className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
           >
-            <User size={28} className="md:hidden"/>
-            <User className="hidden md:block"/>
+            <User size={28} className="md:hidden" />
+            <User className="hidden md:block" />
           </button>
         </div>
       </div>
