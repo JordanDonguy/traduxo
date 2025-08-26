@@ -1,100 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useFavoriteTranslations } from "@/lib/client/hooks/useFavoriteTranslations";
+import { useSelectTranslation } from "@/lib/client/hooks/useSelectTranslation";
 import { CircleX } from "lucide-react";
-import { toast } from "react-toastify";
 
 interface FavoriteTranslationProps {
   showMenu: boolean
 };
 
-type FavoriteTranslation = {
-  id: string;
-  inputText: string;
-  translation: string;
-  inputLang: string;
-  outputLang: string;
-  alt1: string | null;
-  alt2: string | null;
-  alt3: string | null;
-};
-
 function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
-  const router = useRouter();
-
-  const { loadTranslationFromMenu, translationId, setTranslationId, setIsFavorite } = useTranslationContext();
-  const [favoriteTranslations, setFavoriteTranslations] = useState<FavoriteTranslation[]>([]);
-  const { setInputLang, setOutputLang } = useLanguageContext();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const { status } = useSession();
-
-  async function deleteTranslation(id: string) {
-    // If the deleted translation is currently shown in the main view,
-    // reset its favorite state in the UI.
-    if (translationId === id) {
-      setTranslationId(undefined);
-      setIsFavorite(false)
-    }
-
-    try {
-      const res = await fetch("/api/favorite", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const errorMsg = data.error || "Failed to delete translation";
-        throw new Error(errorMsg);
-      }
-
-      // Remove the deleted translation from the state
-      setFavoriteTranslations((prev) => prev.filter((t) => t.id !== id));
-    } catch (error: unknown) {
-      let message = "An error occurred";
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      toast.error(message);
-      router.push("/");
-    }
-  }
-
-  // Fetch user's translation history on mount
-  useEffect(() => {
-    if (status === "loading") return;
-    if (status !== "authenticated") return setIsLoading(false);
-
-    async function fetchData() {
-      try {
-        const res = await fetch("/api/favorite");
-
-        if (res.status === 204) {
-          // No history — just set empty list
-          setFavoriteTranslations([]);
-        } else if (res.ok) {
-          const data = await res.json();
-          setFavoriteTranslations(data);
-        } else {
-          console.error("Failed to fetch history:", res.statusText);
-        }
-      } catch (err) {
-        console.error("Error fetching history:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [setFavoriteTranslations, status]);
+  const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations();
+  const { selectTranslation } = useSelectTranslation();
 
   return (
     <div
@@ -118,12 +34,7 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
             {favoriteTranslations.map((t, idx) => (
               <article
                 key={idx}
-                onClick={() => {
-                  loadTranslationFromMenu(t, true);
-                  setInputLang(t.inputLang);
-                  setOutputLang(t.outputLang);
-                  router.push("/");
-                }}
+                onClick={() => selectTranslation(t, true) }
                 className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4
               border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer

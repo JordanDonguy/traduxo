@@ -1,66 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
-import { fetchHistory } from "@/lib/client/utils/fetchHistory";
+import { useTranslationHistory } from "@/lib/client/hooks/useTranslationHistory";
+import { useSelectTranslation } from "@/lib/client/hooks/useSelectTranslation";
 import { CircleX } from "lucide-react";
-import { toast } from "react-toastify";
 
 interface TranslationHistoryProps {
   showMenu: boolean
 }
 
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
-  const router = useRouter();
-
-  const { translationHistory, setTranslationHistory, loadTranslationFromMenu } = useTranslationContext();
-  const { setInputLang, setOutputLang } = useLanguageContext();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const { status } = useSession();
-
-  async function deleteTranslation(id: string) {
-    try {
-      const res = await fetch("/api/history", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const errorMsg = data.error || "Failed to delete translation";
-        throw new Error(errorMsg);
-      }
-
-      // Remove the deleted translation from the state
-      setTranslationHistory((prev) => prev.filter((t) => t.id !== id));
-    } catch (error: unknown) {
-      let message = "An error occurred";
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      toast.error(message);
-      router.push("/");
-    }
-  }
-
-  // Fetch user's translation history on mount
-  useEffect(() => {
-    const loadHistory = async () => {
-      await fetchHistory({
-        status,
-        setTranslationHistory
-      });
-    };
-    loadHistory();
-    setIsLoading(false);
-  }, [setTranslationHistory, status]);
+  const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory();
+  const { selectTranslation } = useSelectTranslation();
 
   return (
     <div
@@ -84,12 +34,7 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
             {translationHistory.map((t, idx) => (
               <article
                 key={idx}
-                onClick={() => {
-                  loadTranslationFromMenu(t, false);
-                  setInputLang(t.inputLang);
-                  setOutputLang(t.outputLang);
-                  router.push("/");
-                }}
+                onClick={() => selectTranslation(t, false) }
                 className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4
               border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer
