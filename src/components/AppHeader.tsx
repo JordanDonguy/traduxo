@@ -31,7 +31,7 @@ function AppHeader() {
       params.delete("submenu");
       router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [searchParams]);
+  }, [searchParams, pathname, router]);
 
   return (
     <header className="w-full h-full flex justify-center">

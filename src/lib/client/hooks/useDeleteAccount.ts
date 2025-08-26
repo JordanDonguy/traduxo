@@ -16,9 +16,15 @@ type UseDeleteAccountArgs = {
 export function useDeleteAccount({
   fetcher = fetch,
   toaster = toast,
-  router = useRouter(),
+  router,
   signOutFn = signOut,
 }: UseDeleteAccountArgs = {}) {
+// --- Always call hooks unconditionally ---
+  const defaultRouter = useRouter();
+
+  // --- Use injected values for testing if provided ---
+  const effectiveRouter = router ?? defaultRouter;
+
   const [isLoading, setIsLoading] = useState(false);
 
   const deleteAccount = async () => {
@@ -39,7 +45,7 @@ export function useDeleteAccount({
     if (!res.ok) {
       toaster.error(data.message || "Failed to delete account");
       setIsLoading(false);
-      router.push("/");
+      effectiveRouter.push("/");
       return;
     }
 
@@ -48,7 +54,7 @@ export function useDeleteAccount({
 
     // ---- Step 5: Reset loading state & redirect ----
     setIsLoading(false);
-    router.push("/");
+    effectiveRouter.push("/");
     return true;
   };
 

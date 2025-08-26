@@ -28,7 +28,7 @@ type UseSuggestionArgs = {
 };
 
 export function useSuggestion({
-  router = useRouter(),
+  router,
   session,
   appContext,
   translationContext,
@@ -40,10 +40,19 @@ export function useSuggestion({
   getSuggestionLanguageFn = getSuggestionLanguage,
   timeoutFn = setTimeout,
 }: UseSuggestionArgs = {}) {
-  const { setIsLoading, setError } = appContext ?? useApp();
-  const { status } = session ?? useSession();
-  const { waitForStatus } = waitForAuthStatus ?? useWaitForAuthStatus();
 
+  // --- Always call hooks unconditionally ---
+  const defaultAppContext = useApp();
+  const defaultSession = useSession();
+  const defaultWaitForAuthStatus = useWaitForAuthStatus();
+  const defaultTranslationContext = useTranslationContext();
+  const defaultLanguageContext = useLanguageContext();
+  const defaultRouter = useRouter();
+
+  // --- Use injected values for testing if provided ---
+  const { setIsLoading, setError } = appContext ?? defaultAppContext;
+  const { status } = session ?? defaultSession;
+  const { waitForStatus } = waitForAuthStatus ?? defaultWaitForAuthStatus;
   const {
     setInputText,
     setTranslatedText,
@@ -55,9 +64,10 @@ export function useSuggestion({
     expressionPool,
     setExpressionPool,
     translationHistory,
-  } = translationContext ?? useTranslationContext();
+  } = translationContext ?? defaultTranslationContext;
+  const { outputLang, detectedLang } = languageContext ?? defaultLanguageContext;
 
-  const { outputLang, detectedLang } = languageContext ?? useLanguageContext();
+  const effectiveRouter = router ?? defaultRouter;
 
   const [isRolling, setIsRolling] = useState(false);
 
@@ -67,7 +77,7 @@ export function useSuggestion({
     timeoutFn(() => setIsRolling(false), 600);
 
     // ---- Step 2: Redirect to main page ----
-    router.push("/");
+    effectiveRouter.push("/");
 
     // ---- Step 3: Pick correct language for suggestion ----
     const suggestionLang = getSuggestionLanguageFn(detectedLang, outputLang);

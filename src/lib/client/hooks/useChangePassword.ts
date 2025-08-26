@@ -18,10 +18,16 @@ export function useChangePassword({
   isCredentials,
   fetcher = fetch,
   toaster = toast,
-  router = useRouter(),
+  router,
   sessionUpdater,
 }: UseChangePasswordArgs) {
+
+  // --- Always call hooks unconditionally ---
+  const defaultRouter = useRouter();
   const { update } = useSession();
+
+  // --- Use injected values for testing if provided ---
+  const effectiveRouter = router ?? defaultRouter;
   const effectiveUpdater = sessionUpdater ?? update;
 
   // State to track loading spinner
@@ -88,13 +94,13 @@ export function useChangePassword({
       );
 
       // ---- Step 8: Redirect user back to home ----
-      router.push("/");
+      effectiveRouter.push("/");
 
       // ---- Step 9: Refresh session in NextAuth ----
       await effectiveUpdater();
 
       return true;
-    } catch (err) {
+    } catch {
       // ---- Step 10: Catch any unexpected error ----
       setError("Internal server error");
       return false;
