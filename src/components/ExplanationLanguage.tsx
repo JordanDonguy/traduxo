@@ -1,7 +1,7 @@
 "use client"
 
 import { useExplanationLanguage } from "@/lib/client/hooks/useExplanationLanguage";
-import { sortedLanguageCodes } from "@/lib/client/utils/sortedLanguageCodes";
+import { getSortedLanguageCodes } from "@/lib/client/utils/sortedLanguageCodes";
 import { Check } from "lucide-react";
 import ISO6391 from "iso-639-1";
 
@@ -24,7 +24,7 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
 
         <div className="flex flex-col gap-6 overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide">
 
-          {sortedLanguageCodes.map(code => (
+          {getSortedLanguageCodes().map(code => (
             <article
               key={code}
               onClick={() => {

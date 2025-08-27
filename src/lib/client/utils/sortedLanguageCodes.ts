@@ -14,15 +14,15 @@ const popularLangs = [
   "hi", // Hindi
 ];
 
-export const sortedLanguageCodes = ISO6391.getAllCodes().sort((a, b) => {
-  const indexA = popularLangs.indexOf(a);
-  const indexB = popularLangs.indexOf(b);
+export const getSortedLanguageCodes = () => {
+  return ISO6391.getAllCodes().sort((a, b) => {
+    const indexA = popularLangs.indexOf(a);
+    const indexB = popularLangs.indexOf(b);
 
-  if (indexA !== -1 && indexB !== -1) {
-    return indexA - indexB;
-  }
-  if (indexA !== -1) return -1;
-  if (indexB !== -1) return 1;
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
 
-  return a.localeCompare(b);
-});
+    return a.localeCompare(b);
+  });
+};
