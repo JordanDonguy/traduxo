@@ -9,7 +9,8 @@ interface Router {
 const errorMessages: Record<string, string> = {
   NoMailOrPassword: "Please enter an email and a password",
   NoUserFound: "User not found, please sign up",
-  NeedToCreatePassword: "This account uses Google sign-in. Log in with Google first, then set a password in your profile.",
+  NeedToCreatePassword:
+    "This account uses Google sign-in. Log in with Google first, then set a password in your profile.",
   PasswordIncorrect: "Password incorrect",
   InvalidInput: "Invalid form input. Please check and try again.",
 };
@@ -17,17 +18,20 @@ const errorMessages: Record<string, string> = {
 export function showAuthToasts(router: Router) {
   if (typeof window === "undefined") return;
 
-  // Get url params
-  const params = new URLSearchParams(window.location.search);
+  // Always use a URL instance (works better in tests)
+  const url = new URL(window.location.toString());
+  const params = url.searchParams;
+
   const error = params.get("error");
   const login = params.get("login");
   const logout = params.get("logout");
   const accountDeleted = params.get("delete");
   const resetPassword = params.get("reset-password");
+
   let shouldClean = false;
 
   // Display error toast
-  if (typeof error === "string") {
+  if (error) {
     const message = errorMessages[error] || "Unknown authentication error.";
     toast.error(message);
     shouldClean = true;
@@ -48,18 +52,17 @@ export function showAuthToasts(router: Router) {
   // Display account deleted toast
   if (accountDeleted === "true") {
     toast.success("Accound successfully deleted.");
-    shouldClean = true
+    shouldClean = true;
   }
 
   // Display reset password toast
   if (resetPassword === "true") {
     toast.success("Your password has been updated, you can now login.");
-    shouldClean = true
+    shouldClean = true;
   }
 
   // Cleanup url
   if (shouldClean) {
-    const url = new URL(window.location.href);
     url.search = "";
     router.replace(url.toString());
   }
