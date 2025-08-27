@@ -1,38 +1,53 @@
+// fetchExpressionPoolHelper.ts
 import { getPoolPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
+import { SuggestionResult } from "../../../../types/suggestionResult";
 
 type PoolHelperArgs = {
   suggestionLang: string;
   setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  // Injected Dependencies for testing
+  fetcher?: typeof fetch;
+  promptGetter?: (lang: string) => string;
+  responseCleaner?: (raw: string) => string;
 };
 
-// Get a pool of raw expressions (no translations)
 export async function fetchExpressionPoolHelper({
-  setError,
   suggestionLang,
   setExpressionPool,
-}: PoolHelperArgs) {
-  const poolPrompt = getPoolPrompt(suggestionLang);
+  setError,
+  fetcher = fetch,
+  promptGetter = getPoolPrompt,
+  responseCleaner = cleanGeminiResponse,
+}: PoolHelperArgs): Promise<SuggestionResult<string[]>> {
+  try {
+    const poolPrompt = promptGetter(suggestionLang);
 
-  const res = await fetch("/api/gemini/complete", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: poolPrompt }),
-  });
+    const res = await fetcher("/api/gemini/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: poolPrompt }),
+    });
 
-  if (res.status === 429) {
-    const { error } = await res.json();
-    setError(error);
-    return;
+    if (res.status === 429) {
+      const { error } = await res.json();
+      setError(error);
+      return { success: false, error };
+    }
+
+    if (!res.ok) throw new Error(`Gemini pool request error: ${res.status}`);
+
+    const { text } = await res.json();
+    const poolArray: string[] = JSON.parse(responseCleaner(text));
+
+    const cleanedPool = poolArray.map((expr) => expr.replace(/\.+$/, ""));
+    setExpressionPool(cleanedPool);
+
+    return { success: true, data: cleanedPool };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : "Unknown error";
+    setError(errorMsg);
+    return { success: false, error: errorMsg };
   }
-
-  if (!res.ok) throw new Error(`Gemini pool request error: ${res.status}`);
-
-  const { text } = await res.json();
-  const poolArray: string[] = JSON.parse(cleanGeminiResponse(text));
-
-  setExpressionPool(
-    poolArray.map(expr => expr.replace(/\.+$/, "")) // remove trailing dots
-  );
 }

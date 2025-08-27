@@ -14,9 +14,11 @@ type TranslateHelperArgs = {
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  // Injected dependencies for testing
+  fetcher?: typeof fetch;
+  promptGetter?: typeof getTranslationPrompt;
+  responseCleaner?: typeof cleanGeminiResponse;
 };
-
-// Handle a translation request to Gemini
 
 export async function translationHelper({
   inputText,
@@ -31,14 +33,18 @@ export async function translationHelper({
   setIsFavorite,
   setTranslationId,
   setError,
+  fetcher = fetch,
+  promptGetter = getTranslationPrompt,
+  responseCleaner = cleanGeminiResponse,
 }: TranslateHelperArgs) {
-  // Blur active element to close mobile keyboard
-  if (document.activeElement instanceof HTMLElement) {
+  if (!inputText.length) return { success: false, message: "No input text" };
+
+  // Blur active element safely
+  if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
 
-  if (!inputText.length) return;
-
+  // Reset state
   setIsLoading(true);
   setError("");
   setTranslatedText([]);
@@ -46,35 +52,44 @@ export async function translationHelper({
   setIsFavorite(false);
   setTranslationId(undefined);
 
-  const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
+  const prompt = promptGetter({ inputText, inputLang, outputLang });
   setInputText("");
 
-  const res = await fetch("/api/gemini/complete", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, isSuggestion: false }),
-  });
+  try {
+    const res = await fetcher("/api/gemini/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, isSuggestion: false }),
+    });
 
-  if (res.status === 429) {
-    const { error } = await res.json();
-    setError(error);
+    if (res.status === 429) {
+      const { error } = await res.json();
+      setError(error);
+      setIsLoading(false);
+      return { success: false, error };
+    }
+
+    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+
+    const { text } = await res.json();
+    const translationArray = JSON.parse(responseCleaner(text));
+
+    if (inputLang === "auto") {
+      setInputTextLang(translationArray[translationArray.length - 1]);
+    } else {
+      setInputTextLang(inputLang);
+    }
+
+    setTranslatedTextLang(outputLang);
+    setTranslatedText(translationArray);
     setIsLoading(false);
-    return;
+
+    return { success: true, data: translationArray };
+  } catch (err: unknown) {
+    console.error(err);
+    const errorMsg = "Internal server error... please try again 🙏";
+    setError(errorMsg);
+    setIsLoading(false);
+    return { success: false, error: errorMsg };
   }
-
-  if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-
-  const { text } = await res.json();
-  const translationArray = JSON.parse(cleanGeminiResponse(text));
-
-  if (inputLang === "auto") {
-    // Assume last element contains detected language
-    setInputTextLang(translationArray[translationArray.length - 1]);
-  } else {
-    setInputTextLang(inputLang);
-  }
-
-  setTranslatedTextLang(outputLang);
-  setTranslatedText(translationArray);
-  setIsLoading(false);
 }

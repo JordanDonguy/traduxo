@@ -1,5 +1,6 @@
 import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
+import { SuggestionResult } from "../../../../types/suggestionResult";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
@@ -12,6 +13,10 @@ type SuggestionHelperArgs = {
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  // Injected dependencies for testing
+  fetcher?: typeof fetch;
+  promptGetter?: typeof getSuggestionPrompt;
+  responseCleaner?: typeof cleanGeminiResponse;
 };
 
 // Get one normal suggestion with translation
@@ -26,47 +31,55 @@ export async function suggestExpressionHelper({
   setIsFavorite,
   setTranslationId,
   setError,
-}: SuggestionHelperArgs) {
-
-  // Blur the active element (input) immediately on submit to close mobile keyboard
-  if (document.activeElement instanceof HTMLElement) {
+  fetcher = fetch,
+  promptGetter = getSuggestionPrompt,
+  responseCleaner = cleanGeminiResponse,
+}: SuggestionHelperArgs): Promise<SuggestionResult<string[]>> {
+  // Blur active element if in browser
+  if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
-  };
+  }
 
+  // Reset state
   setIsLoading(true);
   setError("");
   setTranslatedText([]);
   setExplanation("");
   setIsFavorite(false);
   setTranslationId(undefined);
-
   setInputTextLang(detectedLang);
   setTranslatedTextLang(outputLang);
 
-  const prompt = getSuggestionPrompt({ detectedLang, outputLang });
+  const prompt = promptGetter({ detectedLang, outputLang });
 
   try {
-    const res = await fetch("/api/gemini/complete", {
+    const res = await fetcher("/api/gemini/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, isSuggestion: true }),
     });
-  
+
     if (res.status === 429) {
       const { error } = await res.json();
       setError(error);
       setIsLoading(false);
-      return;
+      return { success: false, error };
     }
+
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
-  
+
     const { text } = await res.json();
-    const translationArray = JSON.parse(cleanGeminiResponse(text));
-  
+    const translationArray = JSON.parse(responseCleaner(text));
+
     setTranslatedText(translationArray);
     setIsLoading(false);
-  } catch (error) {
-    console.log(error);
-    setError("Internal server error... please try again 🙏");
+
+    return { success: true, data: translationArray };
+  } catch (err) {
+    console.error(err);
+    const errorMsg = "Internal server error... please try again 🙏";
+    setError(errorMsg);
+    setIsLoading(false);
+    return { success: false, error: errorMsg };
   }
 }

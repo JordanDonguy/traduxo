@@ -1,20 +1,11 @@
 "use client"
 
-type TranslationHistory = {
-  id: string;
-  inputText: string;
-  translation: string;
-  inputLang: string;
-  outputLang: string;
-  alt1: string | null;
-  alt2: string | null;
-  alt3: string | null;
-};
+import { Translation } from "../../../../types/translation";
 
 type FetchHistoryDeps = {
   status: string;
-  setTranslationHistory: (data: TranslationHistory[]) => void;
-  fetchFn?: typeof fetch; // optional for testing/mock
+  setTranslationHistory: (data: Translation[]) => void;
+  fetchFn?: typeof fetch; // for testing/mock
   url?: string; // default API URL
 };
 

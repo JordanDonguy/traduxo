@@ -5,29 +5,31 @@ export function createSpeechRecognition({
   onResult,
   onError,
   onStop,
+  SpeechRecognitionClass,
 }: {
   lang?: string;
   onResult: (transcript: string) => void;
   onError?: (error: string) => void;
   onStop?: () => void;
+  SpeechRecognitionClass?: new () => SpeechRecognition & { abort: () => void }; // for test injection
 }) {
+  // Environment check
   if (typeof window === "undefined") {
     console.warn("SpeechRecognition not supported in this environment.");
     return null;
   }
 
-  const SpeechRecognitionClass =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Browser support check
+  const effectiveClass =
+    SpeechRecognitionClass ||
+    (window.SpeechRecognition || window.webkitSpeechRecognition);
 
-  if (!SpeechRecognitionClass) {
+  if (!effectiveClass) {
     console.warn("SpeechRecognition not supported in this browser.");
     return null;
   }
 
-  const recognition = new SpeechRecognitionClass() as SpeechRecognition & {
-    abort: () => void;
-  };
-
+  const recognition = new effectiveClass() as SpeechRecognition & { abort: () => void };
   recognition.lang = lang;
   recognition.continuous = false;
   recognition.interimResults = true;
@@ -46,14 +48,13 @@ export function createSpeechRecognition({
   };
 
   recognition.addEventListener("end", () => {
-    if (onStop) {
-      onStop();
-    }
+    if (onStop) onStop();
   });
 
   return {
     start: () => recognition.start(),
     stop: () => recognition.stop(),
     abort: () => recognition.abort(),
+    _recognition: recognition, // for testing
   };
 }
