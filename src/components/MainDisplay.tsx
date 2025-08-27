@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { useCooldown } from "@/lib/client/hooks/useCooldown";
 import { useFavoriteToggle } from "@/lib/client/hooks/useFavoriteToggle";
-import { useExplanation } from "@/lib/client/hooks/useExplanation";
 import { useSwitchTranslations } from "@/lib/client/hooks/useSwitchTranslations";
 import { showAuthToasts } from "@/lib/client/utils/authToasts";
 import ErrorSection from "./ErrorSection";
@@ -16,7 +14,7 @@ import LandingDisplay from "./LandingDisplay";
 import LoadingAnimation from "./LoadingAnimation";
 
 function MainDisplay() {
-  const { isLoading, error, setError, setShowLoginForm } = useApp();
+  const { isLoading, error, setError } = useApp();
 
   const {
     translatedText,
@@ -28,7 +26,6 @@ function MainDisplay() {
   } = useTranslationContext();
 
   const { handleFavorite, isFavLoading } = useFavoriteToggle();
-  const { handleExplanation, isExpLoading, explanationError } = useExplanation();
   const { switchTranslations, fading } = useSwitchTranslations({
     setTranslatedText,
     timeoutFn: setTimeout
@@ -37,15 +34,6 @@ function MainDisplay() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const router = useRouter();
-
-  const cooldown = useCooldown(error.startsWith("Too many requests"));  // Starts a cooldown if rateLimiter error
-
-  // Reset error state when cooldown arrives at 0 if rateLimiting error
-  useEffect(() => {
-    if (cooldown === 0 && error.startsWith("Too many requests")) {
-      setError("")
-    }
-  }, [cooldown, error, setError]);
 
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {
@@ -83,10 +71,12 @@ function MainDisplay() {
   }, [translatedText, isLoading]);
 
   return (
-    <section className={`relative flex flex-col items-center w-full duration-500 mb-40 lg:mb-56 ${!translatedText.length ? "justify-center" : "justify-start"}`}>
+    <section className={`relative flex flex-col items-center w-full duration-500 mt-12 mb-40 lg:mb-56
+      ${!translatedText.length ? "justify-center" : "justify-start"}
+      ${explanation.length > 500 ? "mb-40 lg:mb-56" : "mb-52 lg:mb-68"}`}
+    >
       {error.length ? (
-        <ErrorSection error={error} cooldown={cooldown} onLoginClick={() => setShowLoginForm(true)} />
-
+        <ErrorSection error={error} setError={setError} />
       ) : isLoading ? (
         <LoadingAnimation />
       ) : translatedText.length === 0 ? (
@@ -107,11 +97,8 @@ function MainDisplay() {
 
           <ExplanationSection
             explanation={explanation}
-            error={explanationError}
-            isLoading={isExpLoading}
             mounted={mounted}
             ready={ready}
-            onGenerate={handleExplanation}
           />
 
         </TranslationSection>

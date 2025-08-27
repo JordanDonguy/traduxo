@@ -3,7 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 
 // -------------- Config --------------
-export const runtime = 'nodejs'; // switch to 'edge' for lower latency
+export const runtime = 'nodejs';
 
 // Simple schema to keep the handler tidy
 const BodySchema = z.object({

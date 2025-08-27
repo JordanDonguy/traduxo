@@ -64,6 +64,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   // Open menu and login submenu if global showLoginForm state is true
   useEffect(() => {
     if (showLoginForm) {
+      setShowLogin(true);
       router.push(`${pathname}/?menu=open&submenu=login`);
       setShowLoginForm(false);
     }

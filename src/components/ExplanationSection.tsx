@@ -2,37 +2,35 @@
 
 import ReactMarkdown from "react-markdown";
 import LoadingAnimation from "./LoadingAnimation";
+import ErrorSection from "./ErrorSection";
+import { useExplanation } from "@/lib/client/hooks/useExplanation";
 
 type ExplanationSectionProps = {
   explanation: string;
-  error: string;
-  isLoading: boolean;
   mounted: boolean;
   ready: boolean;
-  onGenerate: () => void;
 };
 
 export default function ExplanationSection({
   explanation,
-  error,
-  isLoading,
   mounted,
   ready,
-  onGenerate,
 }: ExplanationSectionProps) {
-  if (error.length) {
-    return <p className="text-2xl/10 text-center whitespace-pre-line mt-8">{error}</p>;
+  const { handleExplanation, isExpLoading, explanationError, setExplanationError } = useExplanation();
+
+  if (explanationError.length) {
+    return <ErrorSection error={explanationError} setError={setExplanationError} />;
   }
 
   if (explanation.length) {
     return (
-      <div className="flex-1 flex flex-col justify-center explanation mt-12 mb-4">
+      <div className="flex-1 flex flex-col justify-center explanation mt-10 mb-4">
         <ReactMarkdown>{explanation}</ReactMarkdown>
       </div>
     );
   }
 
-  if (isLoading) {
+  if (isExpLoading) {
     return (
       <div className="flex justify-center items-center w-full h-[58px] mt-8">
         <LoadingAnimation />
@@ -52,7 +50,7 @@ export default function ExplanationSection({
         }`}
     >
       <button
-        onClick={onGenerate}
+        onClick={handleExplanation}
         className="w-full max-w-xl py-4 rounded-full border border-[var(--border)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
       >
         ✨ AI explanations

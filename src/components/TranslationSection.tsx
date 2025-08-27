@@ -36,8 +36,7 @@ function TranslationSection({
 }: TranslationSectionProps) {
   return (
     <div
-      className={`w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${translatedText.length > 2 ? "mt-20 md:mt-24" : "mt-12"
-        }`}
+      className="w-full max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col mt-12"
     >
       {/* Input language + original text */}
       <article

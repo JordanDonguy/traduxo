@@ -1,4 +1,5 @@
-// hooks/useExplanation.ts
+"use client"
+
 import { useState } from "react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
@@ -83,7 +84,9 @@ export function useExplanation({
       }
       return true;
     } catch (err: unknown) {
-      setExplanationError(err instanceof Error ? err.message : "Unknown error");
+      console.error(err);
+      const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
+      setExplanationError(errorMsg);
       return false;
     } finally {
       // ---- Step 3f: Stop loading ----
@@ -92,5 +95,5 @@ export function useExplanation({
   }
 
   // ---- Step 4: Return handler + states ----
-  return { handleExplanation, isExpLoading, explanationError };
+  return { handleExplanation, isExpLoading, explanationError, setExplanationError };
 }

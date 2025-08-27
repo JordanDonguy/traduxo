@@ -64,7 +64,7 @@ export async function suggestExpressionHelper({
       setError(error);
       setIsLoading(false);
       return { success: false, error };
-    }
+    };
 
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
@@ -77,7 +77,7 @@ export async function suggestExpressionHelper({
     return { success: true, data: translationArray };
   } catch (err) {
     console.error(err);
-    const errorMsg = "Internal server error... please try again 🙏";
+    const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
     setError(errorMsg);
     setIsLoading(false);
     return { success: false, error: errorMsg };

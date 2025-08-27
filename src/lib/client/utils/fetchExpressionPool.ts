@@ -34,8 +34,8 @@ export async function fetchExpressionPoolHelper({
       const { error } = await res.json();
       setError(error);
       return { success: false, error };
-    }
-
+    };
+ 
     if (!res.ok) throw new Error(`Gemini pool request error: ${res.status}`);
 
     const { text } = await res.json();
@@ -46,7 +46,8 @@ export async function fetchExpressionPoolHelper({
 
     return { success: true, data: cleanedPool };
   } catch (err: unknown) {
-    const errorMsg = err instanceof Error ? err.message : "Unknown error";
+    console.error(err);
+    const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
     setError(errorMsg);
     return { success: false, error: errorMsg };
   }

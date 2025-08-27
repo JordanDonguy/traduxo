@@ -137,6 +137,7 @@ You are a native-speaking language teacher and idiom expert.
 
 Your task:
 ${randomVariant}
+${detectedLang === "fr" ? "IMPORTANT: Avoid 'Avoir le cafard'." : ""}
 Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. 
 If no exact idiom exists, choose the closest equivalent used in similar situations.
 

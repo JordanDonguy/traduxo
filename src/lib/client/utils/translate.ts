@@ -67,7 +67,7 @@ export async function translationHelper({
       setError(error);
       setIsLoading(false);
       return { success: false, error };
-    }
+    };
 
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
@@ -87,7 +87,7 @@ export async function translationHelper({
     return { success: true, data: translationArray };
   } catch (err: unknown) {
     console.error(err);
-    const errorMsg = "Internal server error... please try again 🙏";
+    const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
     setError(errorMsg);
     setIsLoading(false);
     return { success: false, error: errorMsg };

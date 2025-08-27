@@ -1,4 +1,5 @@
-// hooks/useFavoriteToggle.ts
+"use client"
+
 import { useState } from "react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useSession } from "next-auth/react";
