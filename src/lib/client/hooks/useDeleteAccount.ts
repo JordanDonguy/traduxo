@@ -19,7 +19,7 @@ export function useDeleteAccount({
   router,
   signOutFn = signOut,
 }: UseDeleteAccountArgs = {}) {
-// --- Always call hooks unconditionally ---
+  // --- Always call hooks unconditionally ---
   const defaultRouter = useRouter();
 
   // --- Use injected values for testing if provided ---
@@ -32,30 +32,34 @@ export function useDeleteAccount({
     setIsLoading(true);
 
     // ---- Step 2: Call API to delete the account ----
-    const res = await fetcher("/api/auth/delete-account", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const res = await fetcher("/api/auth/delete-account", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    const data = await res.json();
+      // ---- Step 3: Handle error response ----
+      if (!res.ok) {
+        toaster.error("Failed to delete account");
+        setIsLoading(false);
+        effectiveRouter.push("/");
+        return;
+      }
 
-    // ---- Step 3: Handle error response ----
-    if (!res.ok) {
-      toaster.error(data.message || "Failed to delete account");
+      // ---- Step 4: Sign out user after account deletion ----
+      await signOutFn({ callbackUrl: "/?delete=true" });
+
+      // ---- Step 5: Reset loading state & redirect ----
       setIsLoading(false);
       effectiveRouter.push("/");
-      return;
+      return true;
+    } catch {
+      toaster.error("Failed to delete account");
+      setIsLoading(false);
+      effectiveRouter.push("/");
     }
-
-    // ---- Step 4: Sign out user after account deletion ----
-    await signOutFn({ callbackUrl: "/?delete=true" });
-
-    // ---- Step 5: Reset loading state & redirect ----
-    setIsLoading(false);
-    effectiveRouter.push("/");
-    return true;
   };
 
   return { deleteAccount, isLoading };
