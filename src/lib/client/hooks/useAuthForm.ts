@@ -23,22 +23,27 @@ export function useAuthHandlers() {
     // ---- step 2: set loading ----
     setIsLoading(true);
 
-    // ---- step 3: attempt sign in ----
-    const res = await signIn("credentials", {
-      callbackUrl: "/?login=true",
-      email,
-      password,
-    });
+    try {
+      // ---- step 3: attempt sign in ----
+      const res = await signIn("credentials", {
+        callbackUrl: "/?login=true",
+        email,
+        password,
+      });
 
-    // ---- step 4: handle success or error ----
-    if (res?.error) {
-      setError(res.error);
-    } else {
-      router.push("/");
+      // ---- step 4: handle success or error ----
+      if (res?.error) {
+        setError(res.error);
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
+    } finally {
+      // ---- step 5: stop loading ----
+      setIsLoading(false);
     }
-
-    // ---- step 5: stop loading ----
-    setIsLoading(false);
   };
 
   // ---- handleGoogleButton ----
@@ -72,31 +77,35 @@ export function useAuthHandlers() {
       return;
     }
 
-    // ---- step 3: register user to db ----
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      // ---- step 3: register user to db ----
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    // ---- step 4: handle API error ----
-    if (!res.ok) {
-      setError(data.error);
-      return;
+      // ---- step 4: handle API error ----
+      if (!res.ok) {
+        setError(data.error);
+        return;
+      }
+
+      // ---- step 5: login after successful signup ----
+      await signIn("credentials", {
+        callbackUrl: "/?login=true",
+        email,
+        password,
+      });
+
+      // ---- step 5: reset isSignup state ----
+      setIsSignup(false);
+    } catch (err) {
+      console.error("Signup failed:", err);
+      setError("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
     }
-
-    // ---- step 5: login after successful signup ----
-    await signIn("credentials", {
-      callbackUrl: "/?login=true",
-      email,
-      password,
-    });
-
-    // ---- step 6: redirect user ----
-    router.push("/");
-    setIsSignup(false);
   };
 
   // ---- handleForgotPassword ----
@@ -108,6 +117,7 @@ export function useAuthHandlers() {
     // ---- step 1: check email is provided ----
     if (!email) {
       setError("Please enter your email to reset your password");
+      setIsLoading(false);
       return;
     }
 
@@ -117,19 +127,24 @@ export function useAuthHandlers() {
 
     try {
       // ---- step 3: call reset API ----
-      await fetch("/api/auth/forgot-password", {
+      const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      const data = await res.json();
 
       // ---- step 4: notify user ----
+      if (!res.ok) {
+        toast.error(data.error || "Oops! Something went wrong... Please try again 🙏");
+        return;
+      };
+
       toast.success("If this email exists, a reset link has been sent.");
-      router.replace("/");
     } catch (err) {
       // ---- step 5: handle error ----
       console.error(err);
-      toast.error("Something went wrong.");
+      toast.error("Oops! Something went wrong... Please try again 🙏");
     }
 
     // ---- step 6: stop loading ----
