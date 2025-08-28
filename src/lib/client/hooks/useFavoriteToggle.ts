@@ -3,14 +3,12 @@
 import { useState } from "react";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites";
 
 // Injected dependencies for testing
 type UseFavoriteToggleArgs = {
   session?: ReturnType<typeof useSession>;
-  router?: ReturnType<typeof useRouter>;
   addToFavoriteFn?: typeof addToFavorite;
   deleteFromFavoriteFn?: typeof deleteFromFavorite;
   toaster?: typeof toast;
@@ -18,7 +16,6 @@ type UseFavoriteToggleArgs = {
 
 export function useFavoriteToggle({
   session,
-  router,
   addToFavoriteFn = addToFavorite,
   deleteFromFavoriteFn = deleteFromFavorite,
   toaster = toast,
@@ -36,13 +33,11 @@ export function useFavoriteToggle({
 
   // --- Always call hooks unconditionally ---
   const defaultSession = useSession();
-  const defaultRouter = useRouter();
-  
+
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;
   const { status } = effectiveSession;
-  const effectiveRouter = router ?? defaultRouter;
-  
+
   // ---- Step 2: Local loading state ----
   const [isFavLoading, setIsFavLoading] = useState(false);
 
@@ -54,7 +49,7 @@ export function useFavoriteToggle({
 
     try {
       if (status !== "authenticated") {
-        effectiveRouter.push("/login");
+        toaster.error("You need to be logged in to add translations to favorites.")
         return;
       }
 
