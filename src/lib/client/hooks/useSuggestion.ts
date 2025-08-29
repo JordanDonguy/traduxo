@@ -41,7 +41,7 @@ export function useSuggestion({
   timeoutFn = setTimeout,
 }: UseSuggestionArgs = {}) {
 
-  // --- Always call hooks unconditionally ---
+  // ---- Step 0: Initialize hooks and context ----
   const defaultAppContext = useApp();
   const defaultSession = useSession();
   const defaultWaitForAuthStatus = useWaitForAuthStatus();
@@ -49,7 +49,7 @@ export function useSuggestion({
   const defaultLanguageContext = useLanguageContext();
   const defaultRouter = useRouter();
 
-  // --- Use injected values for testing if provided ---
+  // ---- Step 0b: Use injected values for testing if provided ----
   const { setIsLoading, setError } = appContext ?? defaultAppContext;
   const { status } = session ?? defaultSession;
   const { waitForStatus } = waitForAuthStatus ?? defaultWaitForAuthStatus;
@@ -66,7 +66,6 @@ export function useSuggestion({
     translationHistory,
   } = translationContext ?? defaultTranslationContext;
   const { outputLang, detectedLang } = languageContext ?? defaultLanguageContext;
-
   const effectiveRouter = router ?? defaultRouter;
 
   const [isRolling, setIsRolling] = useState(false);
@@ -76,82 +75,95 @@ export function useSuggestion({
     setIsRolling(true);
     timeoutFn(() => setIsRolling(false), 600);
 
-    // ---- Step 2: Redirect to main page ----
+    // ---- Step 2: Redirect user to the main page ----
     effectiveRouter.push("/");
 
-    // ---- Step 3: Pick correct language for suggestion ----
+    // ---- Step 3: Determine which language to use for suggestion ----
     const suggestionLang = getSuggestionLanguageFn(detectedLang, outputLang);
 
     // ---- Step 4: Show loading spinner ----
     setIsLoading(true);
 
-    // ---- Step 5: Wait for NextAuth to resolve authentication status ----
-    await waitForStatus();
+    // ---- Step 5: Wait for authentication status ----
+    try {
+      await waitForStatus();
+    } catch (err) {
+      console.error(err)
+      setError("Oops! An unexpected error occured... Please try again 🙏");
+      setIsLoading(false);
+      return;
+    };
 
-    // ---- Step 6: If no pool, fetch suggestion and optionally fetch pool ----
-    if (!expressionPool.length) {
-      const promises = [
-        suggestExpressionHelperFn({
-          detectedLang: suggestionLang,
+    // ---- Step 6: Work with a local copy of the pool to prevent stale closures ----
+    let pool = [...expressionPool];
+
+    // ---- Step 7: Loop until we find a new expression or fetch a new pool ----
+    while (true) {
+      // ---- Step 7a: If pool is empty, fetch a new suggestion and optionally fetch pool ----
+      if (!pool.length) {
+        const promises = [
+          suggestExpressionHelperFn({
+            detectedLang: suggestionLang,
+            outputLang,
+            setTranslatedText,
+            setInputTextLang,
+            setTranslatedTextLang,
+            setExplanation,
+            setError,
+            setIsLoading,
+            setIsFavorite,
+            setTranslationId,
+          }),
+        ];
+
+        if (status === "authenticated") {
+          promises.push(
+            fetchExpressionPoolHelperFn({
+              setError,
+              suggestionLang,
+              setExpressionPool,
+            })
+          );
+        }
+
+        await Promise.all(promises);
+        break; // Done after fetching new suggestion/pool
+      }
+
+      // ---- Step 7b: Find first expression in pool that is NOT in history ----
+      const newExpression = pool.find(
+        (expression) =>
+          !translationHistory.some(
+            (t) => t.inputText.toLowerCase() === expression.toLowerCase()
+          )
+      );
+
+      // ---- Step 8: If found, translate it ----
+      if (newExpression) {
+        await translationHelperFn({
+          inputText: newExpression,
+          inputLang: suggestionLang,
           outputLang,
-          setTranslatedText,
+          setInputText,
           setInputTextLang,
           setTranslatedTextLang,
+          setTranslatedText,
           setExplanation,
-          setError,
           setIsLoading,
           setIsFavorite,
           setTranslationId,
-        }),
-      ];
+          setError,
+        });
 
-      if (status === "authenticated") {
-        promises.push(
-          fetchExpressionPoolHelperFn({
-            setError,
-            suggestionLang,
-            setExpressionPool,
-          })
-        );
+        // ---- Step 9: Remove used expression from pool ----
+        setExpressionPool((prev) => prev.filter((expr) => expr !== newExpression));
+        break;
+      } else {
+        // ---- Step 10: If none left, reset pool locally and globally, loop again ----
+        setExpressionPool([]);
+        pool = [];
       }
-
-      await Promise.all(promises);
-      return;
     }
-
-    // ---- Step 7: Find first expression not in history ----
-    const newExpression = expressionPool.find(
-      (expression) =>
-        !translationHistory.some(
-          (t) => t.inputText.toLowerCase() === expression.toLowerCase()
-        )
-    );
-
-    // ---- Step 8: If none left, reset pool & retry ----
-    if (!newExpression) {
-      setExpressionPool([]);
-      await suggestTranslation(); // recursive call
-      return;
-    }
-
-    // ---- Step 9: Request translation for the chosen expression ----
-    await translationHelperFn({
-      inputText: newExpression,
-      inputLang: suggestionLang,
-      outputLang,
-      setInputText,
-      setInputTextLang,
-      setTranslatedTextLang,
-      setTranslatedText,
-      setExplanation,
-      setIsLoading,
-      setIsFavorite,
-      setTranslationId,
-      setError,
-    });
-
-    // ---- Step 10: Remove used expression from pool ----
-    setExpressionPool((prev) => prev.filter((expr) => expr !== newExpression));
   }
 
   return { suggestTranslation, isRolling };
