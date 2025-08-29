@@ -39,4 +39,12 @@ describe("cleanGeminiResponse", () => {
     // Case-insensitive removal of ```JSON
     expect(cleanGeminiResponse(input)).toBe(expected);
   });
+
+  // ------ Test 6️⃣ ------
+  it("removes trailing dots and ellipses after fences", () => {
+    const input = "```json\n{\"y\":2}\n```...";
+    const expected = "{\"y\":2}";
+    // Should strip both fences and trailing dots
+    expect(cleanGeminiResponse(input)).toBe(expected);
+  });
 });

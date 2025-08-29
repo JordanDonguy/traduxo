@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
 
 describe("suggestExpressionHelper", () => {
@@ -113,6 +116,64 @@ describe("suggestExpressionHelper", () => {
 
     expect(setters.setError).toHaveBeenCalledWith(expect.stringContaining("Oops!"));
     expect(setters.setIsLoading).toHaveBeenCalledWith(false);
+    expect(result.success).toBe(false);
+  });
+
+  // ------ Test 5️⃣ ------
+  it("blurs active element if present", async () => {
+    // Create a mock input and add it to the document
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.focus();
+
+    // Spy on the blur method
+    const blurSpy = jest.spyOn(input, "blur");
+
+    // Mock fetch response
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ text: '["hola"]' }) });
+
+    await suggestExpressionHelper({
+      detectedLang: "en",
+      outputLang: "fr",
+      fetcher: fetchMock,
+      setTranslatedText: setters.setTranslatedText,
+      setInputTextLang: setters.setInputTextLang,
+      setTranslatedTextLang: setters.setTranslatedTextLang,
+      setExplanation: setters.setExplanation,
+      setIsLoading: setters.setIsLoading,
+      setIsFavorite: setters.setIsFavorite,
+      setTranslationId: setters.setTranslationId,
+      setError: setters.setError,
+    });
+
+    // Verify that blur was called
+    expect(blurSpy).toHaveBeenCalled();
+
+    // Cleanup
+    document.body.removeChild(input);
+  });
+
+  // ------ Test 6️⃣ ------
+  it("throws error if fetch returns non-ok status", async () => {
+    // Mock fetch to return a non-ok, non-429 status
+    fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
+
+    const result = await suggestExpressionHelper({
+      detectedLang: "en",
+      outputLang: "fr",
+      fetcher: fetchMock,
+      setTranslatedText: setters.setTranslatedText,
+      setInputTextLang: setters.setInputTextLang,
+      setTranslatedTextLang: setters.setTranslatedTextLang,
+      setExplanation: setters.setExplanation,
+      setIsLoading: setters.setIsLoading,
+      setIsFavorite: setters.setIsFavorite,
+      setTranslationId: setters.setTranslationId,
+      setError: setters.setError,
+    });
+
+    // Expect the error handler to be called with the Gemini error
+    expect(setters.setError).toHaveBeenCalledWith("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
     expect(result.success).toBe(false);
   });
 });

@@ -38,7 +38,6 @@ describe("useFavoriteTranslations", () => {
   let mockFetch: jest.Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
     mockFetch = jest.fn();
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
   });

@@ -32,7 +32,6 @@ describe("useAuthHandlers", () => {
     setError = jest.fn();
     setIsLoading = jest.fn();
     setIsSignup = jest.fn();
-    jest.clearAllMocks();
   });
 
   // ------ Test 1️⃣ ------

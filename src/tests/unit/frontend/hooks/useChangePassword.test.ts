@@ -48,7 +48,6 @@ describe("useChangePassword", () => {
     };
     mockUpdater = jest.fn().mockResolvedValue(undefined);
     mockToast = { success: jest.fn(), error: jest.fn() } as unknown as typeof toast;
-    jest.clearAllMocks();
   });
 
   // ------ Test 1️⃣ ------

@@ -106,4 +106,30 @@ describe("fetchExpressionPoolHelper", () => {
     );
     expect(result.success).toBe(false);
   });
+
+  // ------ Test 5️⃣ ------
+  it("uses default promptGetter and responseCleaner when not injected", async () => {
+    const fakeArray = ["hi...", "there..."];
+
+    // mock fetcher returns valid JSON
+    fetcher.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ text: JSON.stringify(fakeArray) }),
+    });
+
+    // Call helper WITHOUT promptGetter and responseCleaner
+    const result = await fetchExpressionPoolHelper({
+      suggestionLang: "en",
+      setExpressionPool,
+      setError,
+      fetcher,
+    });
+
+    // Should update state with cleaned results
+    expect(setExpressionPool).toHaveBeenCalledWith(["hi", "there"]);
+    expect(result.success).toBe(true);
+  });
+
+  
 });
