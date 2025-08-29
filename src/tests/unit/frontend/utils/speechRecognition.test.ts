@@ -120,4 +120,23 @@ describe("createSpeechRecognition", () => {
 
     expect(onStop).toHaveBeenCalled();
   });
+
+  // ------ Test 6️⃣ ------
+  it("logs to console.error if onError is not provided", () => {
+    const spyError = jest.spyOn(console, "error").mockImplementation(() => { });
+
+    const recognition = createSpeechRecognition({
+      onResult,
+      SpeechRecognitionClass: MockSpeechRecognition as unknown as new () => SpeechRecognition & { abort: () => void },
+    });
+
+    const recInstance = recognition!._recognition as unknown as MockRecognition;
+    const mockErrorEvent = { error: "network-fail" } as unknown as SpeechRecognitionErrorEvent;
+
+    recInstance.onerror?.(mockErrorEvent);
+
+    expect(spyError).toHaveBeenCalledWith("Speech recognition error:", "network-fail");
+
+    spyError.mockRestore();
+  });
 });

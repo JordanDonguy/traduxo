@@ -72,4 +72,38 @@ describe('createQuotaChecker', () => {
     await quotaChecker.giveBack(req);
     expect(mockRedisClient.decr).toHaveBeenCalledWith('rl:1.2.3.4');
   });
+
+  // ------ Test 5️⃣ ------
+  it('uses x-real-ip if cf-connecting-ip is missing', async () => {
+    const req = createRequest('11.22.33.44', 'x-real-ip');
+    mockRedisClient.get.mockResolvedValue(0);
+
+    const result = await quotaChecker.checkQuota(req);
+
+    expect(mockRedisClient.get).toHaveBeenCalledWith('rl:11.22.33.44');
+    expect(result.allowed).toBe(true);
+  });
+
+  // ------ Test 6️⃣ ------
+  it('uses x-forwarded-for first IP if cf-connecting-ip and x-real-ip are missing', async () => {
+    const req = createRequest('55.66.77.88,99.100.101.102', 'x-forwarded-for');
+    mockRedisClient.get.mockResolvedValue(0);
+
+    const result = await quotaChecker.checkQuota(req);
+
+    // Should pick only the first IP before the comma
+    expect(mockRedisClient.get).toHaveBeenCalledWith('rl:55.66.77.88');
+    expect(result.allowed).toBe(true);
+  });
+
+  // ------ Test 7️⃣ ------
+  it('falls back to "unknown" if no IP headers are present', async () => {
+    const req = createRequest('', 'non-existent-header');
+    mockRedisClient.get.mockResolvedValue(0);
+
+    const result = await quotaChecker.checkQuota(req);
+
+    expect(mockRedisClient.get).toHaveBeenCalledWith('rl:unknown');
+    expect(result.allowed).toBe(true);
+  });
 });

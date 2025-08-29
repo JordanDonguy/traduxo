@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 type TranslationPromptParams = {
   inputText: string;
   inputLang: string;

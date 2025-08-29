@@ -14,6 +14,8 @@ export function createSpeechRecognition({
   SpeechRecognitionClass?: new () => SpeechRecognition & { abort: () => void }; // for test injection
 }) {
   // Environment check
+  /* istanbul ignore next */
+  // Cannot test the environment branch in jsdom; Node environment does not allow deletion of global.window
   if (typeof window === "undefined") {
     console.warn("SpeechRecognition not supported in this environment.");
     return null;

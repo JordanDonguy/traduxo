@@ -1,4 +1,5 @@
-// lib/mailersend.ts
+/* istanbul ignore file */
+
 import { MailerSend } from "mailersend";
 
 export const mailerSend = new MailerSend({

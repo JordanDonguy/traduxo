@@ -84,4 +84,33 @@ describe("rateLimiter", () => {
 
     jest.useRealTimers();
   });
+
+  // ------ Test 6️⃣ ------
+  it("uses cf-connecting-ip when present", () => {
+    const req = createRequest("1.2.3.4", "cf-connecting-ip");
+    rateLimiter(req, store);
+    expect(store.buckets.has("1.2.3.4")).toBe(true);
+  });
+
+  // ------ Test 7️⃣ ------
+  it("uses x-real-ip if cf-connecting-ip is missing", () => {
+    const req = createRequest("5.6.7.8", "x-real-ip");
+    rateLimiter(req, store);
+    expect(store.buckets.has("5.6.7.8")).toBe(true);
+  });
+
+  // ------ Test 8️⃣ ------
+  it("uses first IP from x-forwarded-for if cf-connecting-ip and x-real-ip are missing", () => {
+    const req = createRequest("9.10.11.12,13.14.15.16", "x-forwarded-for");
+    rateLimiter(req, store);
+    expect(store.buckets.has("9.10.11.12")).toBe(true);
+  });
+
+  // ------ Test 9️⃣ ------
+  it('falls back to "unknown" if no IP headers exist', () => {
+    const req = createRequest(undefined, "non-existent-header");
+    rateLimiter(req, store);
+    expect(store.buckets.has("unknown")).toBe(true);
+  });
+
 });
