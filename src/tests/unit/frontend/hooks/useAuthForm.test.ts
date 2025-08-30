@@ -27,11 +27,21 @@ describe("useAuthHandlers", () => {
   let setError: jest.Mock;
   let setIsLoading: jest.Mock;
   let setIsSignup: jest.Mock;
+  let originalError: typeof console.error;
 
   beforeEach(() => {
     setError = jest.fn();
     setIsLoading = jest.fn();
     setIsSignup = jest.fn();
+    // Mock console.error to not have logs during tests
+    originalError = console.error;
+    // Mock it to do nothing
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    // Restore original console.error
+    console.error = originalError;
   });
 
   // ------ Test 1️⃣ ------
