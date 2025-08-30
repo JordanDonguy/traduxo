@@ -7,7 +7,7 @@
     "generate": "prisma generate",
     "build": "npm run generate && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "jest"
   },
   "dependencies": {
