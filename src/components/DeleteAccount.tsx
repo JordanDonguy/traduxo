@@ -18,7 +18,7 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
         < div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
-          <div className="spinner" />
+          <div role="status" className="spinner" />
         </div>
       ) : null}
 

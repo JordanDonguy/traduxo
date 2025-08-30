@@ -87,7 +87,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
           </label>
           <input
             type="password"
-            id="password"
+            id="confirm-password"
             name="confirm-password"
             placeholder="********"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
