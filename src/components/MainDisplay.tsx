@@ -7,6 +7,7 @@ import { useTranslationContext } from "@/context/TranslationContext";
 import { useFavoriteToggle } from "@/lib/client/hooks/useFavoriteToggle";
 import { useSwitchTranslations } from "@/lib/client/hooks/useSwitchTranslations";
 import { showAuthToasts } from "@/lib/client/utils/authToasts";
+import { replaceQuotesInHTML } from "@/lib/client/utils/replaceQuotesInHTML";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";
 import ExplanationSection from "./ExplanationSection";
@@ -43,11 +44,7 @@ function MainDisplay() {
   useEffect(() => {
     const paragraphs = document.querySelectorAll('p');
     paragraphs.forEach(p => {
-      p.innerHTML = p.innerHTML
-        // Replace double quotes
-        .replace(/"([^"]+)"/g, '<strong>$1</strong>')
-        // Replace french style quotes
-        .replace(/«([^»]+)»/g, '<strong>$1</strong>');
+      p.innerHTML = replaceQuotesInHTML(p.innerHTML);
     });
   }, [explanation.length]);
 
