@@ -4,7 +4,7 @@ function LoadingAnimation() {
   return (
     <>
       <div className="flex justify-center items-end gap-3 h-7 mt-4">
-        <span className="dot" />
+        <span className="dot" role="presentation" />
         <span className="dot delay-150" />
         <span className="dot delay-300" />
       </div>

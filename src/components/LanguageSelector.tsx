@@ -35,6 +35,7 @@ export default function LanguageSelector({
 
       {/* Input language */}
       <select
+        data-testid="input-lang-select"
         value={inputLang}
         onChange={(e) => setInputLang(e.target.value)}
         onClick={() => setShowWarning(false)}
@@ -60,6 +61,7 @@ export default function LanguageSelector({
 
       {/* Output language */}
       <select
+        data-testid="output-lang-select"
         value={outputLang}
         onChange={(e) => setOutputLang(e.target.value)}
         className={`appearance-none w-2/5 bg-[var(--input)] h-12 rounded-2xl text-center
