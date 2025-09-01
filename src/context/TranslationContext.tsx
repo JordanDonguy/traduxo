@@ -5,7 +5,7 @@ import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { useSession } from "next-auth/react";
 
-type TranslationState = {
+export type TranslationState = {
   inputText: string;
   translatedText: string[];
   inputTextLang: string;

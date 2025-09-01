@@ -24,8 +24,8 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
 
         {/* -------------- Loading spinner -------------- */}
         {isLoading ? (
-          < div className="flex-1 flex min-h-[70vh] items-center justify-center">
-            <div className="spinner" />
+          <div className="flex-1 flex min-h-[70vh] items-center justify-center">
+            <div role="status" className="spinner" />
           </div>
         ) : (
 
@@ -50,11 +50,11 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
                   <CircleX className="rounded-full bg-[var(--bg-2)]" />
                 </div>
                 <div className="flex items-center gap-4 item-center bg-[var(--menu)] rounded-md">
-                  <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.inputLang?.toUpperCase()}</span>
+                  <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.inputLang.toUpperCase()}</span>
                   <p className="h-fit truncate flex-1">{t.inputText}</p>
                 </div>
                 <div className="flex items-center gap-4 item-center bg-[var(--menu)] rounded-md">
-                  <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.outputLang?.toUpperCase()}</span>
+                  <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.outputLang.toUpperCase()}</span>
                   <p className="h-fit truncate flex-1">{t.translation}</p>
                 </div>
 

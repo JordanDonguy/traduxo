@@ -11,6 +11,7 @@ module.exports = {
   collectCoverageFrom: [
     "src/lib/**/*.{ts,tsx,js,jsx}",
     "src/components/**/*.{ts,tsx,js,jsx}",
+    "src/context/**/*.{ts,tsx,js,jsx}",
     "!**/node_modules/**",
     "!**/dist/**"
   ],

@@ -44,7 +44,7 @@ function TranslationSection({
           }`}
       >
         <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">
-          {inputTextLang.length <= 2 ? inputTextLang?.toUpperCase() : ""}
+          {inputTextLang.length <= 2 ? inputTextLang.toUpperCase() : ""}
         </p>
         <p className="text-xl min-h-8 flex items-center">
           {capitalizeFirstLetter(translatedText[0])}
@@ -71,12 +71,12 @@ function TranslationSection({
               ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
             `}
           >
-            <Star fill={isFavorite ? "currentColor" : "transparent"} />
+            <Star data-testid="star-icon" fill={isFavorite ? "currentColor" : "transparent"} />
           </button>
 
           {/* Output language */}
           <p className="flex shrink-0 justify-center w-10 h-8 p-1 border border-zinc-400 rounded-md">
-            {translatedTextLang.length <= 2 ? translatedTextLang?.toUpperCase() : ""}
+            {translatedTextLang.length <= 2 ? translatedTextLang.toUpperCase() : ""}
           </p>
 
           {/* Main translation */}
