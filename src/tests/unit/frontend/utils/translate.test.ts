@@ -102,6 +102,7 @@ describe("translationHelper", () => {
     document.body.removeChild(input);
   });
 
+  // ------ Test 6️⃣ ------
   it("sets inputTextLang from last element if inputLang is auto", async () => {
     // If inputLang is auto, Gemini will return the detected input lang as the last element of array
     // We then extract it and use it

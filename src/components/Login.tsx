@@ -19,9 +19,9 @@ export default function Login({ showMenu }: LoginProps) {
 
   const { handleLogin, handleSignup, handleGoogleButton, handleForgotPassword } = useAuthHandlers();
 
-
   return (
     <form
+      data-testid="login-form"
       onSubmit={(e) => {
         e.preventDefault();
         setError("");
@@ -40,7 +40,7 @@ export default function Login({ showMenu }: LoginProps) {
         </div>
       ) : null}
 
-      <h1 className="text-2xl text-center font-medium pb-6">{isSignup ? "Sign Up" : "Login"}</h1>
+      <h1 data-testid="title" className="text-2xl text-center font-medium pb-6">{isSignup ? "Sign Up" : "Login"}</h1>
 
       <div className={`flex flex-col gap-6 ${isLoading ? "opacity-60" : "opacity-100"} overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide`}>
 

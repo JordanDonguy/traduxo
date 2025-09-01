@@ -20,6 +20,7 @@ export default function TextInputForm({
   return (
     <section className="w-full h-1/2 flex items-center justify-center">
       <form
+        data-testid="input-form"
         onSubmit={handleTranslate}
         className="w-[90%] flex bg-[var(--input)] rounded-r-4xl rounded-l-2xl h-12 border border-[var(--input-border)] mt-2"
       >
@@ -35,6 +36,7 @@ export default function TextInputForm({
         <button type="submit" className="sr-only">Translate</button>
 
         <button
+          data-testid="mic-button"
           type="button"
           className="w-12 hover:cursor-pointer hover:bg-[var(--hover)] rounded-full flex justify-center items-center"
           onClick={handleVoice}

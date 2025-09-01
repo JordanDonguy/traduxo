@@ -65,7 +65,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   useEffect(() => {
     if (showLoginForm) {
       setShowLogin(true);
-      router.push(`${pathname}/?menu=open&submenu=login`);
+      router.push(`${pathname}?menu=open&submenu=login`);
       setShowLoginForm(false);
     }
   }, [showLoginForm, setShowLoginForm, router, pathname]);
@@ -84,6 +84,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
   return (
     <div
+      data-testid="user-menu"
       className={`
         z-40 fixed w-full h-full flex justify-center pt-20 px-6 xl:px-0
         inset-0 max-h-screen duration-400 origin-top
@@ -105,7 +106,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
             {/* -------------- Back to Menu button -------------- */}
             {(showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang) ? (
               <button
-                onClick={() => router.replace(`${pathname}/?menu=open`)}
+                onClick={() => router.replace(`${pathname}?menu=open`)}
                 className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
               >
                 <CircleArrowLeft />
@@ -137,6 +138,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
           ) : (
             // Top-level menu
             <div
+              data-testid="top-level-menu"
               className={`max-w-2xl w-full flex flex-col gap-6 items-center duration-400 ${showMenu ? "opacity-100" : "opacity-0"
                 }`}
             >
@@ -150,7 +152,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                   onClick={() => setTheme(isDark ? "light" : "dark")}
                   className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
-                  {isDark ? <Sun /> : <Moon />}
+                  {isDark ? <Moon /> : <Sun />}
                   <span className="pl-6 text-xl">Theme ({theme})</span>
                 </button>
 
@@ -158,7 +160,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                 <button
                   onClick={() => {
                     setShowExplanationLang(true);
-                    router.push(`${pathname}/?menu=open&submenu=explanationLang`)
+                    router.push(`${pathname}?menu=open&submenu=explanationLang`)
                   }}
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -171,7 +173,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                   <button
                     onClick={() => {
                       setShowLogin(true);
-                      router.push(`${pathname}/?menu=open&submenu=login`)
+                      router.push(`${pathname}?menu=open&submenu=login`)
                     }}
                     className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                   >
@@ -184,7 +186,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                 <button
                   onClick={() => {
                     setShowHistory(true);
-                    router.push(`${pathname}/?menu=open&submenu=history`)
+                    router.push(`${pathname}?menu=open&submenu=history`)
                   }}
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -196,7 +198,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                 <button
                   onClick={() => {
                     setShowFavorites(true);
-                    router.push(`${pathname}/?menu=open&submenu=favorites`)
+                    router.push(`${pathname}?menu=open&submenu=favorites`)
                   }}
                   className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -223,7 +225,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                     <button
                       onClick={() => {
                         setShowChangePassword(true);
-                        router.push(`${pathname}/?menu=open&submenu=changePassword`)
+                        router.push(`${pathname}?menu=open&submenu=changePassword`)
                       }}
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >
@@ -249,7 +251,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                     <button
                       onClick={() => {
                         setShowDeleteAccount(true);
-                        router.push(`${pathname}/?menu=open&submenu=deleteAccount`)
+                        router.push(`${pathname}?menu=open&submenu=deleteAccount`)
                       }}
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >
