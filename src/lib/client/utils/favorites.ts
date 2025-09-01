@@ -1,7 +1,9 @@
+import { TranslationItem } from "../../../../types/translation";
+
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export async function addToFavorite(
-  translations: string[],
+  translations: TranslationItem[],
   inputLang: string,
   outputLang: string,
   setTranslationId: SetState<string | undefined>,

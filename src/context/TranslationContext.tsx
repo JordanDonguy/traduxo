@@ -4,10 +4,11 @@ import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactN
 import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { useSession } from "next-auth/react";
+import { Translation, TranslationItem } from "../../types/translation";
 
 export type TranslationState = {
   inputText: string;
-  translatedText: string[];
+  translatedText: TranslationItem[];
   inputTextLang: string;
   translatedTextLang: string;
   explanation: string;
@@ -15,27 +16,16 @@ export type TranslationState = {
   translationId: string | undefined;
   expressionPool: string[];
   setInputText: React.Dispatch<React.SetStateAction<string>>;
-  setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
+  setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  loadTranslationFromMenu: (t: TranslationHistory, fromFavorite: boolean) => void;
-  translationHistory: TranslationHistory[];
-  setTranslationHistory: React.Dispatch<React.SetStateAction<TranslationHistory[]>>;
+  loadTranslationFromMenu: (t: Translation, fromFavorite: boolean) => void;
+  translationHistory: Translation[];
+  setTranslationHistory: React.Dispatch<React.SetStateAction<Translation[]>>;
   setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
-};
-
-type TranslationHistory = {
-  id: string;
-  inputText: string;
-  translation: string;
-  inputLang: string;
-  outputLang: string;
-  alt1: string | null;
-  alt2: string | null;
-  alt3: string | null;
 };
 
 // We use `TranslationState | undefined` as the type, and set the default value to `undefined`.
@@ -46,7 +36,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const { setError } = useApp();
   const { status } = useSession();
   const [inputText, setInputText] = useState<string>("");
-  const [translatedText, setTranslatedText] = useState<string[]>([]);
+  const [translatedText, setTranslatedText] = useState<TranslationItem[]>([]);
 
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
@@ -56,7 +46,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
   const [explanation, setExplanation] = useState<string>("");
 
-  const [translationHistory, setTranslationHistory] = useState<TranslationHistory[]>([]);
+  const [translationHistory, setTranslationHistory] = useState<Translation[]>([]);
   const [expressionPool, setExpressionPool] = useState<string[]>([]);
 
   // This useRef is to skip saving translation to db if translation is loaded from history
@@ -117,7 +107,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   }, [translationSnapshot, inputTextLang, translatedTextLang, status, setError]);
 
   // Load a translation from user's history to main display
-  function loadTranslationFromMenu(t: TranslationHistory, fromFavorite: boolean) {
+  function loadTranslationFromMenu(t: Translation, fromFavorite: boolean) {
     setLoadingFromMenu(true)
     setExplanation("");
     if (fromFavorite) {
@@ -127,7 +117,14 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       setIsFavorite(false);
       setTranslationId(undefined);
     };
-    setTranslatedText([t.inputText, t.translation, t.alt1 ?? "", t.alt2 ?? "", t.alt3 ?? ""]);
+
+    setTranslatedText([
+      { type: "expression", value: t.inputText },
+      { type: "main_translation", value: t.translation },
+      { type: "alternative", value: t.alt1 ?? "" },
+      { type: "alternative", value: t.alt2 ?? "" },
+      { type: "alternative", value: t.alt3 ?? "" },
+    ]);
     setInputTextLang(t.inputLang);
     setTranslatedTextLang(t.outputLang);
   };

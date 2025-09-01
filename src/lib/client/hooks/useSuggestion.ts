@@ -101,7 +101,7 @@ export function useSuggestion({
     while (true) {
       // ---- Step 7a: If pool is empty, fetch a new suggestion and optionally fetch pool ----
       if (!pool.length) {
-        const promises = [
+        const promises: Promise<unknown>[] = [
           suggestExpressionHelperFn({
             detectedLang: suggestionLang,
             outputLang,

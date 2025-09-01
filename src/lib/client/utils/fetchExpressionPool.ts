@@ -1,6 +1,6 @@
 // fetchExpressionPoolHelper.ts
 import { getPoolPrompt } from "@/lib/shared/geminiPrompts";
-import { cleanGeminiResponse } from "./cleanGeminiResponse";
+import { cleanGeminiPoolResponse } from "./cleanGeminiResponse";
 import { SuggestionResult } from "../../../../types/suggestionResult";
 
 type PoolHelperArgs = {
@@ -19,7 +19,7 @@ export async function fetchExpressionPoolHelper({
   setError,
   fetcher = fetch,
   promptGetter = getPoolPrompt,
-  responseCleaner = cleanGeminiResponse,
+  responseCleaner = cleanGeminiPoolResponse,
 }: PoolHelperArgs): Promise<SuggestionResult<string[]>> {
   try {
     const poolPrompt = promptGetter(suggestionLang);

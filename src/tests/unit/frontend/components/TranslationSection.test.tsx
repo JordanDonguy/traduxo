@@ -6,19 +6,33 @@ import React from "react";
 import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import TranslationSection from "@/components/TranslationSection";
+import { TranslationItem } from "../../../../../types/translation";
 
 // --------- Mock lucide-react Star icon ---------
 jest.mock("lucide-react", () => ({
   Star: (props: React.SVGProps<SVGSVGElement>) => <svg data-testid="star-icon" {...props} />,
 }));
 
-
 describe("<TranslationSection />", () => {
   const mockFavoriteClick = jest.fn();
   const mockSwitchTranslations = jest.fn();
 
+  // Utility to create TranslationItem array
+  const makeTranslatedText = (values: string[], mainIdx = 1): TranslationItem[] => {
+    return values.map((v, i) => ({
+      value: v,
+      type: i === 0
+        ? "expression"
+        : i === mainIdx
+          ? "main_translation"
+          : "alternative",
+    }));
+  };
+
+  const defaultTranslatedText = makeTranslatedText(["hello", "world", "alternative1", "alternative2"]);
+
   const defaultProps = {
-    translatedText: ["hello", "world", "alternative1", "alternative2"],
+    translatedText: defaultTranslatedText,
     inputTextLang: "en",
     translatedTextLang: "fr",
     fading: [],
@@ -55,10 +69,10 @@ describe("<TranslationSection />", () => {
     expect(alt2).toBeInTheDocument();
 
     fireEvent.click(alt1);
-    expect(mockSwitchTranslations).toHaveBeenCalledWith(0);
+    expect(mockSwitchTranslations).toHaveBeenCalledWith("alternative1");
 
     fireEvent.click(alt2);
-    expect(mockSwitchTranslations).toHaveBeenCalledWith(1);
+    expect(mockSwitchTranslations).toHaveBeenCalledWith("alternative2");
   });
 
   // ------ Test 4️⃣ ------
@@ -87,7 +101,7 @@ describe("<TranslationSection />", () => {
     render(
       <TranslationSection
         {...defaultProps}
-        fading={[1, 2]} // fading main and first alternative
+        fading={["world", "alternative1"]} // use lowercase 'world', exact value
       />
     );
 
@@ -100,6 +114,7 @@ describe("<TranslationSection />", () => {
     // Second alternative should remain opacity-100
     expect(screen.getByText("Alternative2")).toHaveClass("opacity-100");
   });
+
 
   // ------ Test 8️⃣ ------
   it("capitalizes translated text and alternative translations", () => {
@@ -115,7 +130,7 @@ describe("<TranslationSection />", () => {
     render(
       <TranslationSection
         {...defaultProps}
-        translatedText={["hello", "world", "a", "ab"]}
+        translatedText={makeTranslatedText(["hello", "world", "a", "ab"])}
       />
     );
     expect(screen.queryByText("a")).not.toBeInTheDocument();
@@ -127,7 +142,7 @@ describe("<TranslationSection />", () => {
     render(
       <TranslationSection
         {...defaultProps}
-        translatedText={["", ""]}
+        translatedText={makeTranslatedText(["", ""])}
       >
         ChildrenSlot
       </TranslationSection>
@@ -141,7 +156,6 @@ describe("<TranslationSection />", () => {
 
     expect(paragraphs).toHaveLength(2); // main + first alt
   });
-
 
   // ------ Test 1️⃣1️⃣ ------
   it("applies -translate-x-full opacity-0 when mounted is false", () => {
@@ -179,8 +193,8 @@ describe("<TranslationSection />", () => {
   it("renders empty string when inputTextLang length > 2", () => {
     render(
       <TranslationSection
-        translatedText={["hello", "world"]}
-        inputTextLang="eng"       // length > 2
+        translatedText={makeTranslatedText(["hello", "world"])}
+        inputTextLang="eng"
         translatedTextLang="fr"
         fading={[]}
         mounted={true}
@@ -192,7 +206,7 @@ describe("<TranslationSection />", () => {
       />
     );
 
-    const langP = screen.getByText("", { selector: "p" }); // selects <p> with empty string
+    const langP = screen.getByText("", { selector: "p" });
     expect(langP).toBeInTheDocument();
   });
 
@@ -200,8 +214,8 @@ describe("<TranslationSection />", () => {
   it("renders uppercase inputTextLang when length <= 2", () => {
     render(
       <TranslationSection
-        translatedText={["hello", "world"]}
-        inputTextLang="en"        // length <= 2
+        translatedText={makeTranslatedText(["hello", "world"])}
+        inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}
         mounted={true}
@@ -220,9 +234,9 @@ describe("<TranslationSection />", () => {
   it("renders empty string if translatedTextLang length > 2", () => {
     render(
       <TranslationSection
-        translatedText={["hello", "bonjour"]}
+        translatedText={makeTranslatedText(["hello", "bonjour"])}
         inputTextLang="en"
-        translatedTextLang="eng" // length > 2
+        translatedTextLang="eng"
         fading={[]}
         mounted={true}
         ready={true}
@@ -242,7 +256,7 @@ describe("<TranslationSection />", () => {
   it("renders Star with transparent fill when not favorite", () => {
     render(
       <TranslationSection
-        translatedText={["hello", "bonjour"]}
+        translatedText={makeTranslatedText(["hello", "bonjour"])}
         inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}
@@ -264,7 +278,7 @@ describe("<TranslationSection />", () => {
   it("renders Star with currentColor fill when favorite", () => {
     render(
       <TranslationSection
-        translatedText={["hello", "bonjour"]}
+        translatedText={makeTranslatedText(["hello", "bonjour"])}
         inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}

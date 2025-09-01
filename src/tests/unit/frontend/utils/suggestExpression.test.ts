@@ -8,6 +8,7 @@ describe("suggestExpressionHelper", () => {
   let setters: Record<string, jest.Mock>;
 
   beforeEach(() => {
+    // ---- Mock fetch and setters ----
     fetchMock = jest.fn();
     setters = {
       setTranslatedText: jest.fn(),
@@ -39,7 +40,7 @@ describe("suggestExpressionHelper", () => {
       setError: setters.setError,
     });
 
-    // Ensure all state setters are called to reset before fetch
+    // ---- Check all state resets ----
     expect(setters.setIsLoading).toHaveBeenCalledWith(true);
     expect(setters.setError).toHaveBeenCalledWith("");
     expect(setters.setTranslatedText).toHaveBeenCalledWith([]);
@@ -52,12 +53,17 @@ describe("suggestExpressionHelper", () => {
 
   // ------ Test 2️⃣ ------
   it("handles success response", async () => {
+    // Mock fetch to return a Gemini response
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ text: '["bonjour"]' }) });
+
+    // Mock the cleaner to return TranslationItem[]
+    const mockCleaner = jest.fn(() => [{ type: "expression", value: "bonjour" }]);
 
     const result = await suggestExpressionHelper({
       detectedLang: "en",
       outputLang: "fr",
       fetcher: fetchMock,
+      responseCleaner: mockCleaner,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
       setTranslatedTextLang: setters.setTranslatedTextLang,
@@ -68,9 +74,15 @@ describe("suggestExpressionHelper", () => {
       setError: setters.setError,
     });
 
-    expect(setters.setTranslatedText).toHaveBeenCalledWith(["bonjour"]);
+    // ---- Ensure setters are called with TranslationItem[] ----
+    expect(setters.setTranslatedText).toHaveBeenCalledWith([
+      { type: "expression", value: "bonjour" },
+    ]);
     expect(setters.setIsLoading).toHaveBeenCalledWith(false);
-    expect(result).toEqual({ success: true, data: ["bonjour"] });
+    expect(result).toEqual({
+      success: true,
+      data: [{ type: "expression", value: "bonjour" }],
+    });
   });
 
   // ------ Test 3️⃣ ------
@@ -173,7 +185,9 @@ describe("suggestExpressionHelper", () => {
     });
 
     // Expect the error handler to be called with the Gemini error
-    expect(setters.setError).toHaveBeenCalledWith("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
+    expect(setters.setError).toHaveBeenCalledWith(
+      "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
+    );
     expect(result.success).toBe(false);
   });
 });

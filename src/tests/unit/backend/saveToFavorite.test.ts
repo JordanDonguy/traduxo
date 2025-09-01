@@ -28,10 +28,12 @@ describe("saveToFavorite handler", () => {
   });
 
   // ------ Test 2️⃣ ------
-  it("returns 400 if translations array is too short", async () => {
+  it("returns 400 if missing expression or main_translation", async () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     const req = makeReq({
-      translations: ["only one translation"],
+      translations: [
+        { type: "expression", value: "hello" } // missing main_translation
+      ],
       inputLang: "en",
       outputLang: "fr",
     });
@@ -43,9 +45,8 @@ describe("saveToFavorite handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json).toHaveProperty("error");
     expect(json.error).toContainEqual(
-      expect.objectContaining({ message: "At least two translations required" })
+      expect.objectContaining({ message: "At least one expression and one main_translation required" })
     );
   });
 
@@ -53,7 +54,10 @@ describe("saveToFavorite handler", () => {
   it("returns 400 if language codes invalid", async () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     const req = makeReq({
-      translations: ["hello", "bonjour"],
+      translations: [
+        { type: "expression", value: "hello" },
+        { type: "main_translation", value: "bonjour" },
+      ],
       inputLang: "english",
       outputLang: "fr",
     });
@@ -76,7 +80,10 @@ describe("saveToFavorite handler", () => {
   it("returns 400 if language codes fail regex pattern", async () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     const req = makeReq({
-      translations: ["hello", "bonjour"],
+      translations: [
+        { type: "expression", value: "hello" },
+        { type: "main_translation", value: "bonjour" },
+      ],
       inputLang: "1n",
       outputLang: "fr",
     });
@@ -101,7 +108,13 @@ describe("saveToFavorite handler", () => {
     mockPrisma.favorite.create.mockResolvedValue({ id: "fav1" });
 
     const req = makeReq({
-      translations: ["hello", "bonjour", "salut", "coucou", "bonsoir"],
+      translations: [
+        { type: "expression", value: "hello" },
+        { type: "main_translation", value: "bonjour" },
+        { type: "alternative", value: "salut" },
+        { type: "alternative", value: "coucou" },
+        { type: "alternative", value: "bonsoir" },
+      ],
       inputLang: "en",
       outputLang: "fr",
     });
@@ -135,7 +148,10 @@ describe("saveToFavorite handler", () => {
     mockPrisma.favorite.create.mockRejectedValue(new Error("DB error"));
 
     const req = makeReq({
-      translations: ["hello", "bonjour"],
+      translations: [
+        { type: "expression", value: "hello" },
+        { type: "main_translation", value: "bonjour" },
+      ],
       inputLang: "en",
       outputLang: "fr",
     });

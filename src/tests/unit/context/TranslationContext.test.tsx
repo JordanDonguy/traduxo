@@ -39,7 +39,6 @@ const Providers = ({ children }: React.PropsWithChildren) => (
   </AppProvider>
 );
 
-
 const mockUseApp = (mockSetError = jest.fn()) => {
   jest.spyOn(AppContextModule, "useApp").mockReturnValue({
     showLoginForm: false,
@@ -57,7 +56,13 @@ const setTranslationData = (
   result: RenderHookResult<TranslationContextType, unknown>["result"]
 ) =>
   act(() => {
-    result.current.setTranslatedText(["a", "b"]);
+    result.current.setTranslatedText([
+      { type: "expression", value: "a" },
+      { type: "main_translation", value: "b" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+    ]);
     result.current.setInputTextLang("en");
     result.current.setTranslatedTextLang("fr");
   });
@@ -134,7 +139,13 @@ describe("TranslationContext", () => {
 
     expect(result.current.isFavorite).toBe(false);
     expect(result.current.translationId).toBeUndefined();
-    expect(result.current.translatedText).toEqual(["hello", "bonjour", "hi", "", ""]);
+    expect(result.current.translatedText).toEqual([
+      { type: "expression", value: "hello" },
+      { type: "main_translation", value: "bonjour" },
+      { type: "alternative", value: "hi" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+    ]);
     expect(result.current.inputTextLang).toBe("en");
     expect(result.current.translatedTextLang).toBe("fr");
   });
@@ -199,17 +210,47 @@ describe("TranslationContext", () => {
     (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
 
-    const favoriteItem = { id: "1", inputText: "hi", translation: "salut", inputLang: "en", outputLang: "fr", alt1: null, alt2: null, alt3: null };
-    const nonFavoriteItem = { id: "2", inputText: "test", translation: "testé", inputLang: "en", outputLang: "fr", alt1: "essai", alt2: "épreuve", alt3: "tentative" };
+    const favoriteItem = {
+      id: "1",
+      inputText: "hi",
+      translation: "salut",
+      inputLang: "en",
+      outputLang: "fr",
+      alt1: null,
+      alt2: null,
+      alt3: null,
+    };
+    const nonFavoriteItem = {
+      id: "2",
+      inputText: "test",
+      translation: "testé",
+      inputLang: "en",
+      outputLang: "fr",
+      alt1: "essai",
+      alt2: "épreuve",
+      alt3: "tentative",
+    };
 
     act(() => result.current.loadTranslationFromMenu(favoriteItem, true));
     expect(result.current.isFavorite).toBe(true);
     expect(result.current.translationId).toBe("1");
-    expect(result.current.translatedText).toEqual(["hi", "salut", "", "", ""]);
+    expect(result.current.translatedText).toEqual([
+      { type: "expression", value: "hi" },
+      { type: "main_translation", value: "salut" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+    ]);
 
     act(() => result.current.loadTranslationFromMenu(nonFavoriteItem, false));
     expect(result.current.isFavorite).toBe(false);
     expect(result.current.translationId).toBeUndefined();
-    expect(result.current.translatedText).toEqual(["test", "testé", "essai", "épreuve", "tentative"]);
+    expect(result.current.translatedText).toEqual([
+      { type: "expression", value: "test" },
+      { type: "main_translation", value: "testé" },
+      { type: "alternative", value: "essai" },
+      { type: "alternative", value: "épreuve" },
+      { type: "alternative", value: "tentative" },
+    ]);
   });
 });

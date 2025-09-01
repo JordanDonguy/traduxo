@@ -1,5 +1,6 @@
 import { getTranslationPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
+import { TranslationItem } from "../../../../types/translation";
 
 type TranslateHelperArgs = {
   inputText: string;
@@ -8,13 +9,12 @@ type TranslateHelperArgs = {
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
-  setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
+  setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  // Injected dependencies for testing
   fetcher?: typeof fetch;
   promptGetter?: typeof getTranslationPrompt;
   responseCleaner?: typeof cleanGeminiResponse;
@@ -67,15 +67,19 @@ export async function translationHelper({
       setError(error);
       setIsLoading(false);
       return { success: false, error };
-    };
+    }
 
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
     const { text } = await res.json();
-    const translationArray = JSON.parse(responseCleaner(text));
 
+    // Parse Gemini response into TranslationItem[]
+    const translationArray = responseCleaner(text);
+
+    // Set detected input language if auto
     if (inputLang === "auto") {
-      setInputTextLang(translationArray[translationArray.length - 1]);
+      const langObj = translationArray.find(item => item.type === "orig_lang_code");
+      if (langObj) setInputTextLang(langObj.value);
     } else {
       setInputTextLang(inputLang);
     }

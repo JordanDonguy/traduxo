@@ -8,3 +8,8 @@ export type Translation = {
   alt2: string | null;
   alt3: string | null;
 };
+
+export type TranslationItem = {
+  type: "expression" | "main_translation" | "alternative" | "orig_lang_code";
+  value: string;
+};

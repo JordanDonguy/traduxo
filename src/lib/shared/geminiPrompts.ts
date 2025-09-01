@@ -1,5 +1,7 @@
 /* istanbul ignore file */
 
+import { TranslationItem } from "../../../types/translation";
+
 type TranslationPromptParams = {
   inputText: string;
   inputLang: string;
@@ -9,7 +11,7 @@ type TranslationPromptParams = {
 type ExplanationPromptParams = {
   inputTextLang: string;
   translatedTextLang: string;
-  translatedText: string[];
+  translatedText: TranslationItem[];
   systemLang: string;
 };
 
@@ -28,12 +30,8 @@ export function getTranslationPrompt({
   const fromLangText = detectOriginalLang ? "" : `(in ${inputLang}) `;
 
   const detectionInstruction = detectOriginalLang
-    ? `4. Detect the ORIGINAL language of the extracted expression (two-letter ISO-639-1 code, lowercase).`
+    ? `4. Detect the ORIGINAL language of the extracted expression and return it as a separate JSON object (two-letter ISO-639-1 code, lowercase).`
     : "";
-
-  const outputFormat = detectOriginalLang
-    ? `["expression", "main translation", "alternative 1", "alternative 2", "alternative 3", "orig-lang-code"]`
-    : `["expression", "main translation", "alternative 1", "alternative 2", "alternative 3"]`;
 
   return `
 You will receive a user request that may include extra words such as
@@ -45,14 +43,18 @@ You will receive a user request that may include extra words such as
 ${detectionInstruction}
 
 **Output**  
-Return EXACTLY this JSON array (no markdown):  
-${outputFormat}
+Return MULTIPLE JSON objects, one per line, **no markdown**, with the following structure:
 
-**IMPORTANT:** Always return exactly one translation and 3 alternatives.
+- {"type":"expression","value":"..."}          // the original expression
+- {"type":"main_translation","value":"..."}   // main translation
+- {"type":"alternative","value":"..."}       // alternative translations (3 times)
+${detectOriginalLang ? '- {"type":"orig_lang_code","value":"..."}' : ''}
+
+Always return exactly one main translation and exactly 3 alternatives.
 
 Expression: ${inputText}
-  `.trim();
-};
+  `;
+}
 
 // ------------------------------------- Explanation Prompt -------------------------------------
 export function getExplanationPrompt({
@@ -61,12 +63,18 @@ export function getExplanationPrompt({
   translatedText,
   systemLang,
 }: ExplanationPromptParams): string {
-  if (translatedText.length < 2) {
-    throw new Error("translatedText must include at least the original and one translation.");
+  // Find the main items by type
+  const originalItem = translatedText.find(t => t.type === "expression");
+  const mainTranslationItem = translatedText.find(t => t.type === "main_translation");
+  const alternativeItems = translatedText.filter(t => t.type === "alternative");
+
+  if (!originalItem || !mainTranslationItem) {
+    throw new Error("translatedText must include at least 'expression' and 'main_translation'.");
   }
 
-  const original = translatedText[0];
-  const translations = translatedText.slice(1, translatedText.length - 2).join(", ");
+  const original = originalItem.value;
+  const mainTranslation = mainTranslationItem.value;
+  const alternatives = alternativeItems.map(a => a.value).join(", ");
 
   return `
 SYSTEM
@@ -94,44 +102,31 @@ For each example, use this structure:
 
 ### 💬 Example 1:
 - **${inputTextLang.toUpperCase()}:** Full sentence in ${inputTextLang} containing **${original}**
-- **${translatedTextLang.toUpperCase()}:** Full sentence in ${translatedTextLang} containing **${translations}**
-- short explanation in ${systemLang}
+- **${translatedTextLang.toUpperCase()}:** Full sentence in ${translatedTextLang} containing **${mainTranslation}**
+- Short explanation in ${systemLang}
 
 USER  
 Original*** (${inputTextLang}): "${original}"
 
-Translation (${translatedTextLang}): "${translations}"
+Translation (${translatedTextLang}): "${mainTranslation}${alternatives ? `, ${alternatives}` : ""}"
 
 `.trim();
-};
+}
 
 // ------------------------------------- Suggestion Prompt -------------------------------------
 export function getSuggestionPrompt({
   detectedLang,
   outputLang,
 }: SuggestionPromptParams): string {
-  // Initialize a promptVariant array to avoid returning the same expression every time
   const promptVariants = [
-    // Variant 1
     `Suggest one modern, expressive idiom or common phrase that real native speakers use naturally in everyday speech or writing in ${detectedLang}. Avoid overused internet clichés.`,
-
-    // Variant 2
     `Suggest one fresh, less common idiom or everyday expression in ${detectedLang} that native speakers actually use in daily life. Avoid clichés or overused expressions.`,
-
-    // Variant 3
     `Suggest one contemporary idiom or phrase in ${detectedLang} that is actively used by younger or modern speakers today. Avoid overused internet clichés.`,
-
-    // Variant 4
     `Suggest one idiom or phrase in ${detectedLang} that differs from typical textbook examples. Choose something diverse or regionally popular but still understandable to most native speakers.`,
-
-    // Variant 5
     `Suggest one culturally natural idiom or phrase in ${detectedLang} that feels authentic and commonly used in casual conversations, not a literal or formal one.`,
-
-    // Variant 6
     `Suggest one idiom or phrase in ${detectedLang} that is interesting and adds variety. Prioritize novelty and ensure it would sound natural to a native speaker.`
   ];
 
-  // Select a random variant
   const randomVariant = promptVariants[Math.floor(Math.random() * promptVariants.length)];
 
   return `
@@ -144,10 +139,16 @@ Then translate it into a **natural, equivalent** expression in ${outputLang}, no
 If no exact idiom exists, choose the closest equivalent used in similar situations.
 
 **Output**
-Return EXACTLY this JSON array (no markdown, no explanation):
-["original expression in \${detectedLang}", "best equivalent translation in \${outputLang}", "alternative 1", "alternative 2", "alternative 3"]
+Return EXACTLY multiple JSON objects, one per line (no markdown), with this format:
+
+{"type":"expression","value":"original expression in ${detectedLang}"}
+{"type":"main_translation","value":"best equivalent translation in ${outputLang}"}
+{"type":"alternative","value":"..."}       // alternative translations (3 times)
+
+**IMPORTANT:** Each object must be on its own line. Do not wrap them in an array.
 `;
-};
+}
+
 
 // ------------------------------------- Pool Prompt -------------------------------------
 export function getPoolPrompt(lang: string) {

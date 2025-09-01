@@ -1,32 +1,41 @@
 import { swapMainTranslation } from "@/lib/client/utils/swapMainTranslation";
+import { TranslationItem } from "../../../../../types/translation";
 
 describe("swapMainTranslation", () => {
+  const makeItems = (values: string[], mainIdx = 0): TranslationItem[] =>
+    values.map((v, i) => ({
+      value: v,
+      type: i === mainIdx ? "main_translation" : "alternative",
+    }));
+
   // ------ Test 1️⃣ ------
-  it("swaps the main translation (index 1) with the alternative at altIndex", () => {
-    const input = ["first", "main", "third", "fourth"];
-    const altIndex = 2;
+  it("swaps the main translation type with the selected alternative type", () => {
+    const input = makeItems(["first", "main", "third", "fourth"], 1); // main at index 1
+    const result = swapMainTranslation(input, "main", "third");
 
-    const result = swapMainTranslation(input, altIndex);
+    // Values remain in same order
+    expect(result.map(t => t.value)).toEqual(["first", "main", "third", "fourth"]);
 
-    expect(result).toEqual(["first", "third", "main", "fourth"]);
+    // Types swapped
+    expect(result.find(t => t.value === "main")?.type).toBe("alternative");
+    expect(result.find(t => t.value === "third")?.type).toBe("main_translation");
   });
 
   // ------ Test 2️⃣ ------
   it("does not mutate the original array", () => {
-    const input = ["first", "main", "third"];
-    const altIndex = 2;
+    const input = makeItems(["first", "main", "third"], 1);
+    const result = swapMainTranslation(input, "main", "third");
 
-    const result = swapMainTranslation(input, altIndex);
-
-    expect(input).toEqual(["first", "main", "third"]); // original stays same
+    expect(input.map(t => t.value)).toEqual(["first", "main", "third"]); // original stays same
     expect(result).not.toBe(input); // new array returned
   });
 
   // ------ Test 3️⃣ ------
-  it("swapping index 1 with itself leaves array unchanged", () => {
-    const input = ["a", "b", "c"];
-    const result = swapMainTranslation(input, 1);
+  it("attempting to swap with a non-existing alternative leaves array unchanged", () => {
+    const input = makeItems(["a", "b", "c"], 1);
+    const result = swapMainTranslation(input, "b", "nonexistent");
 
-    expect(result).toEqual(["a", "b", "c"]);
+    expect(result.map(t => t.value)).toEqual(["a", "b", "c"]);
+    expect(result.find(t => t.value === "b")?.type).toBe("main_translation");
   });
 });

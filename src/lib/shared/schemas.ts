@@ -24,23 +24,23 @@ export const authEnvSchema = z.object({
   JWT_SECRET: z.string(),
 });
 
-export const translationsSchema = z
-  .array(z.string())
-  .min(2, "At least two translations required") // original + main translation
-  .max(6, "No more than five translations allowed"); // original + main + alt1 + alt2 + alt3
-
 export const langSchema = z
   .string()
   .length(2, { message: "Language code must be 2 characters" })
   .regex(/^[a-z]{2}$/i, { message: "Language code must contain only letters" });
 
-export const translationRequestSchema = z.object({
-  translations: translationsSchema,
-  inputLang: langSchema,
-  outputLang: langSchema,
-});
-
 export const resetPasswordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   token: z.string().min(32, "Token must be at least 32 characters"),
+});
+
+export const translationItemSchema = z.object({
+  type: z.enum(["expression", "main_translation", "alternative", "orig_lang_code"]),
+  value: z.string(),
+});
+
+export const translationRequestSchema = z.object({
+  translations: z.array(translationItemSchema),
+  inputLang: langSchema,
+  outputLang: langSchema,
 });

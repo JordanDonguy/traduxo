@@ -31,21 +31,30 @@ describe("translationHelper", () => {
 
   // ------ Test 2️⃣ ------
   it("sets state correctly on successful translation", async () => {
-    const fakeText = JSON.stringify(["Bonjour"]);
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue({ text: fakeText }),
+      json: jest.fn().mockResolvedValue({ text: "ignored" }),
     });
+
+    // Mock cleaner to return TranslationItem[]
+    const fakeResponseCleaner = jest.fn(() => [
+      { type: "main_translation", value: "Bonjour" },
+    ]);
 
     const res = await translationHelper({
       ...defaultArgs,
       fetcher: fakeFetcher,
-      responseCleaner: (s) => s, // return raw string
+      responseCleaner: fakeResponseCleaner,
     });
 
-    expect(res).toEqual({ success: true, data: ["Bonjour"] });
-    expect(mockSet).toHaveBeenCalledWith(["Bonjour"]);
+    expect(res).toEqual({
+      success: true,
+      data: [{ type: "main_translation", value: "Bonjour" }],
+    });
+    expect(defaultArgs.setTranslatedText).toHaveBeenCalledWith([
+      { type: "main_translation", value: "Bonjour" },
+    ]);
   });
 
   // ------ Test 3️⃣ ------
@@ -62,12 +71,16 @@ describe("translationHelper", () => {
     });
 
     expect(res).toEqual({ success: false, error: "Rate limit exceeded" });
-    expect(mockSet).toHaveBeenCalledWith("Rate limit exceeded");
+    expect(defaultArgs.setError).toHaveBeenCalledWith("Rate limit exceeded");
   });
 
   // ------ Test 4️⃣ ------
-  it("handles generic fetch error", async () => {
-    const fakeFetcher = jest.fn().mockRejectedValue(new Error("Network error"));
+  it("handles generic non-429 fetch response error", async () => {
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jest.fn().mockResolvedValue({ error: "Server crashed" }),
+    });
 
     const res = await translationHelper({
       ...defaultArgs,
@@ -76,9 +89,10 @@ describe("translationHelper", () => {
 
     expect(res.success).toBe(false);
     expect(res.error).toContain("Oops! Something went wrong");
-    expect(mockSet).toHaveBeenCalledWith(expect.stringContaining("Oops! Something went wrong"));
+    expect(defaultArgs.setError).toHaveBeenCalledWith(
+      expect.stringContaining("Oops! Something went wrong")
+    );
   });
-
 
   // ------ Test 5️⃣ ------
   it("blurs active element if present", async () => {
@@ -104,28 +118,51 @@ describe("translationHelper", () => {
 
   // ------ Test 6️⃣ ------
   it("sets inputTextLang from last element if inputLang is auto", async () => {
-    // If inputLang is auto, Gemini will return the detected input lang as the last element of array
-    // We then extract it and use it
+    const setTranslatedText = jest.fn();
     const setInputTextLang = jest.fn();
+    const setTranslatedTextLang = jest.fn();
+    const setIsLoading = jest.fn();
+    const setError = jest.fn();
 
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({ text: JSON.stringify(["Bonjour", "fr"]) }),
+      json: async () => ({ text: "ignored" }),
     });
 
-    // responseCleaner just returns the string as-is
-    const fakeResponseCleaner = (s: string) => s;
+    const fakeResponseCleaner = jest.fn(() => [
+      { type: "main_translation", value: "Bonjour" },
+      { type: "orig_lang_code", value: "fr" },
+    ]);
 
     const res = await translationHelper({
-      ...defaultArgs,
-      inputLang: "auto",         // triggers the 'auto' branch
-      setInputTextLang,          // override the setter for this test
+      inputText: "Hello",
+      inputLang: "auto",
+      outputLang: "fr",
+      setInputText: jest.fn(),
+      setInputTextLang,
+      setTranslatedTextLang,
+      setTranslatedText,
+      setExplanation: jest.fn(),
+      setIsLoading,
+      setIsFavorite: jest.fn(),
+      setTranslationId: jest.fn(),
+      setError,
       fetcher: fakeFetcher,
-      responseCleaner: fakeResponseCleaner,
+      responseCleaner: fakeResponseCleaner, // ✅ this is crucial
     });
 
     expect(setInputTextLang).toHaveBeenCalledWith("fr");
-    expect(res).toEqual({ success: true, data: ["Bonjour", "fr"] });
+    expect(setTranslatedText).toHaveBeenCalledWith([
+      { type: "main_translation", value: "Bonjour" },
+      { type: "orig_lang_code", value: "fr" },
+    ]);
+    expect(res).toEqual({
+      success: true,
+      data: [
+        { type: "main_translation", value: "Bonjour" },
+        { type: "orig_lang_code", value: "fr" },
+      ],
+    });
   });
 });

@@ -1,11 +1,12 @@
 import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
 import { SuggestionResult } from "../../../../types/suggestionResult";
+import { TranslationItem } from "../../../../types/translation";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
   outputLang: string;
-  setTranslatedText: React.Dispatch<React.SetStateAction<string[]>>;
+  setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
@@ -13,7 +14,6 @@ type SuggestionHelperArgs = {
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
-  // Injected dependencies for testing
   fetcher?: typeof fetch;
   promptGetter?: typeof getSuggestionPrompt;
   responseCleaner?: typeof cleanGeminiResponse;
@@ -34,7 +34,7 @@ export async function suggestExpressionHelper({
   fetcher = fetch,
   promptGetter = getSuggestionPrompt,
   responseCleaner = cleanGeminiResponse,
-}: SuggestionHelperArgs): Promise<SuggestionResult<string[]>> {
+}: SuggestionHelperArgs): Promise<SuggestionResult<TranslationItem[]>> {
   // Blur active element if in browser
   if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
@@ -64,12 +64,12 @@ export async function suggestExpressionHelper({
       setError(error);
       setIsLoading(false);
       return { success: false, error };
-    };
+    }
 
     if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
     const { text } = await res.json();
-    const translationArray = JSON.parse(responseCleaner(text));
+    const translationArray = responseCleaner(text);
 
     setTranslatedText(translationArray);
     setIsLoading(false);

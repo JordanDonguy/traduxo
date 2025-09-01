@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client/extension";
 import authOptions from "../auth/authOptions";
 import { NextResponse } from "next/server";
 import { translationRequestSchema } from "@/lib/shared/schemas";
+import { TranslationItem } from "../../../../types/translation";
 
 export async function saveToFavorite(
   req: Request,
@@ -32,14 +33,31 @@ export async function saveToFavorite(
 
     const { translations, inputLang, outputLang } = validation.data;
 
+    // Helper to get value by type
+    const getValue = (type: string) =>
+      translations.find((t: TranslationItem) => t.type === type)?.value ?? null;
+
+    const mainExpression = getValue("expression");
+    const mainTranslation = getValue("main_translation");
+
+    // Check minimum required translations
+    if (!mainExpression || !mainTranslation) {
+      return NextResponse.json(
+        { error: [{ path: "translations", message: "At least one expression and one main_translation required" }] },
+        { status: 400 }
+      );
+    }
+
+    const alternativeItems = translations.filter((t: TranslationItem) => t.type === "alternative");
+
     const favorite = await prismaClient.favorite.create({
       data: {
         userId: session.user.id,
-        inputText: translations[0] ?? "",
-        translation: translations[1] ?? "",
-        alt1: translations[2] ?? null,
-        alt2: translations[3] ?? null,
-        alt3: translations[4] ?? null,
+        inputText: mainExpression,
+        translation: mainTranslation,
+        alt1: alternativeItems[0]?.value ?? null,
+        alt2: alternativeItems[1]?.value ?? null,
+        alt3: alternativeItems[2]?.value ?? null,
         inputLang,
         outputLang,
       },

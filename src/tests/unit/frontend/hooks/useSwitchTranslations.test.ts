@@ -4,83 +4,99 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSwitchTranslations } from "@/lib/client/hooks/useSwitchTranslations";
 import { swapMainTranslation } from "@/lib/client/utils/swapMainTranslation";
+import { TranslationItem } from "../../../../../types/translation";
 
-// ---- Mocks----
-jest.mock("@/lib/client/utils/swapMainTranslation", () => ({
-  swapMainTranslation: jest.fn((arr) => [...arr].reverse()), // simple mock for testing
-}));
+// ---- Mock swapMainTranslation ----
+// We mock it but also call through so the hook actually executes it
+jest.mock("@/lib/client/utils/swapMainTranslation", () => {
+  const original = jest.requireActual("@/lib/client/utils/swapMainTranslation");
+  return {
+    __esModule: true,
+    swapMainTranslation: jest.fn((arr, main, alt) => original.swapMainTranslation(arr, main, alt)),
+  };
+});
 
-// ---- Tests ----
 describe("useSwitchTranslations", () => {
   let mockSetTranslatedText: jest.Mock;
+  const initialTranslatedText: TranslationItem[] = [
+    { value: "main", type: "main_translation" },
+    { value: "alt1", type: "alternative" },
+    { value: "alt2", type: "alternative" },
+  ];
 
-  // ---- Setup fake timers and mocks ----
   beforeAll(() => jest.useFakeTimers());
   afterAll(() => jest.useRealTimers());
   beforeEach(() => {
-    mockSetTranslatedText = jest.fn();
+    mockSetTranslatedText = jest.fn((updater) => {
+      // Call the updater function to trigger swapMainTranslation
+      if (typeof updater === "function") {
+        updater(initialTranslatedText);
+      }
+    });
+    (swapMainTranslation as jest.Mock).mockClear();
   });
 
   // ------ Test 1️⃣ ------
   it("initializes fading state as empty", () => {
     const { result } = renderHook(() =>
-      useSwitchTranslations({ setTranslatedText: mockSetTranslatedText })
+      useSwitchTranslations({ translatedText: initialTranslatedText, setTranslatedText: mockSetTranslatedText })
     );
 
-    // Fading array should start empty
     expect(result.current.fading).toEqual([]);
   });
 
   // ------ Test 2️⃣ ------
   it("updates fading state and calls setTranslatedText after timeout", () => {
     const { result } = renderHook(() =>
-      useSwitchTranslations({ setTranslatedText: mockSetTranslatedText })
+      useSwitchTranslations({ translatedText: initialTranslatedText, setTranslatedText: mockSetTranslatedText })
     );
 
-    // Trigger switch for idx 0
+    // Trigger switch for "alt2"
     act(() => {
-      result.current.switchTranslations(0);
+      result.current.switchTranslations("alt2");
     });
 
-    // Immediately after calling, fading should include main and selected alt
-    expect(result.current.fading).toEqual([1, 2]);
+    // Immediately after calling, fading should include main and selected alt values
+    expect(result.current.fading).toEqual(["main", "alt2"]);
 
-    // Fast-forward 200ms for the fade animation
+    // Fast-forward 200ms
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    // setTranslatedText should have been called
-    expect(mockSetTranslatedText).toHaveBeenCalled();
+    // setTranslatedText should have been called once
+    expect(mockSetTranslatedText).toHaveBeenCalledTimes(1);
 
-    // Fading state should reset after swap
+    // Because setTranslatedText receives an updater function, we can call it with initialTranslatedText
+    const updater = mockSetTranslatedText.mock.calls[0][0];
+    const updatedArray = typeof updater === "function" ? updater(initialTranslatedText) : updater;
+    expect(updatedArray).toEqual(initialTranslatedText);
+
+    // Fading state should reset
     expect(result.current.fading).toEqual([]);
   });
 
-  // ------ Test 3️⃣ ------
   it("calls swapMainTranslation with correct arguments", () => {
-    const initialArray = ["main", "alt1", "alt2", "alt3"];
-
-    // Mock setTranslatedText to simulate React state updater
-    const mockSetTranslatedText = jest.fn((updater) => {
-      if (typeof updater === "function") updater(initialArray);
-    });
-
     const { result } = renderHook(() =>
-      useSwitchTranslations({ setTranslatedText: mockSetTranslatedText })
+      useSwitchTranslations({ translatedText: initialTranslatedText, setTranslatedText: mockSetTranslatedText })
     );
 
-    // Trigger switch for idx 1 -> altIdx = 3
+    const mainValue = initialTranslatedText.find(t => t.type === "main_translation")?.value;
+
+    // Trigger switch for "alt2"
     act(() => {
-      result.current.switchTranslations(1);
+      result.current.switchTranslations("alt2");
     });
 
-    // Fast-forward 200ms for fade animation
+    // Fast-forward 200ms
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    // swapMainTranslation should have been called with correct array and index
-    expect(swapMainTranslation).toHaveBeenCalledWith(initialArray, 3);
+    // swapMainTranslation should have been called once
+    expect(swapMainTranslation).toHaveBeenCalledTimes(1);
+
+    // Use dynamic mainValue instead of hardcoded "main"
+    expect(swapMainTranslation).toHaveBeenCalledWith(initialTranslatedText, mainValue, "alt2");
   });
 });

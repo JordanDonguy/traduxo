@@ -34,15 +34,38 @@ export async function saveToHistory(
 
     const { translations, inputLang, outputLang } = validation.data;
 
-    // Add new translation first
+    // Extract values by type
+    const getValue = (type: string) =>
+      translations.find(t => t.type === type)?.value ?? null;
+
+    const mainExpression = getValue("expression");
+    const mainTranslation = getValue("main_translation");
+
+    // Check minimum required translations
+    if (!mainExpression || !mainTranslation) {
+      return NextResponse.json(
+        {
+          error: [
+            {
+              path: "translations",
+              message: "At least one expression and one main_translation required",
+            },
+          ],
+        },
+        { status: 400 }
+      );
+    }
+
+    const alternativeItems = translations.filter(t => t.type === "alternative");
+
     await prismaClient.history.create({
       data: {
         userId: session.user.id,
-        inputText: translations[0] ?? "",
-        translation: translations[1] ?? "",
-        alt1: translations[2] ?? null,
-        alt2: translations[3] ?? null,
-        alt3: translations[4] ?? null,
+        inputText: mainExpression,
+        translation: mainTranslation,
+        alt1: alternativeItems[0]?.value ?? null,
+        alt2: alternativeItems[1]?.value ?? null,
+        alt3: alternativeItems[2]?.value ?? null,
         inputLang,
         outputLang,
       },
@@ -75,4 +98,3 @@ export async function saveToHistory(
     );
   }
 }
-

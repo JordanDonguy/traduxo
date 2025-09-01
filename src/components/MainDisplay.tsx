@@ -28,6 +28,7 @@ function MainDisplay() {
 
   const { handleFavorite, isFavLoading } = useFavoriteToggle();
   const { switchTranslations, fading } = useSwitchTranslations({
+    translatedText,
     setTranslatedText,
     timeoutFn: setTimeout
   });
