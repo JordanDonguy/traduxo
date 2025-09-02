@@ -41,11 +41,27 @@ const passwordReset = {
   delete: jest.fn(),
 }
 
+// ✅ Added refreshToken mock for jwtLoginHandler
+const refreshToken = {
+  create: jest.fn(),
+  findUnique: jest.fn(),
+  findFirst: jest.fn(),
+  findMany: jest.fn(),
+  findUniqueOrThrow: jest.fn(),
+  findFirstOrThrow: jest.fn(),
+  update: jest.fn(),
+  updateMany: jest.fn(),
+  delete: jest.fn(),
+  deleteMany: jest.fn(),
+  upsert: jest.fn(),
+};
+
 const prisma = {
   user,
   history,
   favorite,
   passwordReset,
+  refreshToken, // <- added
   $queryRaw: jest.fn(),
 };
 
@@ -77,7 +93,20 @@ export type MockPrismaClient = Partial<PrismaClient> & {
     create: jest.Mock;
     findUnique: jest.Mock;
     delete: jest.Mock;
-  }
+  };
+  refreshToken: {
+    create: jest.Mock;
+    findUnique: jest.Mock;
+    findFirst: jest.Mock;
+    findUniqueOrThrow: jest.Mock;
+    findFirstOrThrow: jest.Mock;
+    findMany: jest.Mock;
+    update: jest.Mock;
+    updateMany: jest.Mock;
+    delete: jest.Mock;
+    deleteMany: jest.Mock;
+    upsert: jest.Mock;
+  };
   $executeRaw: jest.Mock;
 };
 

@@ -1,25 +1,25 @@
 import { prisma } from "../prisma";
 
 type GoogleSignInResult =
-  | { success: true }
+  | { success: true, userId: string }
   | { success: false; reason: "UpdateFailed" | "NeedGoogleLinking" };
 
 export const handleGoogleSignIn = async (email: string, prismaClient = prisma): Promise<GoogleSignInResult> => {
   if (!email) throw new Error("Missing email");
   // Check if user already exists with this Google email
-  const existingUser = await prismaClient.user.findUnique({
+  let existingUser = await prismaClient.user.findUnique({
     where: { email: email },
   });
 
   // If user does not exist, create new user with Google provider
   if (!existingUser) {
-    await prismaClient.user.create({
+    existingUser = await prismaClient.user.create({
       data: {
         email,
         providers: ["Google"],
       },
     });
-    return { success: true };
+    return { success: true, userId: existingUser.id };
   }
 
   // Block if account exists but user is not already signed in (to avoid hijacking)
@@ -38,5 +38,5 @@ export const handleGoogleSignIn = async (email: string, prismaClient = prisma): 
       return { success: false, reason: "UpdateFailed" };
     }
   }
-  return { success: true };
+  return { success: true, userId: existingUser.id };
 }
