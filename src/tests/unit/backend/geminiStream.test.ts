@@ -235,4 +235,24 @@ describe('geminiStream', () => {
       contents: 'Test',
     });
   });
+
+  // ------ Test 1️⃣1️⃣ ------
+  it('handles Gemini API errors', async () => {
+    // make generateContentStream reject
+    mockGenAI.models.generateContentStream.mockRejectedValue(new Error('Stream failed'));
+
+    const req = createRequest({ prompt: 'Test', mode: 'translation' });
+
+    const res = await geminiStream(req, {
+      checkQuotaFn: mockCheckQuotaFn,
+      genai: mockGenAI as unknown as InstanceType<typeof GoogleGenAI>,
+      getSessionFn: mockGetSession,
+    });
+
+    expect(res.status).toBe(500);
+
+    const data = await res.json();
+    expect(data.error).toBe('Gemini API error');
+    expect(data.details).toContain('Stream failed');
+  });
 });

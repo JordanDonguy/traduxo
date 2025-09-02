@@ -5,7 +5,7 @@ export const QUOTA = 3;            // 3 requests
 export const WINDOW = 24 * 60 * 60;  // 1 day
 
 // Extract IP from request headers
-function getIdentifier(req: NextRequest): string {
+function getIdentifier(req: Request): string {
   return (
     req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-real-ip") ||
@@ -17,7 +17,7 @@ function getIdentifier(req: NextRequest): string {
 export function createQuotaChecker(redisClient: Redis) {
   return {
     // Check quota to allow or not request, and then increment user's used requests by one
-    async checkQuota(req: NextRequest) {
+    async checkQuota(req: Request) {
       const id = getIdentifier(req);
 
       // Get number of user's request for the last 24 hours

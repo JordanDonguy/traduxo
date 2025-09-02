@@ -1,9 +1,8 @@
-import { NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 
 // -------------- Config --------------
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 // Schema to validate input
 const BodySchema = z.object({
@@ -11,25 +10,24 @@ const BodySchema = z.object({
   model: z.string().optional().default('gemini-2.5-flash-lite-preview-06-17'),
 });
 
-// -------------- Inner handler --------------
+// -------------- Edge handler --------------
 export async function geminiComplete(
   req: Request,
-  {
-    genai,
-  }: {
-    genai: InstanceType<typeof GoogleGenAI>;
-  }
+  { genai }: { genai: InstanceType<typeof GoogleGenAI> }
 ) {
-  // 1. Parse & validate input
-  const parse = BodySchema.safeParse(await req.json());
-  if (!parse.success) {
-    return NextResponse.json({ error: parse.error.flatten() }, { status: 400 });
-  }
-
-  const { prompt, model } = parse.data;
-
   try {
-    // 4. Call Gemini API
+    // 1. Parse & validate request body
+    const parse = BodySchema.safeParse(await req.json());
+    if (!parse.success) {
+      return new Response(JSON.stringify({ error: parse.error.flatten() }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { prompt, model } = parse.data;
+
+    // 2. Call Gemini API
     const result = await genai.models.generateContent({
       model,
       contents: prompt,
@@ -40,15 +38,22 @@ export async function geminiComplete(
       },
     });
 
-    return NextResponse.json({ text: result.text });
+    // 3. Return JSON response
+    return new Response(JSON.stringify({ text: result.text }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      {
+    return new Response(
+      JSON.stringify({
         error: 'Gemini API error',
         details: String((err as Error).message),
-      },
-      { status: 500 }
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   }
 }
