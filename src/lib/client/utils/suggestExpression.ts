@@ -1,6 +1,5 @@
 import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "./cleanGeminiResponse";
-import { SuggestionResult } from "../../../../types/suggestionResult";
 import { TranslationItem } from "../../../../types/translation";
 
 type SuggestionHelperArgs = {
@@ -8,6 +7,7 @@ type SuggestionHelperArgs = {
   outputLang: string;
   setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
+  setSaveToHistory: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,6 +25,7 @@ export async function suggestExpressionHelper({
   outputLang,
   setTranslatedText,
   setInputTextLang,
+  setSaveToHistory,
   setTranslatedTextLang,
   setExplanation,
   setIsLoading,
@@ -33,8 +34,7 @@ export async function suggestExpressionHelper({
   setError,
   fetcher = fetch,
   promptGetter = getSuggestionPrompt,
-  responseCleaner = cleanGeminiResponse,
-}: SuggestionHelperArgs): Promise<SuggestionResult<TranslationItem[]>> {
+}: SuggestionHelperArgs) {
   // Blur active element if in browser
   if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
@@ -53,10 +53,10 @@ export async function suggestExpressionHelper({
   const prompt = promptGetter({ detectedLang, outputLang });
 
   try {
-    const res = await fetcher("/api/gemini/complete", {
+    const res = await fetcher("/api/gemini/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, isSuggestion: true }),
+      body: JSON.stringify({ prompt, mode: "suggestion" }),
     });
 
     if (res.status === 429) {
@@ -66,15 +66,36 @@ export async function suggestExpressionHelper({
       return { success: false, error };
     }
 
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
 
-    const { text } = await res.json();
-    const translationArray = responseCleaner(text);
+    // --- Streaming decode (NDJSON) ---
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
 
-    setTranslatedText(translationArray);
-    setIsLoading(false);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    return { success: true, data: translationArray };
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n");
+      buffer = parts.pop() || ""; // keep incomplete chunk
+      setIsLoading(false);
+      setTranslatedTextLang(outputLang);
+
+      for (const part of parts) {
+        if (!part.trim()) continue;
+        const item: TranslationItem = JSON.parse(part);
+
+        // Remove trailing dots
+        if (typeof item.value === "string") {
+          item.value = item.value.replace(/\.+$/, "");
+        }
+        setTranslatedText(prev => [...prev, item]);
+      }
+    }
+    setSaveToHistory(true);
+    return { success: true };
   } catch (err) {
     console.error(err);
     const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";

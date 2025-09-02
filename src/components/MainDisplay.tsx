@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
@@ -33,8 +33,6 @@ function MainDisplay() {
     timeoutFn: setTimeout
   });
 
-  const [mounted, setMounted] = useState<boolean>(false);
-  const [ready, setReady] = useState<boolean>(false);
   const router = useRouter();
 
   // Display a toast message if there's an error or success message in url params
@@ -48,25 +46,6 @@ function MainDisplay() {
       p.innerHTML = replaceQuotesInHTML(p.innerHTML);
     });
   }, [explanation.length]);
-
-  // This is used to make a css translating effect when component mounts
-  // The delay is then removed to prevent late color switching when switching light / dark theme
-  useEffect(() => {
-    if (isLoading) {
-      setMounted(false);
-      setReady(false);
-    } else if (translatedText.length) {
-      const timeoutMounted = setTimeout(() => setMounted(true), 10)
-      const timeoutReady = setTimeout(() => setReady(true), 1000);
-      return () => {
-        clearTimeout(timeoutMounted);
-        clearTimeout(timeoutReady);
-      }
-    } else {
-      setMounted(false);
-      setReady(false);
-    }
-  }, [translatedText, isLoading]);
 
   return (
     <section className={`relative flex flex-col items-center w-full duration-500 mt-12 mb-40 lg:mb-56
@@ -85,8 +64,6 @@ function MainDisplay() {
           inputTextLang={inputTextLang}
           translatedTextLang={translatedTextLang}
           fading={fading}
-          mounted={mounted}
-          ready={ready}
           isFavorite={isFavorite}
           isFavLoading={isFavLoading}
           onFavoriteClick={handleFavorite}
@@ -95,8 +72,7 @@ function MainDisplay() {
 
           <ExplanationSection
             explanation={explanation}
-            mounted={mounted}
-            ready={ready}
+            translatedText={translatedText}
           />
 
         </TranslationSection>

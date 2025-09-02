@@ -36,8 +36,6 @@ describe("<TranslationSection />", () => {
     inputTextLang: "en",
     translatedTextLang: "fr",
     fading: [],
-    mounted: true,
-    ready: true,
     isFavorite: false,
     isFavLoading: false,
     onFavoriteClick: mockFavoriteClick,
@@ -105,14 +103,14 @@ describe("<TranslationSection />", () => {
       />
     );
 
-    // Main translation should have opacity-0
-    expect(screen.getByText("World")).toHaveClass("opacity-0");
+    // Main translation should have scale-y-0
+    expect(screen.getByText("World")).toHaveClass("scale-y-0");
 
-    // First alternative should have opacity-0
-    expect(screen.getByText("Alternative1")).toHaveClass("opacity-0");
+    // First alternative should have scale-y-0
+    expect(screen.getByText("Alternative1")).toHaveClass("scale-y-0");
 
-    // Second alternative should remain opacity-100
-    expect(screen.getByText("Alternative2")).toHaveClass("opacity-100");
+    // Second alternative should remain scale-y-100
+    expect(screen.getByText("Alternative2")).toHaveClass("scale-y-100");
   });
 
 
@@ -158,38 +156,6 @@ describe("<TranslationSection />", () => {
   });
 
   // ------ Test 1️⃣1️⃣ ------
-  it("applies -translate-x-full opacity-0 when mounted is false", () => {
-    render(
-      <TranslationSection
-        {...defaultProps}
-        mounted={false}
-      />
-    );
-
-    // First article (input language + original text)
-    const inputArticle = screen.getByText("EN").closest("article");
-    expect(inputArticle).toHaveClass("-translate-x-full opacity-0");
-
-    // Second article (output language + main translation)
-    const outputArticle = screen.getByText("World").closest("article");
-    expect(outputArticle).toHaveClass("-translate-x-full opacity-0");
-  });
-
-  // ------ Test 1️⃣2️⃣ ------
-  it("applies delay-500 translate-x-0 opacity-100 when mounted is true but ready is false", () => {
-    render(
-      <TranslationSection
-        {...defaultProps}
-        mounted={true}
-        ready={false}
-      />
-    );
-
-    const outputArticle = screen.getByText("World").closest("article");
-    expect(outputArticle).toHaveClass("delay-500 translate-x-0 opacity-100");
-  });
-
-  // ------ Test 1️⃣3️⃣ ------
   it("renders empty string when inputTextLang length > 2", () => {
     render(
       <TranslationSection
@@ -197,8 +163,6 @@ describe("<TranslationSection />", () => {
         inputTextLang="eng"
         translatedTextLang="fr"
         fading={[]}
-        mounted={true}
-        ready={true}
         isFavorite={false}
         isFavLoading={false}
         onFavoriteClick={() => { }}
@@ -210,7 +174,7 @@ describe("<TranslationSection />", () => {
     expect(langP).toBeInTheDocument();
   });
 
-  // ------ Test 1️⃣4️⃣ ------
+  // ------ Test 1️⃣2️⃣ ------
   it("renders uppercase inputTextLang when length <= 2", () => {
     render(
       <TranslationSection
@@ -218,8 +182,6 @@ describe("<TranslationSection />", () => {
         inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}
-        mounted={true}
-        ready={true}
         isFavorite={false}
         isFavLoading={false}
         onFavoriteClick={() => { }}
@@ -230,7 +192,7 @@ describe("<TranslationSection />", () => {
     expect(screen.getByText("EN")).toBeInTheDocument();
   });
 
-  // ------ Test 1️⃣5️⃣ ------
+  // ------ Test 1️⃣3️⃣ ------
   it("renders empty string if translatedTextLang length > 2", () => {
     render(
       <TranslationSection
@@ -238,8 +200,6 @@ describe("<TranslationSection />", () => {
         inputTextLang="en"
         translatedTextLang="eng"
         fading={[]}
-        mounted={true}
-        ready={true}
         isFavorite={false}
         isFavLoading={false}
         onFavoriteClick={() => { }}
@@ -252,7 +212,7 @@ describe("<TranslationSection />", () => {
     expect(langP).toBeInTheDocument();
   });
 
-  // ------ Test 1️⃣6️⃣ ------
+  // ------ Test 1️⃣4️⃣ ------
   it("renders Star with transparent fill when not favorite", () => {
     render(
       <TranslationSection
@@ -260,8 +220,6 @@ describe("<TranslationSection />", () => {
         inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}
-        mounted={true}
-        ready={true}
         isFavorite={false}
         isFavLoading={false}
         onFavoriteClick={() => { }}
@@ -274,7 +232,7 @@ describe("<TranslationSection />", () => {
     expect(starIcon).toHaveAttribute("fill", "transparent");
   });
 
-  // ------ Test 1️⃣7️⃣ ------
+  // ------ Test 1️⃣5️⃣ ------
   it("renders Star with currentColor fill when favorite", () => {
     render(
       <TranslationSection
@@ -282,8 +240,6 @@ describe("<TranslationSection />", () => {
         inputTextLang="en"
         translatedTextLang="fr"
         fading={[]}
-        mounted={true}
-        ready={true}
         isFavorite={true}
         isFavLoading={false}
         onFavoriteClick={() => { }}

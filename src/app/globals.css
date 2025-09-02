@@ -234,3 +234,14 @@ select:-webkit-autofill:focus {
   background: var(--input-placeholder);
   border-radius: 4px;
 }
+
+.fade-in-item {
+  opacity: 0;
+  animation: fadeIn 0.2s forwards; /* quick fade-in */
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}

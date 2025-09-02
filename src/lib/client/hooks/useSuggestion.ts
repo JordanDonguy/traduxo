@@ -57,6 +57,7 @@ export function useSuggestion({
     setInputText,
     setTranslatedText,
     setInputTextLang,
+    setSaveToHistory,
     setTranslatedTextLang,
     setExplanation,
     setIsFavorite,
@@ -107,6 +108,7 @@ export function useSuggestion({
             outputLang,
             setTranslatedText,
             setInputTextLang,
+            setSaveToHistory,
             setTranslatedTextLang,
             setExplanation,
             setError,
@@ -119,8 +121,8 @@ export function useSuggestion({
         if (status === "authenticated") {
           promises.push(
             fetchExpressionPoolHelperFn({
-              setError,
               suggestionLang,
+              setError,
               setExpressionPool,
             })
           );
@@ -146,6 +148,7 @@ export function useSuggestion({
           outputLang,
           setInputText,
           setInputTextLang,
+          setSaveToHistory,
           setTranslatedTextLang,
           setTranslatedText,
           setExplanation,

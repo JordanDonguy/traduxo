@@ -4,17 +4,16 @@ import ReactMarkdown from "react-markdown";
 import LoadingAnimation from "./LoadingAnimation";
 import ErrorSection from "./ErrorSection";
 import { useExplanation } from "@/lib/client/hooks/useExplanation";
+import { TranslationItem } from "../../types/translation";
 
 type ExplanationSectionProps = {
   explanation: string;
-  mounted: boolean;
-  ready: boolean;
+  translatedText: TranslationItem[];
 };
 
 export default function ExplanationSection({
   explanation,
-  mounted,
-  ready,
+  translatedText
 }: ExplanationSectionProps) {
   const { handleExplanation, isExpLoading, explanationError, setExplanationError } = useExplanation();
 
@@ -24,7 +23,7 @@ export default function ExplanationSection({
 
   if (explanation.length) {
     return (
-      <div className="flex-1 flex flex-col justify-center explanation mt-10 mb-4">
+      <div className="flex-1 flex flex-col justify-center explanation mt-10 mb-4 fade-in-item">
         <ReactMarkdown>{explanation}</ReactMarkdown>
       </div>
     );
@@ -42,10 +41,8 @@ export default function ExplanationSection({
     <div
       className={`flex justify-center items-center flex-1 w-full self-center duration-500 ease-in-out transform mt-8
         ${
-          mounted
-            ? ready
+            translatedText.length > 3
               ? "scale-x-100 opacity-100"
-              : "delay-1000 scale-x-100 opacity-100"
             : "scale-x-0 opacity-0"
         }`}
     >

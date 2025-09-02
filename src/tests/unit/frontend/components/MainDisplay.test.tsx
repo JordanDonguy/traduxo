@@ -243,34 +243,4 @@ describe("<MainDisplay />", () => {
     section = container.querySelector("section");
     expect(section).toHaveClass("mb-40 lg:mb-56");
   });
-
-  // ------ Test 7️⃣ ------
-  it("sets mounted and ready after timeouts", () => {
-    jest.useFakeTimers();
-
-    (useApp as jest.Mock).mockReturnValue({
-      isLoading: false,
-      error: "",
-      setError: jest.fn(),
-    });
-
-    (useTranslationContext as jest.Mock).mockReturnValue({
-      translatedText: "Hello world",
-      setTranslatedText: jest.fn(),
-      inputTextLang: "en",
-      translatedTextLang: "fr",
-      explanation: "Short explanation",
-      isFavorite: false,
-    });
-
-    const { container } = render(<MainDisplay />);
-    const section = container.querySelector("section");
-    expect(section).toBeInTheDocument();
-
-    // Advance timers for mounted and ready state changes
-    jest.advanceTimersByTime(10);   // mounted true
-    jest.advanceTimersByTime(1000); // ready true
-
-    jest.useRealTimers();
-  });
 });

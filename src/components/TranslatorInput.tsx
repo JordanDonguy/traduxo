@@ -11,7 +11,7 @@ import TextInputForm from "./TextInputForm";
 
 export default function TranslatorInput() {
   const { setIsLoading, setError } = useApp();
-  const { inputText, setInputText, setTranslatedText, setInputTextLang, setTranslatedTextLang, setExplanation, setIsFavorite, setTranslationId } = useTranslationContext();
+  const { inputText, setInputText, setTranslatedText, setSaveToHistory, setInputTextLang, setTranslatedTextLang, setExplanation, setIsFavorite, setTranslationId } = useTranslationContext();
   const { inputLang, outputLang, setInputLang, setOutputLang, detectedLang } = useLanguageContext();
 
   const { isSwitching, switchLanguage } = useLanguageSwitch({ inputLang, outputLang, setInputLang, setOutputLang, detectedLang });
@@ -26,6 +26,7 @@ export default function TranslatorInput() {
       outputLang,
       setInputText,
       setInputTextLang,
+      setSaveToHistory,
       setTranslatedTextLang,
       setTranslatedText,
       setExplanation,

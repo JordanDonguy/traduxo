@@ -59,7 +59,7 @@ export function useExplanation({
       const res = await fetcher("/api/gemini/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, mode: "explanation" }),
       });
 
       // ---- Step 3d: Handle 429 quota error ----

@@ -93,7 +93,7 @@ describe("TranslationContext", () => {
   });
 
   // ------ Test 3️⃣ ------
-  it("calls saveTranslation when authenticated and valid data", async () => {
+  it("calls saveTranslation when authenticated and saveToHistory is true", async () => {
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
 
     global.fetch = jest.fn().mockResolvedValue({
@@ -101,20 +101,26 @@ describe("TranslationContext", () => {
       json: async () => ({}),
     }) as jest.Mock;
 
-    const { result, rerender } = renderHook(() => useTranslationContext(), { wrapper: Providers });
+    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
 
+    // set up data (so body isn’t empty)
     setTranslationData(result);
-    rerender();
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      "/api/history",
-      expect.objectContaining({
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      })
-    );
+    // trigger the effect
+    act(() => {
+      result.current.setSaveToHistory(true);
+    });
 
-    expect(fetchHistory).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/history",
+        expect.objectContaining({
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+      expect(fetchHistory).toHaveBeenCalled();
+    });
   });
 
   // ------ Test 4️⃣ ------
@@ -124,13 +130,13 @@ describe("TranslationContext", () => {
 
     const historyItem = {
       id: "2",
-      inputText: "hello",
-      translation: "bonjour",
+      inputText: "Hello",
+      translation: "Bonjour",
       inputLang: "en",
       outputLang: "fr",
-      alt1: "hi",
-      alt2: null,
-      alt3: null,
+      alt1: "Salut",
+      alt2: "Coucou",
+      alt3: "Bonsoir",
     };
 
     act(() => {
@@ -140,17 +146,50 @@ describe("TranslationContext", () => {
     expect(result.current.isFavorite).toBe(false);
     expect(result.current.translationId).toBeUndefined();
     expect(result.current.translatedText).toEqual([
-      { type: "expression", value: "hello" },
-      { type: "main_translation", value: "bonjour" },
-      { type: "alternative", value: "hi" },
-      { type: "alternative", value: "" },
-      { type: "alternative", value: "" },
+      { type: "expression", value: "Hello" },
+      { type: "main_translation", value: "Bonjour" },
+      { type: "alternative", value: "Salut" },
+      { type: "alternative", value: "Coucou" },
+      { type: "alternative", value: "Bonsoir" },
     ]);
     expect(result.current.inputTextLang).toBe("en");
     expect(result.current.translatedTextLang).toBe("fr");
   });
 
   // ------ Test 5️⃣ ------
+  it("loadTranslationFromMenu sets state correctly when fromFavorite is true", () => {
+    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
+    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
+
+    const favoriteItem = {
+      id: "42",
+      inputText: "goodbye",
+      translation: "au revoir",
+      inputLang: "en",
+      outputLang: "fr",
+      alt1: null,
+      alt2: null,
+      alt3: null,
+    };
+
+    act(() => {
+      result.current.loadTranslationFromMenu(favoriteItem, true);
+    });
+
+    expect(result.current.isFavorite).toBe(true);
+    expect(result.current.translationId).toBe("42");
+    expect(result.current.translatedText).toEqual([
+      { type: "expression", value: "goodbye" },
+      { type: "main_translation", value: "au revoir" },
+      { type: "alternative", value: "" },          // alt1 fallback
+      { type: "alternative", value: "" },  // alt2 filled
+      { type: "alternative", value: "" },          // alt3 fallback
+    ]);
+    expect(result.current.inputTextLang).toBe("en");
+    expect(result.current.translatedTextLang).toBe("fr");
+  });
+
+  // ------ Test 6️⃣ ------
   it("sets error when fetch returns !ok", async () => {
     const mockSetError = mockUseApp();
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
@@ -163,13 +202,16 @@ describe("TranslationContext", () => {
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
 
     setTranslationData(result);
+    act(() => {
+      result.current.setSaveToHistory(true);
+    });
 
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("Server error");
     });
   });
 
-  // ------ Test 6️⃣ ------
+  // ------ Test 7️⃣ ------
   it("sets fallback error when fetch returns !ok without error field", async () => {
     const mockSetError = mockUseApp();
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
@@ -183,12 +225,16 @@ describe("TranslationContext", () => {
 
     setTranslationData(result);
 
+    act(() => {
+      result.current.setSaveToHistory(true);
+    });
+
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("Failed to save translation");
     });
   });
 
-  // ------ Test 7️⃣ ------
+  // ------ Test 8️⃣ ------
   it("sets error when fetch throws", async () => {
     const mockSetError = mockUseApp();
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
@@ -198,59 +244,13 @@ describe("TranslationContext", () => {
     const { result, rerender } = renderHook(() => useTranslationContext(), { wrapper: Providers });
 
     setTranslationData(result);
+    act(() => {
+      result.current.setSaveToHistory(true);
+    });
     rerender();
 
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("Network error while saving translation");
     });
-  });
-
-  // ------ Test 8️⃣ ------
-  it("loadTranslationFromMenu handles favorites and alts correctly", () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-
-    const favoriteItem = {
-      id: "1",
-      inputText: "hi",
-      translation: "salut",
-      inputLang: "en",
-      outputLang: "fr",
-      alt1: null,
-      alt2: null,
-      alt3: null,
-    };
-    const nonFavoriteItem = {
-      id: "2",
-      inputText: "test",
-      translation: "testé",
-      inputLang: "en",
-      outputLang: "fr",
-      alt1: "essai",
-      alt2: "épreuve",
-      alt3: "tentative",
-    };
-
-    act(() => result.current.loadTranslationFromMenu(favoriteItem, true));
-    expect(result.current.isFavorite).toBe(true);
-    expect(result.current.translationId).toBe("1");
-    expect(result.current.translatedText).toEqual([
-      { type: "expression", value: "hi" },
-      { type: "main_translation", value: "salut" },
-      { type: "alternative", value: "" },
-      { type: "alternative", value: "" },
-      { type: "alternative", value: "" },
-    ]);
-
-    act(() => result.current.loadTranslationFromMenu(nonFavoriteItem, false));
-    expect(result.current.isFavorite).toBe(false);
-    expect(result.current.translationId).toBeUndefined();
-    expect(result.current.translatedText).toEqual([
-      { type: "expression", value: "test" },
-      { type: "main_translation", value: "testé" },
-      { type: "alternative", value: "essai" },
-      { type: "alternative", value: "épreuve" },
-      { type: "alternative", value: "tentative" },
-    ]);
   });
 });

@@ -6,6 +6,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ExplanationSection from "@/components/ExplanationSection";
 import { useExplanation } from "@/lib/client/hooks/useExplanation";
+import { TranslationItem } from "../../../../../types/translation";
 
 // ------ Mocks ------
 jest.mock("@/lib/client/hooks/useExplanation");
@@ -25,8 +26,6 @@ jest.mock("react-markdown", () => ({
     return <div dangerouslySetInnerHTML={{ __html: content }} />;
   },
 }));
-
-
 
 describe("ExplanationSection component", () => {
   const handleExplanation = jest.fn();
@@ -51,32 +50,30 @@ describe("ExplanationSection component", () => {
       setExplanationError,
     });
 
-    render(<ExplanationSection explanation="" mounted={true} ready={true} />);
+    const translatedText: TranslationItem[] = [];
+
+    render(<ExplanationSection explanation="" translatedText={translatedText} />);
     expect(screen.getByText("ErrorSection")).toBeInTheDocument();
   });
 
   // ------ Test 2️⃣ ------
   it("renders explanation content when explanation is provided", () => {
-    render(<ExplanationSection explanation="**Hello**" mounted={true} ready={true} />);
+    const translatedText: TranslationItem[] = [];
+    render(<ExplanationSection explanation="**Hello**" translatedText={translatedText} />);
     expect(screen.getByText("Hello")).toBeInTheDocument(); // Markdown rendered
   });
 
   // ------ Test 3️⃣ ------
-  it("renders LoadingAnimation when isExpLoading is true", () => {
-    (useExplanation as jest.Mock).mockReturnValue({
-      handleExplanation,
-      isExpLoading: true,
-      explanationError: "",
-      setExplanationError: jest.fn(),
-    });
-
-    render(<ExplanationSection explanation="" mounted={true} ready={true} />);
-    expect(screen.getByText("LoadingAnimation")).toBeInTheDocument();
-  });
-
-  // ------ Test 4️⃣ ------
   it("renders AI explanation button when no error, no explanation, and not loading", () => {
-    render(<ExplanationSection explanation="" mounted={true} ready={true} />);
+    const translatedText: TranslationItem[] = [
+      { type: "expression", value: "Hello" },
+      { type: "main_translation", value: "World" },
+    ];
+
+    render(
+      <ExplanationSection explanation="" translatedText={translatedText} />
+    );
+
     const button = screen.getByText("✨ AI explanations");
     expect(button).toBeInTheDocument();
 
@@ -84,15 +81,39 @@ describe("ExplanationSection component", () => {
     expect(handleExplanation).toHaveBeenCalled();
   });
 
-  // ------ Test 5️⃣ ------
-  it("applies correct classes when mounted and ready are false", () => {
-    const { container } = render(<ExplanationSection explanation="" mounted={false} ready={false} />);
-    expect(container.querySelector("div > button")?.parentElement).toHaveClass("scale-x-0 opacity-0");
+  // ------ Test 4️⃣ ------
+  it("applies visible animation when translatedText.length > 3", () => {
+    const translatedText: TranslationItem[] = [
+      { type: "expression", value: "1" },
+      { type: "main_translation", value: "2" },
+      { type: "alternative", value: "3" },
+      { type: "alternative", value: "4" },
+    ];
+
+    render(
+      <ExplanationSection explanation="" translatedText={translatedText} />
+    );
+
+    const container = screen.getByRole("button", { name: "✨ AI explanations" })
+      .parentElement;
+
+    expect(container).toHaveClass("scale-x-100", "opacity-100");
   });
 
-  // ------ Test 6️⃣ ------
-  it("applies correct classes when mounted is true but ready is false", () => {
-    const { container } = render(<ExplanationSection explanation="" mounted={true} ready={false} />);
-    expect(container.querySelector("div > button")?.parentElement).toHaveClass("delay-1000 scale-x-100 opacity-100");
+  // ------ Test 5️⃣ ------
+  it("applies hidden animation when translatedText.length <= 3", () => {
+    const translatedText: TranslationItem[] = [
+      { type: "expression", value: "1" },
+      { type: "main_translation", value: "2" },
+    ];
+
+    render(
+      <ExplanationSection explanation="" translatedText={translatedText} />
+    );
+
+    const container = screen.getByRole("button", { name: "✨ AI explanations" })
+      .parentElement;
+
+    expect(container).toHaveClass("scale-x-0", "opacity-0");
   });
 });

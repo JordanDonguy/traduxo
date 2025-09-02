@@ -45,9 +45,11 @@ ${detectionInstruction}
 **Output**  
 Return MULTIPLE JSON objects, one per line, **no markdown**, with the following structure:
 
-- {"type":"expression","value":"..."}          // the original expression
-- {"type":"main_translation","value":"..."}   // main translation
-- {"type":"alternative","value":"..."}       // alternative translations (3 times)
+- {"type":"expression","value":"..."}   // The original expression
+- {"type":"main_translation","value":"..."}
+- {"type":"alternative","value":"..."}
+- {"type":"alternative","value":"..."}
+- {"type":"alternative","value":"..."}
 ${detectOriginalLang ? '- {"type":"orig_lang_code","value":"..."}' : ''}
 
 Always return exactly one main translation and exactly 3 alternatives.
@@ -143,7 +145,9 @@ Return EXACTLY multiple JSON objects, one per line (no markdown), with this form
 
 {"type":"expression","value":"original expression in ${detectedLang}"}
 {"type":"main_translation","value":"best equivalent translation in ${outputLang}"}
-{"type":"alternative","value":"..."}       // alternative translations (3 times)
+{"type":"alternative","value":"..."}
+{"type":"alternative","value":"..."}
+{"type":"alternative","value":"..."}
 
 **IMPORTANT:** Each object must be on its own line. Do not wrap them in an array.
 `;

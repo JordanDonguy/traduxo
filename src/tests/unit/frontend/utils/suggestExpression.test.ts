@@ -2,6 +2,12 @@
  * @jest-environment jsdom
  */
 import { suggestExpressionHelper } from "@/lib/client/utils/suggestExpression";
+import { TextEncoder, TextDecoder } from "util";
+import { TranslationItem } from "../../../../../types/translation";
+
+(globalThis as unknown as { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
+(globalThis as unknown as { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder;
+
 
 describe("suggestExpressionHelper", () => {
   let fetchMock: jest.Mock;
@@ -13,6 +19,7 @@ describe("suggestExpressionHelper", () => {
     setters = {
       setTranslatedText: jest.fn(),
       setInputTextLang: jest.fn(),
+      setSaveToHistory: jest.fn(),
       setTranslatedTextLang: jest.fn(),
       setExplanation: jest.fn(),
       setIsLoading: jest.fn(),
@@ -32,6 +39,7 @@ describe("suggestExpressionHelper", () => {
       fetcher: fetchMock,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,
@@ -53,19 +61,31 @@ describe("suggestExpressionHelper", () => {
 
   // ------ Test 2️⃣ ------
   it("handles success response", async () => {
-    // Mock fetch to return a Gemini response
-    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ text: '["bonjour"]' }) });
-
-    // Mock the cleaner to return TranslationItem[]
-    const mockCleaner = jest.fn(() => [{ type: "expression", value: "bonjour" }]);
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: {
+        getReader: () => ({
+          read: jest
+            .fn()
+            .mockResolvedValueOnce({
+              done: false,
+              value: new TextEncoder().encode(
+                JSON.stringify({ type: "expression", value: "bonjour" }) + "\n"
+              ),
+            })
+            .mockResolvedValueOnce({ done: true, value: undefined }),
+        }),
+      },
+    });
 
     const result = await suggestExpressionHelper({
       detectedLang: "en",
       outputLang: "fr",
-      fetcher: fetchMock,
-      responseCleaner: mockCleaner,
+      fetcher: fakeFetcher,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,
@@ -74,15 +94,16 @@ describe("suggestExpressionHelper", () => {
       setError: setters.setError,
     });
 
-    // ---- Ensure setters are called with TranslationItem[] ----
-    expect(setters.setTranslatedText).toHaveBeenCalledWith([
-      { type: "expression", value: "bonjour" },
-    ]);
+    // Rebuild state from calls
+    let state: TranslationItem[] = [];
+    for (const [arg] of setters.setTranslatedText.mock.calls) {
+      state = typeof arg === "function" ? arg(state) : arg;
+    }
+
+    expect(state).toEqual([{ type: "expression", value: "bonjour" }]);
     expect(setters.setIsLoading).toHaveBeenCalledWith(false);
-    expect(result).toEqual({
-      success: true,
-      data: [{ type: "expression", value: "bonjour" }],
-    });
+    expect(setters.setSaveToHistory).toHaveBeenCalledWith(true);
+    expect(result).toEqual({ success: true });
   });
 
   // ------ Test 3️⃣ ------
@@ -95,6 +116,7 @@ describe("suggestExpressionHelper", () => {
       fetcher: fetchMock,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,
@@ -118,6 +140,7 @@ describe("suggestExpressionHelper", () => {
       fetcher: fetchMock,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,
@@ -150,6 +173,7 @@ describe("suggestExpressionHelper", () => {
       fetcher: fetchMock,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,
@@ -176,6 +200,7 @@ describe("suggestExpressionHelper", () => {
       fetcher: fetchMock,
       setTranslatedText: setters.setTranslatedText,
       setInputTextLang: setters.setInputTextLang,
+      setSaveToHistory: setters.setSaveToHistory,
       setTranslatedTextLang: setters.setTranslatedTextLang,
       setExplanation: setters.setExplanation,
       setIsLoading: setters.setIsLoading,

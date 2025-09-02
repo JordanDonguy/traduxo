@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useMemo, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 import { useSession } from "next-auth/react";
@@ -9,6 +9,7 @@ import { Translation, TranslationItem } from "../../types/translation";
 export type TranslationState = {
   inputText: string;
   translatedText: TranslationItem[];
+  saveToHistory: boolean;
   inputTextLang: string;
   translatedTextLang: string;
   explanation: string;
@@ -17,6 +18,7 @@ export type TranslationState = {
   expressionPool: string[];
   setInputText: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
+  setSaveToHistory: React.Dispatch<React.SetStateAction<boolean>>;
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setExplanation: React.Dispatch<React.SetStateAction<string>>;
@@ -37,6 +39,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const { status } = useSession();
   const [inputText, setInputText] = useState<string>("");
   const [translatedText, setTranslatedText] = useState<TranslationItem[]>([]);
+  const [saveToHistory, setSaveToHistory] = useState<boolean>(false);
 
   const [inputTextLang, setInputTextLang] = useState<string>("");
   const [translatedTextLang, setTranslatedTextLang] = useState<string>("");
@@ -49,31 +52,9 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const [translationHistory, setTranslationHistory] = useState<Translation[]>([]);
   const [expressionPool, setExpressionPool] = useState<string[]>([]);
 
-  // This useRef is to skip saving translation to db if translation is loaded from history
-  const isLoadingFromHistoryRef = useRef(false);
-  function setLoadingFromMenu(value: boolean) {
-    isLoadingFromHistoryRef.current = value;
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const translationSnapshot = useMemo(() => translatedText, [translatedText.length]);
-
-  // Save translation do db
+  // Save a translation once saveToHistory is triggered
   useEffect(() => {
-    // Skip saving translation to db if loaded from history
-    if (isLoadingFromHistoryRef.current) {
-      isLoadingFromHistoryRef.current = false;
-      return;
-    }
-
-    // Only call saveTranslation if user is authenticated
-    // And if there's valid translatedText (at least 2 translations) and valid languages
-    if (
-      status === "authenticated" &&
-      translationSnapshot.length >= 2 &&
-      inputTextLang.length === 2 &&
-      translatedTextLang.length === 2
-    ) {
+    if (status === "authenticated" && saveToHistory) {
 
       const saveTranslation = async () => {
         try {
@@ -83,7 +64,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              translations: translationSnapshot,
+              translations: translatedText,
               inputLang: inputTextLang,
               outputLang: translatedTextLang,
             }),
@@ -103,12 +84,12 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         }
       };
       saveTranslation();
+      setSaveToHistory(false)
     }
-  }, [translationSnapshot, inputTextLang, translatedTextLang, status, setError]);
+  }, [saveToHistory, setSaveToHistory, inputTextLang, translatedText, translatedTextLang, status, setError]);
 
   // Load a translation from user's history to main display
   function loadTranslationFromMenu(t: Translation, fromFavorite: boolean) {
-    setLoadingFromMenu(true)
     setExplanation("");
     if (fromFavorite) {
       setIsFavorite(true);
@@ -146,6 +127,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       value={{
         inputText,
         translatedText,
+        saveToHistory,
         inputTextLang,
         translatedTextLang,
         explanation,
@@ -154,6 +136,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         expressionPool,
         setInputText,
         setTranslatedText,
+        setSaveToHistory,
         setInputTextLang,
         setTranslatedTextLang,
         setExplanation,

@@ -1,5 +1,4 @@
 import { getTranslationPrompt } from "@/lib/shared/geminiPrompts";
-import { cleanGeminiResponse } from "./cleanGeminiResponse";
 import { TranslationItem } from "../../../../types/translation";
 
 type TranslateHelperArgs = {
@@ -10,14 +9,14 @@ type TranslateHelperArgs = {
   setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
   setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
-  setExplanation: React.Dispatch<React.SetStateAction<string>>;
+  setSaveToHistory: React.Dispatch<React.SetStateAction<boolean>>;
+  setExplanation: React.Dispatch<React.SetStateAction<string>>; // stays, but unused here
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
   setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
   fetcher?: typeof fetch;
   promptGetter?: typeof getTranslationPrompt;
-  responseCleaner?: typeof cleanGeminiResponse;
 };
 
 export async function translationHelper({
@@ -28,6 +27,7 @@ export async function translationHelper({
   setInputTextLang,
   setTranslatedTextLang,
   setTranslatedText,
+  setSaveToHistory,
   setExplanation,
   setIsLoading,
   setIsFavorite,
@@ -35,7 +35,6 @@ export async function translationHelper({
   setError,
   fetcher = fetch,
   promptGetter = getTranslationPrompt,
-  responseCleaner = cleanGeminiResponse,
 }: TranslateHelperArgs) {
   if (!inputText.length) return { success: false, message: "No input text" };
 
@@ -56,10 +55,10 @@ export async function translationHelper({
   setInputText("");
 
   try {
-    const res = await fetcher("/api/gemini/complete", {
+    const res = await fetcher("/api/gemini/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, isSuggestion: false }),
+      body: JSON.stringify({ prompt, mode: "translation" }),
     });
 
     if (res.status === 429) {
@@ -69,29 +68,43 @@ export async function translationHelper({
       return { success: false, error };
     }
 
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
 
-    const { text } = await res.json();
+    // --- Streaming decode (NDJSON) ---
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
 
-    // Parse Gemini response into TranslationItem[]
-    const translationArray = responseCleaner(text);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    // Set detected input language if auto
-    if (inputLang === "auto") {
-      const langObj = translationArray.find(item => item.type === "orig_lang_code");
-      if (langObj) setInputTextLang(langObj.value);
-    } else {
-      setInputTextLang(inputLang);
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n");
+      buffer = parts.pop() || ""; // keep incomplete chunk
+
+      setIsLoading(false);
+      setTranslatedTextLang(outputLang);
+
+      for (const part of parts) {
+        if (!part.trim()) continue;
+        const item: TranslationItem = JSON.parse(part);
+        // Remove trailing dots
+        if (typeof item.value === "string") {
+          item.value = item.value.replace(/\.+$/, "");
+        }
+        if (inputLang === "auto" && item.type === "orig_lang_code") {
+          setInputTextLang(item.value);
+        }
+        setTranslatedText(prev => [...prev, item]);
+      }
     }
-
-    setTranslatedTextLang(outputLang);
-    setTranslatedText(translationArray);
-    setIsLoading(false);
-
-    return { success: true, data: translationArray };
+    setSaveToHistory(true);
+    return { success: true };
   } catch (err: unknown) {
     console.error(err);
-    const errorMsg = "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
+    const errorMsg =
+      "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏";
     setError(errorMsg);
     setIsLoading(false);
     return { success: false, error: errorMsg };
