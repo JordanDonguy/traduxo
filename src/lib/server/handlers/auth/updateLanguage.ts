@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { langSchema } from '@/lib/shared/schemas';
+import { langSchema } from '@/lib/shared/schemas/language/lang.schemas';
 import { ZodError } from 'zod';
 import type { PrismaClient } from "@prisma/client/extension";
 import { checkAuth } from '../../middlewares/checkAuth';

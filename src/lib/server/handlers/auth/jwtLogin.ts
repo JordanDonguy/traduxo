@@ -6,8 +6,6 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-
-
 // Relax types for DI
 export interface JwtLoginDeps {
   authorizeUserFn: typeof authorizeUser;

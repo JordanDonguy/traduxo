@@ -1,5 +1,5 @@
 
-import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
+import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import Link from "next/link";
 
 export default function Page() {

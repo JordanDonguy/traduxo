@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { loginSchema } from "@/lib/shared/schemas";
+import { loginSchema } from "@/lib/shared/schemas/auth/login.schemas";
 import { ZodError } from "zod";
 import sanitizeHtml from "sanitize-html";
 import type { PrismaClient } from "@prisma/client/extension";

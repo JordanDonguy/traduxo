@@ -19,7 +19,7 @@ jest.mock("next-auth/react", () => ({
   useSession: jest.fn(),
 }));
 
-jest.mock("@/lib/client/utils/fetchHistory", () => ({
+jest.mock("@/lib/client/utils/history/fetchHistory", () => ({
   fetchHistory: jest.fn(),
 }));
 

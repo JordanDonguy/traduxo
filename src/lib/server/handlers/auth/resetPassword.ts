@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import { ZodError } from 'zod';
-import { resetPasswordSchema } from '@/lib/shared/schemas';
+import { resetPasswordSchema } from '@/lib/shared/schemas/password/resetPassword.schemas';
 import { PrismaClient } from "@prisma/client/extension";
 
 export async function resetPassword(

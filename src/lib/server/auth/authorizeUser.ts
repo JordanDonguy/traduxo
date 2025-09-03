@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-import { loginSchema } from "../../shared/schemas";
+import { loginSchema } from "@/lib/shared/schemas/auth/login.schemas";
 import sanitizeHtml from "sanitize-html";
 import bcrypt from "bcrypt";
 import { ZodError } from "zod";

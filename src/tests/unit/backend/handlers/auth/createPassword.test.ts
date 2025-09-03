@@ -35,7 +35,6 @@ describe('createPassword', () => {
 
   // ------ Test 3️⃣ ------
   it('returns 404 if user not found', async () => {
-
     mockPrisma.user.findUnique.mockResolvedValue(null);
 
     const req = createMockRequest({ password: 'test1234' });

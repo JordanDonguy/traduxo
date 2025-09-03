@@ -1,4 +1,3 @@
-// src/lib/server/middlewares/checkAuth.ts
 import { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 import authOptions from "@/lib/server/auth/authOptions";

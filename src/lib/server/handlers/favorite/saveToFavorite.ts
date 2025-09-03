@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client/extension";
 import { NextResponse } from "next/server";
-import { translationRequestSchema } from "@/lib/shared/schemas";
+import { translationRequestSchema } from "@/lib/shared/schemas/translation/translationRequest.schemas";
 import { TranslationItem } from "../../../../../types/translation";
 import { checkAuth } from "../../middlewares/checkAuth";
 

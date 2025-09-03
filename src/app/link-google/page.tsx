@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useApp } from "@/context/AppContext";
-import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
+import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import { Mail, Lock } from "lucide-react";
 
 export default function Page() {

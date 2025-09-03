@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client/extension";
 import { NextResponse } from "next/server";
-import { translationRequestSchema } from "@/lib/shared/schemas";
+import { translationRequestSchema } from "@/lib/shared/schemas/translation/translationRequest.schemas";
 import { checkAuth } from "../../middlewares/checkAuth";
 
 const MAX_HISTORY = 100;

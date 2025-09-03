@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { PrismaClient } from "@prisma/client/extension";
 import bcrypt from "bcrypt";
 import sanitizeHtml from "sanitize-html";
-import { loginSchema } from "@/lib/shared/schemas";
+import { loginSchema } from "@/lib/shared/schemas/auth/login.schemas";
 
 export async function linkGoogle(
     req: Request,

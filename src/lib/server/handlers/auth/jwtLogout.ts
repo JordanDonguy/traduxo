@@ -3,8 +3,6 @@ import { PrismaClient } from "@prisma/client/extension";
 import { prisma } from "@/lib/server/prisma";
 import bcrypt from "bcrypt";
 
-
-
 interface LogoutBody {
   refreshToken: string;
 }

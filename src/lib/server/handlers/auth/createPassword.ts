@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { createPasswordSchema } from "@/lib/shared/schemas";
+import { createPasswordSchema } from "@/lib/shared/schemas/password/createPassword.schemas";
 import { ZodError } from "zod";
 import type { PrismaClient } from "@prisma/client/extension";
 import { checkAuth } from "@/lib/server/middlewares/checkAuth";

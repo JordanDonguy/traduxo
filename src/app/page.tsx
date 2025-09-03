@@ -1,6 +1,6 @@
-import AppHeaderSuspenseWrapper from "@/components/AppHeaderSuspenseWrapper";
-import MainDisplay from "@/components/MainDisplay";
-import TranslatorInput from "@/components/TranslatorInput";
+import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
+import MainDisplay from "@/components/main-section/MainDisplay";
+import TranslatorInput from "@/components/translator/TranslatorInput";
 
 export default function Home() {
   return (

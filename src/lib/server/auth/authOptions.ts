@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
 import { prisma } from "../prisma";
 import { authorizeUser } from "./authorizeUser";
-import { authEnvSchema } from "../../shared/schemas";
+import { authEnvSchema } from "@/lib/shared/schemas/auth/authEnv.schemas";
 import { handleGoogleSignIn } from "./handleGoogleSignIn";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
