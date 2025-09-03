@@ -1,4 +1,4 @@
-import { jwtLogoutHandler } from "@/lib/server/handlers/jwtLogout";
+import { jwtLogoutHandler } from "@/lib/server/handlers/auth/jwtLogout";
 import { prisma } from "@/lib/server/prisma";
 import { NextRequest } from "next/server";
 

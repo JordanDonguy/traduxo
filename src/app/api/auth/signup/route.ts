@@ -1,7 +1,7 @@
 // src/app/api/register/route.ts
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/server/prisma";
-import { signupHandler } from "@/lib/server/handlers/signup";
+import { signupHandler } from "@/lib/server/handlers/auth/signup";
 
 // -------------- Route handler --------------
 export async function POST(req: NextRequest) {

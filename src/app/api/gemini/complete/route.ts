@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { geminiComplete } from "@/lib/server/handlers/geminiComplete";
+import { geminiComplete } from "@/lib/server/handlers/gemini/geminiComplete";
 
 // -------------- Route handler --------------
 export async function POST(req: NextRequest) {

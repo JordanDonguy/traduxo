@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/server/prisma";
-import { linkGoogle } from "@/lib/server/handlers/linkGoogle";
+import { linkGoogle } from "@/lib/server/handlers/auth/linkGoogle";
 import { NextRequest } from "next/server";
 
 // -------------- Route handler --------------

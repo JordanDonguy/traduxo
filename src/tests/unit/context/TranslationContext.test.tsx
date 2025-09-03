@@ -8,7 +8,6 @@ import { TranslationProvider, useTranslationContext } from "@/context/Translatio
 import * as AppContextModule from "@/context/AppContext";
 import AppProvider from "@/context/AppContext";
 import { useSession } from "next-auth/react";
-import { fetchHistory } from "@/lib/client/utils/fetchHistory";
 
 // ---- Mocks ----
 jest.mock("next-themes", () => ({
