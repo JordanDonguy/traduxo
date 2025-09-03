@@ -37,13 +37,7 @@ describe("saveToHistory handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          message: "At least one expression and one main_translation required",
-        }),
-      ])
-    );
+    expect(json.error).toContain("At least one expression and one main translation required");
   });
 
   // ------ Test 3️⃣ ------
@@ -61,11 +55,7 @@ describe("saveToHistory handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ message: "Language code must be 2 characters" }),
-      ])
-    );
+    expect(json.error).toContain("Language code must be 2 characters");
   });
 
   // ------ Test 4️⃣ ------
@@ -83,11 +73,7 @@ describe("saveToHistory handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ message: "Language code must contain only letters" }),
-      ])
-    );
+    expect(json.error).toContain("Language code must contain only letters");
   });
 
   // ------ Test 5️⃣ ------

@@ -23,11 +23,12 @@ export async function saveToFavorite(
     // Req body validation with Zod schema
     const validation = translationRequestSchema.safeParse(await req.json());
     if (!validation.success) {
-      const errors = validation.error.issues.map(issue => ({
-        path: issue.path.join("."),
-        message: issue.message,
-      }));
-      return NextResponse.json({ error: errors }, { status: 400 });
+      // Combine all error messages into one string
+      const errorMessage = validation.error.issues
+        .map(issue => `${issue.path.join(".")}: ${issue.message}`)
+        .join("; ");
+
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     const { translations, inputLang, outputLang } = validation.data;
@@ -42,7 +43,7 @@ export async function saveToFavorite(
     // Check minimum required translations
     if (!mainExpression || !mainTranslation) {
       return NextResponse.json(
-        { error: [{ path: "translations", message: "At least one expression and one main_translation required" }] },
+        { error: "At least one expression and one main translation required" },
         { status: 400 }
       );
     }

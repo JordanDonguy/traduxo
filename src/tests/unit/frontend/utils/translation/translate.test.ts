@@ -141,4 +141,71 @@ describe("translationHelper", () => {
     expect(blurSpy).toHaveBeenCalled();
     document.body.removeChild(input);
   });
+
+  // ------ Test 6️⃣ ------
+  it("sets inputTextLang immediately if inputLang is not 'auto'", async () => {
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: { getReader: () => ({ read: jest.fn().mockResolvedValue({ done: true }) }) },
+      json: jest.fn(),
+    });
+
+    await translationHelper({ ...defaultArgs, inputLang: "en", fetcher: fakeFetcher });
+
+    expect(setInputTextLang).toHaveBeenCalledWith("en");
+  });
+
+  // ------ Test 7️⃣ ------
+  it("sets fallback inputTextLang to 'XX' if inputLang is 'auto' and Gemini returns no orig_lang_code", async () => {
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: { getReader: () => ({ read: jest.fn().mockResolvedValue({ done: true }) }) },
+      json: jest.fn(),
+    });
+
+    await translationHelper({ ...defaultArgs, inputLang: "auto", fetcher: fakeFetcher });
+
+    expect(setInputTextLang).toHaveBeenCalledWith(expect.any(Function));
+
+    // Execute the updater function to verify fallback
+    const updater = setInputTextLang.mock.calls[setInputTextLang.mock.calls.length - 1][0];
+    expect(updater(undefined)).toBe("XX"); // fallback works
+  });
+
+  // ------ Test 8️⃣ ------
+  it("sets inputTextLang to Gemini's orig_lang_code if inputLang is 'auto'", async () => {
+    const encoder = new TextEncoder();
+    const chunk = JSON.stringify({ type: "orig_lang_code", value: "de" }) + "\n";
+
+    let callIndex = 0;
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: {
+        getReader: () => ({
+          read: jest.fn().mockImplementation(async () => {
+            if (callIndex < 1) {
+              callIndex++;
+              return { done: false, value: encoder.encode(chunk) };
+            }
+            return { done: true, value: undefined };
+          }),
+        }),
+      },
+      json: jest.fn(),
+    });
+
+    await translationHelper({ ...defaultArgs, inputLang: "auto", fetcher: fakeFetcher });
+
+    // Ensure the updater function was called with Gemini's orig_lang_code
+    expect(setInputTextLang).toHaveBeenCalledWith("de");
+
+    // The fallback ("XX") should never overwrite
+    const lastCall = setInputTextLang.mock.calls[setInputTextLang.mock.calls.length - 1][0];
+    if (typeof lastCall === "function") {
+      expect(lastCall(undefined)).not.toBe("XX");
+    }
+  });
 });

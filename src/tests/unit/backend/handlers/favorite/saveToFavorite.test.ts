@@ -8,7 +8,7 @@ jest.mock('@/lib/server/middlewares/checkAuth');
 describe("saveToFavorite handler", () => {
   beforeEach(() => {
     mockPrisma.favorite.create.mockReset();
-     (checkAuth as jest.Mock).mockResolvedValue({ user: { id: "1", email: "user@example.com" } });
+    (checkAuth as jest.Mock).mockResolvedValue({ user: { id: "1", email: "user@example.com" } });
   });
 
   // ------ Test 1️⃣ ------
@@ -38,13 +38,7 @@ describe("saveToFavorite handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          message: "At least one expression and one main_translation required",
-        }),
-      ])
-    );
+    expect(json.error).toContain("At least one expression and one main translation required");
   });
 
   // ------ Test 3️⃣ ------
@@ -65,13 +59,7 @@ describe("saveToFavorite handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          message: "Language code must be 2 characters",
-        }),
-      ])
-    );
+    expect(json.error).toContain("Language code must be 2 characters");
   });
 
   // ------ Test 4️⃣ ------
@@ -92,13 +80,7 @@ describe("saveToFavorite handler", () => {
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    expect(json.error).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          message: "Language code must contain only letters",
-        }),
-      ])
-    );
+    expect(json.error).toContain("Language code must contain only letters");
   });
 
   // ------ Test 5️⃣ ------
