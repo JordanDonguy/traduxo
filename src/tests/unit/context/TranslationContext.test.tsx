@@ -96,9 +96,11 @@ describe("TranslationContext", () => {
   it("calls saveTranslation when authenticated and saveToHistory is true", async () => {
     (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
 
+    // Mock fetch to resolve with a sample saved history object:
+    const mockHistory = { id: 1, inputText: "Hello", translation: "Hola" };
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({}),
+      json: async () => ({ data: mockHistory }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
@@ -119,7 +121,9 @@ describe("TranslationContext", () => {
           headers: { "Content-Type": "application/json" },
         })
       );
-      expect(fetchHistory).toHaveBeenCalled();
+
+      // Check local state update
+      expect(result.current.translationHistory).toContainEqual(mockHistory);
     });
   });
 

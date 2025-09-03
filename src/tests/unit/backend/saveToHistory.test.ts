@@ -107,7 +107,7 @@ describe("saveToHistory handler", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("creates history record successfully and returns success", async () => {
+  it("creates history record successfully and returns success & res", async () => {
     mockGetSessionFn.mockResolvedValue({ user: { email: "test@example.com", id: "user1" } });
     mockPrisma.history.create.mockResolvedValue({ id: "record1" });
     mockPrisma.history.count.mockResolvedValue(50); // Below limit, no deletion
@@ -151,7 +151,7 @@ describe("saveToHistory handler", () => {
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toEqual({ success: true });
+    expect(json).toEqual({ success: true, data: { id: "record1" } });
   });
 
   // ------ Test 6️⃣ ------
@@ -200,7 +200,7 @@ describe("saveToHistory handler", () => {
 
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json).toEqual({ success: true });
+    expect(json).toEqual({ success: true, data: { id: "record2" } });
   });
 
   // ------ Test 7️⃣ ------

@@ -70,14 +70,13 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
             }),
           });
 
+          const data = await res.json();
+
           if (!res.ok) {
-            const data = await res.json();
             setError(data.error || "Failed to save translation");
           };
-          await fetchHistory({
-            status,
-            setTranslationHistory
-          })
+
+          setTranslationHistory(prev => [...prev, data.data])
         } catch (err) {
           console.error(err);
           setError("Network error while saving translation");

@@ -58,7 +58,7 @@ export async function saveToHistory(
 
     const alternativeItems = translations.filter(t => t.type === "alternative");
 
-    await prismaClient.history.create({
+    const res = await prismaClient.history.create({
       data: {
         userId: session.user.id,
         inputText: mainExpression,
@@ -89,7 +89,7 @@ export async function saveToHistory(
       `;
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data: res });
   } catch (error) {
     console.error("saveToHistory error:", error);
     return NextResponse.json(
