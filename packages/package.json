@@ -1,0 +1,19 @@
+{
+  "name": "@traduxo/packages",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.34.0",
+    "globals": "^16.3.0",
+    "typescript": "^5"
+  }
+}

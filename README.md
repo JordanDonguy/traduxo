@@ -61,7 +61,7 @@ With features like **voice input, auto language detection, and personal history*
 
 ## 📁 Project Structure
 ```
-traduxo/
+traduxo/nextjs/
 ├── app/                     # Next.js App Router pages & layouts
 │   ├── api/                 # API routes (Supabase, Gemini)
 ├── components/              # Reusable UI components

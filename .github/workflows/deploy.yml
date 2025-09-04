@@ -1,9 +1,10 @@
-name: Deploy Prisma Migrations to Production
+name: Deploy Web App & Prisma Migrations
+
 
 on:
   push:
     branches:
-      - main  
+      - main
   workflow_dispatch:
 
 jobs:
@@ -23,18 +24,17 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        run: npm run lint
+        run: npm run lint:web
 
       - name: Run tests
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: npm test
-
+        run: npm run test:web
 
   deploy:
-    needs: test     # deploy waits for test to succeed
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -50,16 +50,16 @@ jobs:
         run: npm ci
 
       - name: Set Prisma DATABASE_URL
-        run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> nextjs/.env
 
       - name: Generate Prisma Client
-        run: npx prisma generate
+        run: npm --prefix nextjs run generate
 
       - name: Clear Next.js build cache
-        run: rm -rf .next
+        run: rm -rf nextjs/.next
 
       - name: Build project
-        run: npm run build
+        run: npm --prefix nextjs run build
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -72,4 +72,4 @@ jobs:
           UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
 
       - name: Deploy Prisma Migrations
-        run: npx prisma migrate deploy
+        run: npm --prefix nextjs run prisma:migrate:deploy
