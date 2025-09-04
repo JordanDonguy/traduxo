@@ -59,7 +59,7 @@ jobs:
         run: rm -rf nextjs/.next
 
       - name: Build project
-        run: npm --prefix nextjs run build
+        run: npm run build:web
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
