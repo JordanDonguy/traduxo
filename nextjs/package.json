@@ -1,5 +1,5 @@
 {
-  "name": "traduxo",
+  "name": "@traduxo/nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
