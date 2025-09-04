@@ -36,7 +36,6 @@ describe("showAuthToasts", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Reset mocks before each test
     router = { replace: jest.fn() }; // Mock router.replace
     setWindowUrl("http://localhost/"); // Default URL
   });
