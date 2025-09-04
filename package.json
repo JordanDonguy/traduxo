@@ -2,31 +2,39 @@
   "name": "traduxo",
   "version": "1.0.0",
   "description": "**Traduxo** is a modern web application that helps users go beyond basic translation.   It provides **native-like translations, idiomatic expressions, cultural explanations, and real usage examples** powered by **Gemini API**.",
+  "private": true,
+  "workspaces": [
+    "nextjs",
+    "packages"
+  ],
   "scripts": {
-    "dev:web": "npm --prefix nextjs run dev",
-    "build:web": "npm --prefix nextjs run build",
-    "test:web": "npm --prefix nextjs run test",
-    "lint:web": "npm --prefix nextjs run lint"
+    "dev:web": "npm --workspace nextjs run dev",
+    "build:web": "npm --workspace nextjs run build",
+    "lint:web": "npm --workspace nextjs run lint",
+    "lint:packages": "npm --workspace packages run lint",
+    "lint": "npm run lint:web && npm run lint:packages",
+    "test:web": "npm --workspace nextjs run test",
+    "test:packages": "jest --config jest.config.packages.cjs",
+    "test": "npm run test:web && npm run test:packages"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JordanDonguy/traduxo.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/JordanDonguy/traduxo/issues"
   },
   "homepage": "https://github.com/JordanDonguy/traduxo#readme",
-    "devDependencies": {
-    "typescript": "^5",
-    "jest": "^30.1.1",
-    "ts-jest": "^29.4.1",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/node": "^20",
-    "eslint": "^9",
-    "eslint-config-next": "^15"
+    "jest": "^30.1.1",
+    "ts-jest": "^29.4.1",
+    "jest-environment-jsdom": "^30.1.1",
+    "babel-jest": "^30.1.1",
+    "typescript": "^5"
   }
 }
