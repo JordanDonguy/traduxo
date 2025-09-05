@@ -1,5 +1,5 @@
 import { getTranslationPrompt } from "@/lib/shared/geminiPrompts";
-import { TranslationItem } from "../../../../../types/translation";
+import { TranslationItem } from "@traduxo/packages/types";
 
 type TranslateHelperArgs = {
   inputText: string;

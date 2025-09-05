@@ -1,7 +1,7 @@
 // fetchExpressionPoolHelper.ts
 import { getPoolPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "../ui/cleanGeminiResponse";
-import { SuggestionResult } from "../../../../../types/suggestionResult";
+import { SuggestionResult } from "../../../../../../packages/types/suggestionResult";
 
 type PoolHelperArgs = {
   suggestionLang: string;

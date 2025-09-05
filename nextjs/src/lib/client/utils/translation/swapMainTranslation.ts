@@ -1,4 +1,4 @@
-import { TranslationItem } from "../../../../../types/translation";
+import { TranslationItem } from "@traduxo/packages/types";
 
 // Swap the main translation with an alternative
 export function swapMainTranslation(

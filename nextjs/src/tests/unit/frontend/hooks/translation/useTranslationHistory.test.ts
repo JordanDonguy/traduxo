@@ -4,7 +4,7 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useTranslationHistory } from "@/lib/client/hooks/translation/useTranslationHistory";
 import { useSession } from "next-auth/react";
-import { Translation } from "../../../../../../types/translation";
+import { Translation } from "@traduxo/packages/types";
 
 // ---- Mocks ----
 const mockSetTranslationHistory = jest.fn();

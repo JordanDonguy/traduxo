@@ -1,5 +1,5 @@
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
-import { Translation } from "../../../../../../types/translation";
+import { Translation } from "@traduxo/packages/types";
 
 describe("fetchHistory", () => {
   let setTranslationHistory: jest.Mock;

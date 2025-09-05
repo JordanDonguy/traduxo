@@ -29,6 +29,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@traduxo/packages": [
+        "../packages/*"
       ]
     }
   },
@@ -37,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "../packages/types/suggestionResult.ts"  ],
   "exclude": [
     "node_modules"
   ]

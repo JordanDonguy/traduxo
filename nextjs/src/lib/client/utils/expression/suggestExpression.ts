@@ -1,6 +1,6 @@
 import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
 import { cleanGeminiResponse } from "../ui/cleanGeminiResponse";
-import { TranslationItem } from "../../../../../types/translation";
+import { TranslationItem } from "@traduxo/packages/types";
 
 type SuggestionHelperArgs = {
   detectedLang: string;

@@ -1,6 +1,6 @@
 "use client"
 
-import { Translation } from "../../../../../types/translation";
+import { Translation } from "@traduxo/packages/types";
 
 type FetchHistoryDeps = {
   status: string;
