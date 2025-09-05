@@ -3,7 +3,7 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
-import { Translation } from "@traduxo/packages/types";
+import { Translation } from "@traduxo/packages/types/translation";
 
 // ---- Mocks ----
 const mockLoadTranslationFromMenu = jest.fn();

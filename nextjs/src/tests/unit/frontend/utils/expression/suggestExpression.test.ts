@@ -3,7 +3,7 @@
  */
 import { suggestExpressionHelper } from "@/lib/client/utils/expression/suggestExpression";
 import { TextEncoder, TextDecoder } from "util";
-import { TranslationItem } from "@traduxo/packages/types";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 (globalThis as unknown as { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
 (globalThis as unknown as { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder;

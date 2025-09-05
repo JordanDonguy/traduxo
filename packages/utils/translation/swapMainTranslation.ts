@@ -5,7 +5,7 @@ export function swapMainTranslation(
   translations: TranslationItem[],
   mainTranslation: string,
   alt: string
-) {
+): TranslationItem[] {
   const updated = [...translations];
 
   // find the indices by value
@@ -26,3 +26,4 @@ export function swapMainTranslation(
 
   return updated;
 }
+  

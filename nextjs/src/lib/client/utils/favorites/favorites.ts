@@ -1,4 +1,4 @@
-import { TranslationItem } from "@traduxo/packages/types"
+import { TranslationItem } from "@traduxo/packages/types/translation"
 
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 

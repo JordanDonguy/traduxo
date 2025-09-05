@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 
-import type { Translation } from "@traduxo/packages/types";
+import type { Translation } from "@traduxo/packages/types/translation";
 
 // Injected dependencies for testing
 type UseSelectTranslationArgs = {

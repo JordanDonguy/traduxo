@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 import type { GenerateContentResponse } from '@google/genai';
 import { checkQuota } from "@/lib/server/dailyLimiter";
-import { TranslationItem } from "@traduxo/packages/types";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 import { checkAuth } from "@/lib/server/middlewares/checkAuth";
 
 type GenerateContentStreamFn = typeof GoogleGenAI.prototype.models.generateContentStream;

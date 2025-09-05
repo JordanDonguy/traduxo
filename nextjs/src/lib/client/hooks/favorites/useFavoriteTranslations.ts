@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { Translation } from "@traduxo/packages/types";
+import { Translation } from "@traduxo/packages/types/translation";
 
 // Injected dependencies for testing
 type UseFavoriteTranslationsArgs = {

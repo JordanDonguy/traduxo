@@ -4,7 +4,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSwitchTranslations } from "@/lib/client/hooks/translation/useSwitchTranslations";
 import { swapMainTranslation } from "@/lib/client/utils/translation/swapMainTranslation";
-import { TranslationItem } from "@traduxo/packages/types";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 // ---- Mock swapMainTranslation ----
 // We mock it but also call through so the hook actually executes it

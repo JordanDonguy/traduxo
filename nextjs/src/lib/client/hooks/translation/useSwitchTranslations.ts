@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { swapMainTranslation } from "../../utils/translation/swapMainTranslation";
-import { TranslationItem } from "@traduxo/packages/types";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 type UseSwitchTranslationsArgs = {
   translatedText: TranslationItem[];

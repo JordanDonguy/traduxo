@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client/extension";
 import { NextResponse } from "next/server";
 import { translationRequestSchema } from "@/lib/shared/schemas/translation/translationRequest.schemas";
-import { TranslationItem } from "@traduxo/packages/types";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 import { checkAuth } from "../../middlewares/checkAuth";
 
 export async function saveToFavorite(

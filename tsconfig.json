@@ -14,10 +14,11 @@
     "jsx": "preserve",
     "types": ["jest", "node"],
     "incremental": true,
+    "sourceMap": true,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./nextjs/src/*"],
-      "@utils/*": ["./packages/*"]
+      "@packages/*": ["./packages/*"]
     }
   },
   "include": [

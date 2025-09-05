@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
 import { useSelectTranslation } from "./useSelectTranslation";
-import { Translation } from "@traduxo/packages/types";
+import { Translation } from "@traduxo/packages/types/translation";
 
 // Injected dependencies for testing
 type UseTranslationHistoryArgs = {

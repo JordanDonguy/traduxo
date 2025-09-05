@@ -20,7 +20,6 @@ export default [
       "@typescript-eslint": tsPlugin,
     },
     rules: {
-      "no-console": "warn",
       // ⚡ Correct usage: severity + options array
       "@typescript-eslint/no-unused-expressions": [
         "error",

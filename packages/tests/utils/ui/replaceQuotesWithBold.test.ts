@@ -1,4 +1,4 @@
-import { replaceQuotesWithBold } from "@utils/utils/ui/replaceQuotesWithBold";
+import { replaceQuotesWithBold } from "@packages/utils/ui/replaceQuotesWithBold";
 
 describe("replaceQuotesWithBold", () => {
   // ------ Test 1️⃣ ------

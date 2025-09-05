@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
 import { useSession } from "next-auth/react";
-import { Translation, TranslationItem } from "@traduxo/packages/types";
+import { Translation, TranslationItem } from "@traduxo/packages/types/translation";
 
 export type TranslationState = {
   inputText: string;

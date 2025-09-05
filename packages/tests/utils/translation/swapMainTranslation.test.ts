@@ -1,4 +1,4 @@
-import { swapMainTranslation } from "@/lib/client/utils/translation/swapMainTranslation";
+import { swapMainTranslation } from "@packages/utils/translation/swapMainTranslation";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 
 describe("swapMainTranslation", () => {

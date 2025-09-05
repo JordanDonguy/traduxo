@@ -3,12 +3,12 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['<rootDir>/packages/**/*.test.ts', '<rootDir>/packages/**/*.test.tsx'],
   moduleNameMapper: {
-    '^@utils/(.*)$': '<rootDir>/packages/$1',
+    '^@packages/(.*)$': '<rootDir>/packages/$1',
   },
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
   },
-  setupFilesAfterEnv: [],
+  setupFilesAfterEnv: ['<rootDir>/packages/tests/jest.setup.ts'],
   collectCoverage: true,
   collectCoverageFrom: [
     'packages/**/*.{ts,tsx}',
