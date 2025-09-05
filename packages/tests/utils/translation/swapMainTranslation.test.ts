@@ -1,5 +1,5 @@
 import { swapMainTranslation } from "@packages/utils/translation/swapMainTranslation";
-import { TranslationItem } from "@traduxo/packages/types/translation";
+import { TranslationItem } from "@packages/types/translation";
 
 describe("swapMainTranslation", () => {
   const makeItems = (values: string[], mainIdx = 0): TranslationItem[] =>

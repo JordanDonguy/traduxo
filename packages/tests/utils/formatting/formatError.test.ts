@@ -1,4 +1,4 @@
-import { formatError } from "@packages/utils/ui/formatError";
+import { formatError } from "@packages/utils/formatting/formatError";
 
 describe("formatError", () => {
   // ------ Test 1️⃣ ------

@@ -41,14 +41,14 @@ describe("translationHelper", () => {
 
   beforeEach(() => jest.clearAllMocks());
 
-  // ------ Test 1: Early return ------
+  // ------ Test 1️⃣ ------
   it("returns early if inputText is empty", async () => {
     const res = await translationHelper({ ...defaultArgs, inputText: "", fetcher: jest.fn() });
-    expect(res).toEqual({ success: false, message: "No input text" });
+    expect(res).toEqual({ success: false, error: "No input text" });
     expect(setInputText).not.toHaveBeenCalled();
   });
 
-  // ------ Test 2: Calls blurActiveInput ------
+  // ------ Test 2️⃣ ------
   it("calls blurActiveInput", async () => {
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: true,
@@ -62,7 +62,7 @@ describe("translationHelper", () => {
     expect(blurActiveInput).toHaveBeenCalled();
   });
 
-  // ------ Test 3: Successful streamed translation ------
+  // ------ Test 3️⃣ ------
   it("handles a simple streamed translation chunk", async () => {
     const encoder = new TextEncoder();
     const chunk = JSON.stringify({ type: "main_translation", value: "Bonjour" }) + "\n";
@@ -91,7 +91,7 @@ describe("translationHelper", () => {
     expect(setSaveToHistory).toHaveBeenCalledWith(true);
   });
 
-  // ------ Test 4: Handles 429 rate limit ------
+  // ------ Test 4️⃣ ------
   it("handles 429 response with error message", async () => {
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: false,
@@ -105,7 +105,7 @@ describe("translationHelper", () => {
     expect(setError).toHaveBeenCalledWith("Rate limit exceeded");
   });
 
-  // ------ Test 5: Handles generic fetch error ------
+  // ------ Test 5️⃣ ------
   it("handles generic non-429 fetch response error", async () => {
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: false,
@@ -120,7 +120,7 @@ describe("translationHelper", () => {
     expect(setError).toHaveBeenCalledWith(expect.stringContaining("Oops! Something went wrong"));
   });
 
-  // ------ Test 6: inputTextLang fallback ------
+  // ------ Test 6️⃣ ------
   it("falls back to 'XX' if inputLang is auto and no orig_lang_code returned", async () => {
     const fakeFetcher = jest.fn().mockResolvedValue({
       ok: true,
@@ -135,6 +135,7 @@ describe("translationHelper", () => {
     expect(updater(undefined)).toBe("XX");
   });
 
+  // ------ Test 7️⃣ ------
   it("sets inputTextLang to Gemini's orig_lang_code if provided", async () => {
     const encoder = new TextEncoder();
     const chunk = JSON.stringify({ type: "orig_lang_code", value: "de" }) + "\n";
@@ -167,6 +168,7 @@ describe("translationHelper", () => {
     }
   });
 
+  // ------ Test 8️⃣ ------
   it("covers empty lines, non-string values, and prev state in setTranslatedText", async () => {
     const encoder = new TextEncoder();
     const chunks = [
@@ -209,4 +211,20 @@ describe("translationHelper", () => {
     ]);
   });
 
+  // ------ Test 9️⃣ ------
+  it("uses the default fetch if no fetcher is provided", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: {
+        getReader: () => ({
+          read: jest.fn().mockResolvedValueOnce({ done: true }),
+        }),
+      },
+    });
+
+    await translationHelper({ ...defaultArgs });
+
+    expect(globalThis.fetch).toHaveBeenCalled();
+  });
 });

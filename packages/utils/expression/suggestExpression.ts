@@ -1,22 +1,24 @@
-import { getSuggestionPrompt } from "@/lib/shared/geminiPrompts";
-import { cleanGeminiResponse } from "../ui/cleanGeminiResponse";
+import { getSuggestionPrompt } from "../geminiPrompts";
 import { TranslationItem } from "@traduxo/packages/types/translation";
+import { blurActiveInput } from "../ui/blurActiveInput";
+import { decodeStream } from "../formatting/decodeStream";
+import { SetState } from "@packages/types/reactSetState";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
   outputLang: string;
-  setTranslatedText: React.Dispatch<React.SetStateAction<TranslationItem[]>>;
-  setInputTextLang: React.Dispatch<React.SetStateAction<string>>;
-  setSaveToHistory: React.Dispatch<React.SetStateAction<boolean>>;
-  setTranslatedTextLang: React.Dispatch<React.SetStateAction<string>>;
-  setExplanation: React.Dispatch<React.SetStateAction<string>>;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsFavorite: React.Dispatch<React.SetStateAction<boolean>>;
-  setTranslationId: React.Dispatch<React.SetStateAction<string | undefined>>;
-  setError: React.Dispatch<React.SetStateAction<string>>;
+  setTranslatedText: SetState<TranslationItem[]>;
+  setInputTextLang: SetState<string>;
+  setSaveToHistory: SetState<boolean>;
+  setTranslatedTextLang: SetState<string>;
+  setExplanation: SetState<string>;
+  setIsLoading: SetState<boolean>;
+  setIsFavorite: SetState<boolean>;
+  setTranslationId: SetState<string | undefined>;
+  setError: SetState<string>;
   fetcher?: typeof fetch;
   promptGetter?: typeof getSuggestionPrompt;
-  responseCleaner?: typeof cleanGeminiResponse;
+  keyboardModule?: { dismiss: () => void };
 };
 
 // Get one normal suggestion with translation
@@ -34,11 +36,10 @@ export async function suggestExpressionHelper({
   setError,
   fetcher = fetch,
   promptGetter = getSuggestionPrompt,
+  keyboardModule,
 }: SuggestionHelperArgs) {
-  // Blur active element if in browser
-  if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
-    document.activeElement.blur();
-  }
+  // Blur active input
+  blurActiveInput(keyboardModule);
 
   // Reset state
   setIsLoading(true);
@@ -68,32 +69,21 @@ export async function suggestExpressionHelper({
 
     if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
 
-    // --- Streaming decode (NDJSON) ---
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n");
-      buffer = parts.pop() || ""; // keep incomplete chunk
+    // --- Streaming decode using decodeStream ---
+    for await (const line of decodeStream(res.body.getReader())) {
       setIsLoading(false);
       setTranslatedTextLang(outputLang);
 
-      for (const part of parts) {
-        if (!part.trim()) continue;
-        const item: TranslationItem = JSON.parse(part);
+      const item: TranslationItem = JSON.parse(line);
 
-        // Remove trailing dots
-        if (typeof item.value === "string") {
-          item.value = item.value.replace(/\.+$/, "").trim();
-        }
-        setTranslatedText(prev => [...prev, item]);
+      // Clean string: remove trailing dots and trim whitespace
+      if (typeof item.value === "string") {
+        item.value = item.value.replace(/\.+$/, "").trim();
       }
+
+      setTranslatedText(prev => [...prev, item]);
     }
+
     setSaveToHistory(true);
     return { success: true };
   } catch (err) {

@@ -1,4 +1,4 @@
-import { cleanGeminiResponse } from "@packages/utils/ui/cleanGeminiResponse";
+import { cleanGeminiResponse } from "@packages/utils/formatting/cleanGeminiResponse";
 
 describe("cleanGeminiResponse", () => {
   // ------ Test 1️⃣ ------

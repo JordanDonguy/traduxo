@@ -2,6 +2,7 @@ import { getTranslationPrompt } from "../geminiPrompts";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { blurActiveInput } from "@packages/utils/ui/blurActiveInput";
 import { SetState } from "@packages/types/reactSetState";
+import { decodeStream } from "@packages/utils/formatting/decodeStream";
 
 type TranslateHelperArgs = {
   inputText: string;
@@ -19,7 +20,7 @@ type TranslateHelperArgs = {
   setError: SetState<string>;
   fetcher?: typeof fetch;
   promptGetter?: typeof getTranslationPrompt;
-  keyboardModule?: { dismiss: () => void }; // RN keyboard module
+  keyboardModule?: { dismiss: () => void };
 };
 
 export async function translationHelper({
@@ -40,9 +41,9 @@ export async function translationHelper({
   promptGetter = getTranslationPrompt,
   keyboardModule,
 }: TranslateHelperArgs) {
-  if (!inputText.length) return { success: false, message: "No input text" };
+  if (!inputText.length) return { success: false, error: "No input text" };
 
-  // Blur input / dismiss keyboard
+  // Blur active input
   blurActiveInput(keyboardModule);
 
   // Reset UI state
@@ -54,7 +55,7 @@ export async function translationHelper({
   setTranslationId(undefined);
 
   const prompt = promptGetter({ inputText, inputLang, outputLang });
-  setInputText(""); // Clear input after sending to AI
+  setInputText("");
 
   if (inputLang !== "auto") setInputTextLang(inputLang);
 
@@ -74,37 +75,24 @@ export async function translationHelper({
 
     if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
 
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
+    const reader = res.body.getReader(); // same API in Next.js, RN polyfill if needed
     let detectedInputLang: string | null = null;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    for await (const part of decodeStream(reader)) {
+      const item: TranslationItem = JSON.parse(part);
 
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split("\n");
-      buffer = parts.pop() || "";
+      if (typeof item.value === "string") {
+        item.value = item.value.replace(/\.+$/, "").trim();
+      }
 
+      if (inputLang === "auto" && item.type === "orig_lang_code") {
+        detectedInputLang = item.value;
+        setInputTextLang(item.value);
+      }
+
+      setTranslatedText(prev => [...prev, item]);
       setIsLoading(false);
       setTranslatedTextLang(outputLang);
-
-      for (const part of parts) {
-        if (!part.trim()) continue;
-        const item: TranslationItem = JSON.parse(part);
-
-        if (typeof item.value === "string") {
-          item.value = item.value.replace(/\.+$/, "");
-        }
-
-        if (inputLang === "auto" && item.type === "orig_lang_code") {
-          detectedInputLang = item.value;
-          setInputTextLang(item.value);
-        }
-
-        setTranslatedText(prev => [...prev, item]);
-      }
     }
 
     if (inputLang === "auto") {
