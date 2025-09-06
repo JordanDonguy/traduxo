@@ -40,7 +40,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "../packages/types/suggestionResult.ts"  ],
+, "../packages/types/suggestionResult.d.ts"  ],
   "exclude": [
     "node_modules"
   ]
