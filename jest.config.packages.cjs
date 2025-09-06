@@ -4,6 +4,7 @@ module.exports = {
   testMatch: ['<rootDir>/packages/**/*.test.ts', '<rootDir>/packages/**/*.test.tsx'],
   moduleNameMapper: {
     '^@packages/(.*)$': '<rootDir>/packages/$1',
+    "^@react-native-async-storage/async-storage$": "<rootDir>/packages/tests/mocks/asyncStorageMock.ts",
   },
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],

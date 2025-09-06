@@ -41,7 +41,6 @@ const passwordReset = {
   delete: jest.fn(),
 }
 
-// ✅ Added refreshToken mock for jwtLoginHandler
 const refreshToken = {
   create: jest.fn(),
   findUnique: jest.fn(),
@@ -61,7 +60,7 @@ const prisma = {
   history,
   favorite,
   passwordReset,
-  refreshToken, // <- added
+  refreshToken,
   $queryRaw: jest.fn(),
 };
 
