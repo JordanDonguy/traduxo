@@ -7,7 +7,7 @@ import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UserMenu from "@/components/menu/UserMenu";
 import { useTheme } from "next-themes";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
 // ---- Mock modules/hooks ----
 const mockSetShowLoginForm = jest.fn();
@@ -36,10 +36,22 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock next-auth
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
-  signOut: jest.fn(),
+// Mock AuthContext
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(() => ({
+    status: "unauthenticated",
+    token: undefined,
+    providers: ["Credentials"],
+    refresh: jest.fn(),
+  })),
+}));
+
+// Mock useAuthHandlers
+const handleLogoutMock = jest.fn();
+jest.mock("@/lib/client/hooks/auth/useAuthForm", () => ({
+  useAuthHandlers: () => ({
+    handleLogout: handleLogoutMock,
+  }),
 }));
 
 // Mock icons
@@ -126,10 +138,12 @@ describe("<UserMenu />", () => {
       setTheme: mockSetTheme,
       themes: ["light", "dark", "system"],
     });
-    // Reset session mock
-    (useSession as jest.Mock).mockReturnValue({
+    // Reset auth mock
+    (useAuth as jest.Mock).mockReturnValue({
       status: "unauthenticated",
-      data: null,
+      token: null,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
     });
   });
 
@@ -171,9 +185,11 @@ describe("<UserMenu />", () => {
 
   // ------- Test 5️⃣ -------
   it("renders authenticated buttons when session exists", () => {
-    (useSession as jest.Mock).mockReturnValue({
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
-      data: { user: { providers: ["Credentials"] } },
+      token: null,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
     });
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
     expect(screen.getByText("Change password")).toBeInTheDocument();
@@ -257,9 +273,11 @@ describe("<UserMenu />", () => {
     useRouterSpy.mockReturnValue({ push: mockPushLocal, replace: jest.fn() });
 
     // Mock authenticated session
-    (useSession as jest.Mock).mockReturnValue({
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
-      data: { user: { providers: ["Credentials"] } },
+      token: "my-auth-token",
+      providers: ["Credentials"],
+      refresh: jest.fn(),
     });
 
     // HISTORY BUTTON
@@ -287,12 +305,9 @@ describe("<UserMenu />", () => {
     expect(mockPushLocal).toHaveBeenCalledWith("/?menu=open&submenu=changePassword");
 
     // LOG OUT
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const signOutSpy = jest.spyOn(require("next-auth/react"), "signOut");
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    const logOutButton = screen.getByText(/Log Out/i).closest("button")!;
-    fireEvent.click(logOutButton);
-    expect(signOutSpy).toHaveBeenCalledWith({ callbackUrl: "/?logout=true" });
+    fireEvent.click(screen.getByText(/Log Out/i).closest("button")!);
+    expect(handleLogoutMock).toHaveBeenCalledTimes(1);
 
     // DELETE ACCOUNT
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
@@ -360,11 +375,14 @@ describe("<UserMenu />", () => {
     expect(mockSetTheme).toHaveBeenCalledWith("dark");
   });
 
+  // ------- Test 1️⃣1️⃣ -------
   it("renders 'Create password' when user is authenticated but has no Credentials provider", () => {
     // Mock authenticated session without Credentials
-    (useSession as jest.Mock).mockReturnValue({
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
-      data: { user: { providers: [] } },
+      token: null,
+      providers: [],
+      refresh: jest.fn(),
     });
 
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
@@ -380,7 +398,7 @@ describe("<UserMenu />", () => {
     expect(mockPush).toHaveBeenCalledWith("/?menu=open&submenu=changePassword");
   });
 
-  // ------- Test 1️⃣1️⃣ -------
+  // ------- Test 1️⃣2️⃣ -------
   it("detects system dark mode when theme is 'system'", () => {
     (useTheme as jest.Mock).mockReturnValue({
       theme: "system",

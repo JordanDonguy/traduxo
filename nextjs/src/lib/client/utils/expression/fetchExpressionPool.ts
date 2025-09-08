@@ -4,6 +4,7 @@ import { cleanGeminiResponse } from "../ui/cleanGeminiResponse";
 import { SuggestionResult } from "../../../../../../packages/types/suggestionResult";
 
 type PoolHelperArgs = {
+  token: string | undefined;
   suggestionLang: string;
   setExpressionPool: React.Dispatch<React.SetStateAction<string[]>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
@@ -14,6 +15,7 @@ type PoolHelperArgs = {
 };
 
 export async function fetchExpressionPoolHelper({
+  token,
   suggestionLang,
   setExpressionPool,
   setError,
@@ -26,7 +28,10 @@ export async function fetchExpressionPoolHelper({
 
     const res = await fetcher("/api/gemini/complete", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+      },
       body: JSON.stringify({ prompt: poolPrompt }),
     });
 
@@ -35,7 +40,7 @@ export async function fetchExpressionPoolHelper({
       setError(error);
       return { success: false, error };
     };
- 
+
     if (!res.ok) throw new Error(`Gemini pool request error: ${res.status}`);
 
     const { text } = await res.json();

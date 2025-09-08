@@ -22,6 +22,7 @@ export async function refreshTokenHandler(
     return NextResponse.json({ error: "Missing refresh token" }, { status: 400 });
   }
 
+  // Find unexpired refresh token in DB
   const tokenRecord = await prismaClient.refreshToken.findFirst({
     where: { expiresAt: { gt: new Date() } },
   });
@@ -35,17 +36,26 @@ export async function refreshTokenHandler(
     return NextResponse.json({ error: "Invalid refresh token" }, { status: 401 });
   }
 
-  const user = await prismaClient.user.findUnique({ where: { id: tokenRecord.userId } });
+  // Fetch user to include language and providers in JWT
+  const user = await prismaClient.user.findUnique({
+    where: { id: tokenRecord.userId },
+  });
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const newAccessToken = jwtFn.sign(
-    { sub: user.id, email: user.email },
+    {
+      sub: user.id,
+      email: user.email,
+      language: user.systemLang,
+      providers: user.providers,
+    },
     process.env.JWT_SECRET!,
     { expiresIn: "1h" }
   );
 
+  // Generate new refresh token
   const newRefreshToken = cryptoFn.randomBytes(64).toString("hex");
   const hashedToken = await bcryptFn.hash(newRefreshToken, 10);
   const expiresAt = new Date();
@@ -54,6 +64,8 @@ export async function refreshTokenHandler(
   await prismaClient.refreshToken.create({
     data: { token: hashedToken, userId: user.id, expiresAt },
   });
+
+  // Delete old refresh token
   await prismaClient.refreshToken.delete({ where: { id: tokenRecord.id } });
 
   return NextResponse.json({

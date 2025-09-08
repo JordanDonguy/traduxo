@@ -4,7 +4,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import * as nextNavigation from "next/navigation";
 
 // ---- Mock helpers ----
@@ -47,8 +47,8 @@ jest.mock("@/context/LanguageContext", () => ({
   }),
 }));
 
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 jest.mock("next/navigation", () => ({
@@ -74,12 +74,17 @@ describe("useSuggestion", () => {
   afterAll(() => jest.useRealTimers());
   beforeEach(() => {
     mockRouter = { push: jest.fn() } as unknown as ReturnType<typeof nextNavigation.useRouter>;
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "authenticated",
+      token: "fake-token",
+      providers: [],
+      language: "en",
+      refresh: jest.fn(),
+    });
   });
 
   // ------ Test 1️⃣ ------
   it("toggles isRolling and calls router.push", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     const { result } = renderHook(() =>
       useSuggestion({
         router: mockRouter,
@@ -105,7 +110,14 @@ describe("useSuggestion", () => {
 
   // ------ Test 2️⃣ ------
   it("calls suggestExpressionHelper when pool is empty", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: undefined,
+      providers: [],
+      language: undefined,
+      refresh: jest.fn(),
+    });
+
     const { result } = renderHook(() =>
       useSuggestion({
         translationHelperFn: mockTranslationHelper,
@@ -126,8 +138,6 @@ describe("useSuggestion", () => {
 
   // ------ Test 3️⃣ ------
   it("fetches expression pool when authenticated", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     const translationContextMock: ReturnType<typeof useTranslationContext> = {
       inputText: "",
       translatedText: [],
@@ -180,8 +190,6 @@ describe("useSuggestion", () => {
 
   // ------ Test 4️⃣ ------
   it("calls translationHelper when pool has an unused expression", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     // Properly typed translation context
     const translationContextMock: ReturnType<typeof useTranslationContext> = {
       inputText: "",
@@ -229,7 +237,6 @@ describe("useSuggestion", () => {
 
   // ------ Test 5️⃣ ------
   it("resets the pool and calls suggestExpressionHelper when all expressions are used", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
     const translationContextMock: ReturnType<typeof useTranslationContext> = {
       // ---- State values (just dummy values for testing) ----
       inputText: "",

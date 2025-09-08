@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useApp } from "./AppContext";
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { Translation, TranslationItem } from "@traduxo/packages/types/translation";
 
 export type TranslationState = {
@@ -36,7 +36,7 @@ const TranslationContext = createContext<TranslationState | undefined>(undefined
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   const { setError } = useApp();
-  const { status } = useSession();
+  const { status, token } = useAuth();
   const [inputText, setInputText] = useState<string>("");
   const [translatedText, setTranslatedText] = useState<TranslationItem[]>([]);
   const [saveToHistory, setSaveToHistory] = useState<boolean>(false);
@@ -62,6 +62,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
             },
             body: JSON.stringify({
               translations: translatedText,
@@ -85,7 +86,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       saveTranslation();
       setSaveToHistory(false)
     }
-  }, [saveToHistory, setSaveToHistory, inputTextLang, translatedText, translatedTextLang, status, setError]);
+  }, [saveToHistory, setSaveToHistory, inputTextLang, translatedText, translatedTextLang, status, token, setError]);
 
   // Load a translation from user's history to main display
   function loadTranslationFromMenu(t: Translation, fromFavorite: boolean) {
@@ -114,12 +115,13 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
       const loadHistory = async () => {
         await fetchHistory({
           status,
+          token,
           setTranslationHistory
         })
       };
       loadHistory();
     }
-  }, [status])
+  }, [status, token])
 
   return (
     <TranslationContext.Provider

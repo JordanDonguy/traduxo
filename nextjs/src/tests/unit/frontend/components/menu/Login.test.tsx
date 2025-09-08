@@ -31,6 +31,13 @@ jest.mock("@/lib/client/hooks/auth/useAuthForm", () => ({
   }),
 }));
 
+// ---- Mock useAuth (needed for refresh) ----
+const mockRefresh = jest.fn();
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    refresh: mockRefresh,
+  }),
+}));
 
 // ---- Tests ----
 describe("<Login />", () => {
@@ -62,7 +69,7 @@ describe("<Login />", () => {
 
   // ------ Test 3️⃣ ------
   it("calls handleLogin on submit", () => {
-  render(<Login showMenu={true} />);
+    render(<Login showMenu={true} />);
     fireEvent.change(screen.getByLabelText("Email"), {
       target: { value: "test@example.com" },
     });
@@ -76,7 +83,8 @@ describe("<Login />", () => {
       "test@example.com",
       "password",
       expect.any(Function), // setError
-      expect.any(Function)  // setIsLoading
+      expect.any(Function), // setIsLoading
+      mockRefresh           // refresh injected from useAuth
     );
   });
 
@@ -102,7 +110,8 @@ describe("<Login />", () => {
       "password",
       "password",
       expect.any(Function), // setError
-      expect.any(Function)  // setIsSignup
+      expect.any(Function),  // setIsSignup
+      expect.any(Function)  // refresh
     );
   });
 

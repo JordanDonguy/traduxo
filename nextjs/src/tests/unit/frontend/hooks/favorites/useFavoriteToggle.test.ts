@@ -3,7 +3,7 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useFavoriteToggle } from "@/lib/client/hooks/favorites/useFavoriteToggle";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
 
 // ---- Mocks ----
@@ -25,9 +25,9 @@ jest.mock("@/context/TranslationContext", () => ({
   }),
 }));
 
-// Mock NextAuth 
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+// Mock useAuth 
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 // Mock Toastify
@@ -45,13 +45,25 @@ describe("useFavoriteToggle", () => {
     mockIsFavorite = false;
     mockTranslationId = "123";
 
-    // Default: authenticated session
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
+    // Default: authenticated
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "authenticated",
+      token: "fake-token",
+      providers: [],
+      language: "en",
+      refresh: jest.fn(),
+    });
   });
 
   // ------ Test 1️⃣ ------
   it("Display a toast error and return if not logged in", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: null,
+      providers: [],
+      language: null,
+      refresh: jest.fn(),
+    });
 
     const { result } = renderHook(() =>
       useFavoriteToggle({
@@ -149,8 +161,13 @@ describe("useFavoriteToggle", () => {
 
   // ------ Test 6️⃣ ------
   it("uses default session and toast when no overrides are passed", async () => {
-    // unauthenticated session from mock
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: null,
+      providers: [],
+      language: null,
+      refresh: jest.fn(),
+    });
 
     const { result } = renderHook(() => useFavoriteToggle());
 

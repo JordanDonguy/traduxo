@@ -4,7 +4,7 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { useExplanationLanguage } from "@/lib/client/hooks/explanation/useExplanationLanguage";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
 // ---- Mocks ----
 let mockSystemLang = "en";
@@ -17,16 +17,16 @@ jest.mock("@/context/LanguageContext", () => ({
   }),
 }));
 
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 // Session mock
-const mockSession = (authenticated: boolean) => {
-  (useSession as jest.Mock).mockReturnValue(
+const mockAuth = (authenticated: boolean) => {
+  (useAuth as jest.Mock).mockReturnValue(
     authenticated
-      ? { status: "authenticated", data: { user: { name: "Test" }, expires: "" }, update: jest.fn() }
-      : { status: "unauthenticated", data: null, update: jest.fn() }
+      ? { status: "authenticated", token: "fake-token", providers: [], language: "en", refresh: jest.fn() }
+      : { status: "unauthenticated", token: null, providers: [], language: null, refresh: jest.fn() }
   );
 };
 
@@ -41,7 +41,7 @@ describe("useExplanationLanguage", () => {
 
   // ------ Test 1️⃣ ------
   it("returns current system language", () => {
-    mockSession(true); // inject authenticated session
+    mockAuth(true); // inject authenticated session
     const { result } = renderHook(() =>
       useExplanationLanguage({ fetcher: mockFetcher })
     );
@@ -66,7 +66,7 @@ describe("useExplanationLanguage", () => {
 
   // ------ Test 3️⃣ ------ 
   it("calls API when session is authenticated", async () => {
-    mockSession(true); // inject authenticated session
+    mockAuth(true); // inject authenticated session
 
     mockFetcher.mockResolvedValue({ ok: true }); // mock successful API response
 
@@ -85,7 +85,10 @@ describe("useExplanationLanguage", () => {
       "/api/auth/update-language",
       expect.objectContaining({
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Authorization": "Bearer fake-token",
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ code: "fr" }),
       })
     );
@@ -93,7 +96,7 @@ describe("useExplanationLanguage", () => {
 
   // ------ Test 4️⃣ ------
   it("does not call API when session is unauthenticated", async () => {
-    mockSession(false);  // inject unauthenticated session
+    mockAuth(false);  // inject unauthenticated session
 
     const { result } = renderHook(() =>
       useExplanationLanguage({ fetcher: mockFetcher })
@@ -111,7 +114,7 @@ describe("useExplanationLanguage", () => {
 
   // ------ Test 5️⃣ ------
   it("returns false on fetch error when session is authenticated", async () => {
-    mockSession(true); // inject authenticated session
+    mockAuth(true); // inject authenticated session
 
     // Simulate network failure
     mockFetcher.mockRejectedValue(new Error("network fail"));

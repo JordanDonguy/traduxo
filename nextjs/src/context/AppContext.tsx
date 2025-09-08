@@ -1,8 +1,8 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { SessionProvider } from "next-auth/react";
 import { TranslationProvider } from '@/context/TranslationContext';
 import { LanguageProvider } from "@/context/LanguageContext";
+import { AuthProvider } from "@traduxo/packages/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import { ToastContainer } from "react-toastify";
 
@@ -40,7 +40,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
         defaultTheme="system"
         enableSystem
       >
-        <SessionProvider>
+        <AuthProvider>
           <TranslationProvider>
             <LanguageProvider>
               {children}
@@ -52,7 +52,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
               />
             </LanguageProvider>
           </TranslationProvider>
-        </SessionProvider>
+        </AuthProvider>
       </ThemeProvider>
     </AppContext.Provider>
   );

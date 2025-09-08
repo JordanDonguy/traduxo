@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
+import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
 import { useApp } from "@/context/AppContext";
 import { useTheme } from "next-themes";
 import Login from "./Login";
@@ -36,10 +37,11 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   const { showLoginForm, setShowLoginForm } = useApp();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-    ;
-  const { status, data: session } = useSession();
-  const isCredentials = session?.user.providers?.includes("Credentials");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { handleLogout } = useAuthHandlers();
+  const { status, providers , refresh } = useAuth();
+  const isCredentials = providers?.includes("Credentials");
 
   const router = useRouter();
 
@@ -237,9 +239,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                     {/* -------------- Log Out -------------- */}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         setIsLoading(true);
-                        signOut({ callbackUrl: "/?logout=true" })
+                        await handleLogout(refresh, setIsLoading);
                       }}
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >

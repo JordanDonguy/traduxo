@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
@@ -10,7 +10,7 @@ import { Translation } from "@traduxo/packages/types/translation";
 
 // Injected dependencies for testing
 type UseTranslationHistoryArgs = {
-  session?: ReturnType<typeof useSession>;
+  session?: AuthContextType;
   fetcher?: typeof fetch;
   toaster?: typeof toast;
   selectTranslationHook?: ReturnType<typeof useSelectTranslation>;
@@ -27,12 +27,12 @@ export function useTranslationHistory({
   const [isLoading, setIsLoading] = useState(true);
 
   // --- Always call hooks unconditionally ---
-  const defaultSession = useSession();
+  const defaultSession = useAuth();
   const defaultSelectTranslationHook = useSelectTranslation();
 
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;
-  const { status } = effectiveSession;
+  const { status, token } = effectiveSession;
   const { selectTranslation } = selectTranslationHook ?? defaultSelectTranslationHook;
 
   // ---- Step 2: Delete handler ----
@@ -40,7 +40,10 @@ export function useTranslationHistory({
     try {
       const res = await fetcher("/api/history", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+        },
         body: JSON.stringify({ id }),
       });
 
@@ -61,11 +64,11 @@ export function useTranslationHistory({
   // ---- Step 3: Fetch history on mount ----
   useEffect(() => {
     const load = async () => {
-      await fetchHistory({ status, setTranslationHistory });
+      await fetchHistory({ status, token, setTranslationHistory });
       setIsLoading(false);
     };
     load();
-  }, [status, setTranslationHistory]);
+  }, [status, token, setTranslationHistory]);
 
   return {
     translationHistory,

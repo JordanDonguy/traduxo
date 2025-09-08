@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useAuth, type AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useLanguageContext } from "@/context/LanguageContext";
@@ -15,7 +15,7 @@ import getSuggestionLanguage from "@/lib/client/utils/language/getSuggestionLang
 // Injected dependencies for testing
 type UseSuggestionArgs = {
   router?: ReturnType<typeof useRouter>;
-  session?: ReturnType<typeof useSession>;
+  session?: AuthContextType;
   appContext?: ReturnType<typeof useApp>;
   translationContext?: ReturnType<typeof useTranslationContext>;
   languageContext?: ReturnType<typeof useLanguageContext>;
@@ -43,7 +43,7 @@ export function useSuggestion({
 
   // ---- Step 0: Initialize hooks and context ----
   const defaultAppContext = useApp();
-  const defaultSession = useSession();
+  const defaultSession = useAuth();
   const defaultWaitForAuthStatus = useWaitForAuthStatus();
   const defaultTranslationContext = useTranslationContext();
   const defaultLanguageContext = useLanguageContext();
@@ -51,7 +51,7 @@ export function useSuggestion({
 
   // ---- Step 0b: Use injected values for testing if provided ----
   const { setIsLoading, setError } = appContext ?? defaultAppContext;
-  const { status } = session ?? defaultSession;
+  const { status, token } = session ?? defaultSession;
   const { waitForStatus } = waitForAuthStatus ?? defaultWaitForAuthStatus;
   const {
     setInputText,
@@ -115,12 +115,14 @@ export function useSuggestion({
             setIsLoading,
             setIsFavorite,
             setTranslationId,
+            token,
           }),
         ];
 
         if (status === "authenticated") {
           promises.push(
             fetchExpressionPoolHelperFn({
+              token,
               suggestionLang,
               setError,
               setExpressionPool,

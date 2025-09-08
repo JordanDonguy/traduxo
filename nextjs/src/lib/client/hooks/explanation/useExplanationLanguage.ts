@@ -1,12 +1,12 @@
 "use client"
 
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useLanguageContext } from "@/context/LanguageContext";
 
 // Injected dependencies for testing
 type UseExplanationLanguageArgs = {
   fetcher?: typeof fetch;
-  session?: ReturnType<typeof useSession>;
+  session?: AuthContextType;
 };
 
 // Custom hook for handling explanation language changes.
@@ -16,11 +16,11 @@ export function useExplanationLanguage({
 }: UseExplanationLanguageArgs = {}) {
   const { systemLang, setSystemLang } = useLanguageContext();
   // --- Always call hooks unconditionally ---
-  const defaultSession = useSession();
+  const defaultSession = useAuth();
 
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;
-  const { status } = effectiveSession;
+  const { status, token } = effectiveSession;
 
   // Change the explanation/system language.
   // Updates local state immediately, and syncs with DB if user is logged in.
@@ -35,6 +35,7 @@ export function useExplanationLanguage({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
           },
           body: JSON.stringify({ code }),
         });

@@ -1,17 +1,17 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useEffect, useRef, useState } from "react";
 
 // Injected dependencies for testing
 type UseWaitForAuthStatusArgs = {
-  sessionHook?: typeof useSession;
+  sessionHook?: () => AuthContextType;
   intervalFn?: typeof setInterval;
   clearIntervalFn?: typeof clearInterval;
 };
 
 export function useWaitForAuthStatus({
-  sessionHook = useSession,
+  sessionHook = useAuth,
   intervalFn = setInterval,
   clearIntervalFn = clearInterval,
 }: UseWaitForAuthStatusArgs = {}) {

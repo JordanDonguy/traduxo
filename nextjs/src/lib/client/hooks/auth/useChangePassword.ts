@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -11,7 +11,7 @@ type UseChangePasswordArgs = {
   fetcher?: typeof fetch;
   toaster?: typeof toast;
   router?: ReturnType<typeof useRouter>;
-  sessionUpdater?: ReturnType<typeof useSession>["update"];
+  sessionUpdater?: AuthContextType["refresh"];
 };
 
 export function useChangePassword({
@@ -24,11 +24,11 @@ export function useChangePassword({
 
   // --- Always call hooks unconditionally ---
   const defaultRouter = useRouter();
-  const { update } = useSession();
+  const { refresh } = useAuth();
 
   // --- Use injected values for testing if provided ---
   const effectiveRouter = router ?? defaultRouter;
-  const effectiveUpdater = sessionUpdater ?? update;
+  const effectiveUpdater = sessionUpdater ?? refresh;
 
   // State to track loading spinner
   const [isLoading, setIsLoading] = useState(false);

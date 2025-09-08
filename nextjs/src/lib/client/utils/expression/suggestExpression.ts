@@ -17,6 +17,7 @@ type SuggestionHelperArgs = {
   fetcher?: typeof fetch;
   promptGetter?: typeof getSuggestionPrompt;
   responseCleaner?: typeof cleanGeminiResponse;
+  token: string | undefined;
 };
 
 // Get one normal suggestion with translation
@@ -34,6 +35,7 @@ export async function suggestExpressionHelper({
   setError,
   fetcher = fetch,
   promptGetter = getSuggestionPrompt,
+  token,
 }: SuggestionHelperArgs) {
   // Blur active element if in browser
   if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
@@ -55,7 +57,10 @@ export async function suggestExpressionHelper({
   try {
     const res = await fetcher("/api/gemini/stream", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+      },
       body: JSON.stringify({ prompt, mode: "suggestion" }),
     });
 

@@ -4,6 +4,7 @@ import { Translation } from "@traduxo/packages/types/translation";
 
 type FetchHistoryDeps = {
   status: string;
+  token: string | undefined;
   setTranslationHistory: (data: Translation[]) => void;
   fetchFn?: typeof fetch; // for testing/mock
   url?: string; // default API URL
@@ -11,6 +12,7 @@ type FetchHistoryDeps = {
 
 export async function fetchHistory({
   status,
+  token,
   setTranslationHistory,
   fetchFn = fetch,
   url = "/api/history",
@@ -18,7 +20,12 @@ export async function fetchHistory({
   if (status === "loading") return;
 
   try {
-    const res = await fetchFn(url);
+    const res = await fetchFn(url, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+      },
+    });
 
     if (res.status === 204) {
       setTranslationHistory([]);

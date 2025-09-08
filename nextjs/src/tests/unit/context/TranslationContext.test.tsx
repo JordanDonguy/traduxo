@@ -7,16 +7,24 @@ import { renderHook, RenderHookResult, act, waitFor } from "@testing-library/rea
 import { TranslationProvider, useTranslationContext } from "@/context/TranslationContext";
 import * as AppContextModule from "@/context/AppContext";
 import AppProvider from "@/context/AppContext";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
 // ---- Mocks ----
 jest.mock("next-themes", () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock("next-auth/react", () => ({
-  SessionProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  useSession: jest.fn(),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
+}));
+
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
+}));
+
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAuth: jest.fn(() => ({ status: "unauthenticated", token: null })),
 }));
 
 jest.mock("@/lib/client/utils/history/fetchHistory", () => ({
@@ -69,7 +77,12 @@ const setTranslationData = (
 // ---- Tests ----
 describe("TranslationContext", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "authenticated",
+      token: "my-auth-token",
+      providers: ["Credentials"],
+      refresh: jest.fn(),
+    });
   });
 
   // ------ Test 1️⃣ ------
@@ -81,33 +94,40 @@ describe("TranslationContext", () => {
 
   // ------ Test 2️⃣ ------
   it("provides state inside provider", () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: undefined,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
+    });
 
+    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
     act(() => {
       result.current.setInputText("hello");
     });
-
     expect(result.current.inputText).toBe("hello");
   });
 
   // ------ Test 3️⃣ ------
   it("calls saveTranslation when authenticated and saveToHistory is true", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
-    // Mock fetch to resolve with a sample saved history object:
     const mockHistory = { id: 1, inputText: "Hello", translation: "Hola" };
+    const authToken = "my-auth-token";
+
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "authenticated",
+      token: authToken,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
+    });
+
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ data: mockHistory }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-
-    // set up data (so body isn’t empty)
     setTranslationData(result);
 
-    // trigger the effect
     act(() => {
       result.current.setSaveToHistory(true);
     });
@@ -117,20 +137,26 @@ describe("TranslationContext", () => {
         "/api/history",
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: expect.objectContaining({
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          }),
         })
       );
-
-      // Check local state update
       expect(result.current.translationHistory).toContainEqual(mockHistory);
     });
   });
 
   // ------ Test 4️⃣ ------
   it("loadTranslationFromMenu sets state correctly when fromFavorite is false", () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: undefined,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
+    });
 
+    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
     const historyItem = {
       id: "2",
       inputText: "Hello",
@@ -161,9 +187,14 @@ describe("TranslationContext", () => {
 
   // ------ Test 5️⃣ ------
   it("loadTranslationFromMenu sets state correctly when fromFavorite is true", () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: undefined,
+      providers: ["Credentials"],
+      refresh: jest.fn(),
+    });
 
+    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
     const favoriteItem = {
       id: "42",
       inputText: "goodbye",
@@ -184,9 +215,9 @@ describe("TranslationContext", () => {
     expect(result.current.translatedText).toEqual([
       { type: "expression", value: "goodbye" },
       { type: "main_translation", value: "au revoir" },
-      { type: "alternative", value: "" },          // alt1 fallback
-      { type: "alternative", value: "" },  // alt2 filled
-      { type: "alternative", value: "" },          // alt3 fallback
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
+      { type: "alternative", value: "" },
     ]);
     expect(result.current.inputTextLang).toBe("en");
     expect(result.current.translatedTextLang).toBe("fr");
@@ -195,16 +226,14 @@ describe("TranslationContext", () => {
   // ------ Test 6️⃣ ------
   it("sets error when fetch returns !ok", async () => {
     const mockSetError = mockUseApp();
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       json: async () => ({ error: "Server error" }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-
     setTranslationData(result);
+
     act(() => {
       result.current.setSaveToHistory(true);
     });
@@ -217,15 +246,12 @@ describe("TranslationContext", () => {
   // ------ Test 7️⃣ ------
   it("sets fallback error when fetch returns !ok without error field", async () => {
     const mockSetError = mockUseApp();
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       json: async () => ({}),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-
     setTranslationData(result);
 
     act(() => {
@@ -240,13 +266,11 @@ describe("TranslationContext", () => {
   // ------ Test 8️⃣ ------
   it("sets error when fetch throws", async () => {
     const mockSetError = mockUseApp();
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
-
     global.fetch = jest.fn().mockRejectedValue(new Error("Network down")) as jest.Mock;
 
     const { result, rerender } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-
     setTranslationData(result);
+
     act(() => {
       result.current.setSaveToHistory(true);
     });

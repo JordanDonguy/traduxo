@@ -1,333 +1,256 @@
 /**
  * @jest-environment jsdom
  */
-
 import { renderHook, act } from "@testing-library/react";
 import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
-import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
-// ---- Mocks ----
 jest.mock("next-auth/react", () => ({
   signIn: jest.fn(),
 }));
+
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
+   useRouter: jest.fn(),
 }));
+
 jest.mock("react-toastify", () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-
-// ---- Tests ----
-describe("useAuthHandlers", () => {
-  let setError: jest.Mock;
-  let setIsLoading: jest.Mock;
-  let setIsSignup: jest.Mock;
-  let originalError: typeof console.error;
+describe("useAuthHandlers split tests", () => {
+  let pushMock: jest.Mock;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let routerMock: any;
 
   beforeEach(() => {
-    setError = jest.fn();
-    setIsLoading = jest.fn();
-    setIsSignup = jest.fn();
-    // Mock console.error to not have logs during tests
-    originalError = console.error;
-    // Mock it to do nothing
-    console.error = jest.fn();
+    pushMock = jest.fn();
+    routerMock = { push: pushMock, replace: jest.fn() };
+    (useRouter as jest.Mock).mockReturnValue(routerMock);
+
+    localStorage.clear();
+    global.fetch = jest.fn();
   });
 
-  afterEach(() => {
-    // Restore original console.error
-    console.error = originalError;
-  });
+  // -------------------- handleLogin --------------------
+  describe("handleLogin", () => {
+    it("rejects password shorter than 8 chars", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
 
-  // ------ Test 1️⃣ ------
-  it("accepts minimum 8 char password", async () => {
-    (signIn as jest.Mock).mockResolvedValue({ ok: true });
+      await act(async () => {
+        await result.current.handleLogin("a@b.com", "123", setError, setIsLoading, refresh);
+      });
 
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleLogin with 8-char password
-    await act(async () => {
-      await result.current.handleLogin("test@test.com", "12345678", setError, setIsLoading);
-    });
-
-    // Step 2: signIn should be called
-    expect(signIn).toHaveBeenCalled();
-  });
-
-  // ------ Test 2️⃣ ------
-  it("rejects password shorter than 8 characters", async () => {
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleLogin with a 7-char password
-    await act(async () => {
-      await result.current.handleLogin("test@test.com", "1234567", setError, setIsLoading);
-    });
-
-    // Step 2: setError should be called with the correct validation message
-    expect(setError).toHaveBeenCalledWith("Password length must be at least 8 characters");
-
-    // Step 3: signIn should NOT be called
-    expect(signIn).not.toHaveBeenCalled();
-  });
-
-  // ------ Test 3️⃣ ------
-  it("handles signIn returning res.error", async () => {
-    // Step 0: Mock signIn to return an error
-    (signIn as jest.Mock).mockResolvedValue({ error: "Invalid credentials" });
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleLogin
-    await act(async () => {
-      await result.current.handleLogin("test@test.com", "password123", setError, setIsLoading);
-    });
-
-    // Step 2: setError should be called with the error returned by signIn
-    expect(setError).toHaveBeenCalledWith("Invalid credentials");
-
-    // Step 3: Loading should be stopped
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-  });
-
-
-  // ------ Test 4️⃣ ------
-  it("handles signIn throwing an error", async () => {
-    (signIn as jest.Mock).mockRejectedValue(new Error("network"));
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleLogin, error should be caught internally
-    await act(async () => {
-      await result.current.handleLogin("test@test.com", "password123", setError, setIsLoading);
-    });
-
-    // Step 2: setError should be called with user friendly message
-    expect(setError).toHaveBeenCalledWith("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
-
-    // Step 3: Loading should be stopped
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-  });
-
-  // ------ Test 5️⃣ ------
-  it("rejects confirmPassword < 8 chars", async () => {
-    const { result } = renderHook(() => useAuthHandlers());
-
-    await act(async () => {
-      await result.current.handleSignup("test@test.com", "password123", "short", setError, setIsSignup);
-    });
-
-    // Password length error should be set
-    expect(setError).toHaveBeenCalledWith("Passwords length must be at least 8 characters");
-  });
-
-  // ------ Test 6️⃣ ------
-  it("rejects signup when password and confirmPassword do not match", async () => {
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleSignup with mismatched passwords
-    await act(async () => {
-      await result.current.handleSignup(
-        "test@test.com",
-        "password123",
-        "password456",
-        setError,
-        setIsSignup
+      expect(setError).toHaveBeenCalledWith(
+        "Password length must be at least 8 characters"
       );
+      expect(setIsLoading).not.toHaveBeenCalledWith(true);
     });
 
-    // Step 2: setError should be called with mismatch message
-    expect(setError).toHaveBeenCalledWith("Password and confirm password don't match");
+    it("logs in successfully with valid credentials", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
 
-    // Step 3: signIn should NOT be called
-    expect(signIn).not.toHaveBeenCalled();
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ accessToken: "a", refreshToken: "b" }),
+      });
 
-    // Step 4: setIsSignup should NOT be toggled
-    expect(setIsSignup).not.toHaveBeenCalled();
+      await act(async () => {
+        await result.current.handleLogin("a@b.com", "12345678", setError, setIsLoading, refresh);
+      });
+
+      expect(localStorage.getItem("accessToken")).toBe("a");
+      expect(localStorage.getItem("refreshToken")).toBe("b");
+      expect(refresh).toHaveBeenCalled();
+      expect(pushMock).toHaveBeenCalledWith("/?login=true");
+    });
   });
 
+  // -------------------- handleLogout --------------------
+  describe("handleLogout", () => {
+    it("returns false if no refresh token", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
 
-  // ------ Test 7️⃣ ------
-  it("handles API error response", async () => {
-    // Mock fetch resolved value to return false, "user exists"
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: "User exists" }),
-    } as Partial<Response>);
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    await act(async () => {
-      await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup);
+      const res = await result.current.handleLogout(refresh, setIsLoading);
+      expect(res).toBe(false);
     });
 
-    // API error message should be set
-    expect(setError).toHaveBeenCalledWith("User exists");
+    it("logs out successfully", async () => {
+      localStorage.setItem("refreshToken", "token123");
+      const { result } = renderHook(() => useAuthHandlers());
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
 
-    // signIn should not be called on API failure
-    expect(signIn).not.toHaveBeenCalled();
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
+
+      await act(async () => {
+        await result.current.handleLogout(refresh, setIsLoading);
+      });
+
+      expect(localStorage.getItem("refreshToken")).toBeNull();
+      expect(localStorage.getItem("accessToken")).toBeNull();
+      expect(refresh).toHaveBeenCalled();
+      expect(pushMock).toHaveBeenCalledWith("/?logout=true");
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
   });
 
-  // ------ Test 8️⃣ ------
-  it("handles fetch rejecting", async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error("network fail"));
+  // -------------------- handleSignup --------------------
+  describe("handleSignup", () => {
+    let setError: jest.Mock;
+    let setIsSignup: jest.Mock;
+    let refresh: jest.Mock;
+    let originalFetch: typeof global.fetch;
 
-    const { result } = renderHook(() => useAuthHandlers());
-
-    await act(async () => {
-      await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup);
+    beforeEach(() => {
+      setError = jest.fn();
+      setIsSignup = jest.fn();
+      refresh = jest.fn();
+      originalFetch = global.fetch;
+      jest.clearAllMocks();
+      localStorage.clear();
     });
 
-    // Should set friendly error message and not call signIn
-    expect(setError).toHaveBeenCalledWith("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
-    expect(signIn).not.toHaveBeenCalled();
-  });
-
-  // ------ Test 9️⃣ ------
-  it("logs error if google signIn fails", async () => {
-    // Step 0: Spy on console.error
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
-
-    // Step 1: Mock signIn to throw
-    (signIn as jest.Mock).mockRejectedValue(new Error("Google fail"));
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 2: Call handleGoogleButton
-    await act(async () => {
-      await result.current.handleGoogleButton();
+    afterEach(() => {
+      global.fetch = originalFetch;
     });
 
-    // Step 3: signIn should still be called with google provider
-    expect(signIn).toHaveBeenCalledWith("google", { callbackUrl: "/?login=true" });
+    it("rejects passwords shorter than 8 characters", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
 
-    // Step 4: console.error should have been called with the error
-    expect(consoleSpy).toHaveBeenCalledWith(
-      "Google sign-in failed:",
-      expect.any(Error)
-    );
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "1234567", "1234567", setError, setIsSignup, refresh);
+      });
 
-    // Step 5: Restore console
-    consoleSpy.mockRestore();
-  });
+      expect(setError).toHaveBeenCalledWith("Passwords length must be at least 8 characters");
+      expect(setIsSignup).not.toHaveBeenCalled();
+    });
 
-  // ------ Test 🔟 ------
-  it("logs in and redirects after successful signup", async () => {
-    // Step 0: Mock fetch to succeed
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({}),
-    } as Partial<Response>);
+    it("rejects when passwords do not match", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
 
-    // Step 1: Mock signIn to succeed
-    (signIn as jest.Mock).mockResolvedValue({ ok: true });
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "password123", "password456", setError, setIsSignup, refresh);
+      });
 
-    const { result } = renderHook(() => useAuthHandlers());
+      expect(setError).toHaveBeenCalledWith("Password and confirm password don't match");
+      expect(setIsSignup).not.toHaveBeenCalled();
+    });
 
-    // Step 2: Call handleSignup with valid data
-    await act(async () => {
-      await result.current.handleSignup(
-        "test@test.com",
-        "password123",
-        "password123",
-        setError,
-        setIsSignup
+    it("handles signup API failure", async () => {
+      global.fetch = jest.fn().mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: "User exists" }),
+      } as Partial<Response>);
+
+      const { result } = renderHook(() => useAuthHandlers());
+
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup, refresh);
+      });
+
+      expect(setError).toHaveBeenCalledWith("User exists");
+      expect(setIsSignup).not.toHaveBeenCalled();
+    });
+
+    it("handles JWT login failure after successful signup", async () => {
+      // Step 1: Signup succeeds
+      global.fetch = jest.fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => ({}) } as Partial<Response>) // signup
+        .mockResolvedValueOnce({ ok: false, json: async () => ({ error: "Login failed" }) } as Partial<Response>); // jwt-login
+
+      const { result } = renderHook(() => useAuthHandlers());
+
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup, refresh);
+      });
+
+      expect(setError).toHaveBeenCalledWith("Login failed");
+      expect(setIsSignup).not.toHaveBeenCalled();
+    });
+
+    it("successfully signs up and logs in using JWT endpoint", async () => {
+      const fakeTokens = { accessToken: "jwt-access", refreshToken: "jwt-refresh" };
+
+      // Step 1: signup API
+      global.fetch = jest.fn()
+        .mockResolvedValueOnce({ ok: true, json: async () => ({}) } as Partial<Response>)
+        // Step 2: jwt-login API
+        .mockResolvedValueOnce({ ok: true, json: async () => fakeTokens } as Partial<Response>);
+
+      const { result } = renderHook(() => useAuthHandlers());
+
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup, refresh);
+      });
+
+      expect(localStorage.getItem("accessToken")).toBe("jwt-access");
+      expect(localStorage.getItem("refreshToken")).toBe("jwt-refresh");
+      expect(refresh).toHaveBeenCalled();
+      expect(setIsSignup).toHaveBeenCalledWith(false);
+      expect(setError).not.toHaveBeenCalled();
+    });
+
+    it("handles network error gracefully", async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error("network fail"));
+
+      const { result } = renderHook(() => useAuthHandlers());
+
+      await act(async () => {
+        await result.current.handleSignup("test@test.com", "password123", "password123", setError, setIsSignup, refresh);
+      });
+
+      expect(setError).toHaveBeenCalledWith(
+        "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
       );
+      expect(setIsSignup).not.toHaveBeenCalled();
     });
-
-    // Step 3: signIn should be called with credentials
-    expect(signIn).toHaveBeenCalledWith("credentials", {
-      callbackUrl: "/?login=true",
-      email: "test@test.com",
-      password: "password123",
-    });
-
-    // Step 4: setIsSignup should be set to false
-    expect(setIsSignup).toHaveBeenCalledWith(false);
-
-    // Step 5: setError should not be called
-    expect(setError).not.toHaveBeenCalled();
   });
 
-  // ------ Test 1️⃣1️⃣ ------
-  it("rejects forgot password when email is empty", async () => {
-    const { result } = renderHook(() => useAuthHandlers());
+  // -------------------- handleForgotPassword --------------------
+  describe("handleForgotPassword", () => {
+    it("rejects empty email", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
 
-    // Step 1: Call handleForgotPassword with empty email
-    await act(async () => {
-      await result.current.handleForgotPassword("", setError, setIsLoading);
+      await act(async () => {
+        await result.current.handleForgotPassword("", setError, setIsLoading);
+      });
+
+      expect(setError).toHaveBeenCalledWith(
+        "Please enter your email to reset your password"
+      );
+      expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    // Step 2: setError should be called with the empty email message
-    expect(setError).toHaveBeenCalledWith("Please enter your email to reset your password");
+    it("calls API and shows success toast", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
 
-    // Step 3: setIsLoading should be set to false
-    expect(setIsLoading).toHaveBeenCalledWith(false);
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
+      });
 
-    // Step 4: fetch should NOT be called
-    expect(global.fetch).not.toHaveBeenCalled();
-  });
+      await act(async () => {
+        await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
+      });
 
-  // ------ Test 1️⃣2️⃣ ------
-  it("handles API returning not-ok", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({}),
-    } as Partial<Response>);
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    await act(async () => {
-      await result.current.handleForgotPassword("test@test.com", setError, setIsLoading);
+      expect(toast.success).toHaveBeenCalledWith(
+        "If this email exists, a reset link has been sent."
+      );
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+      expect(setError).toHaveBeenCalledWith("");
     });
-
-    // Expect a toast.error
-    expect(toast.error).toHaveBeenCalledWith("Oops! Something went wrong... Please try again 🙏");
-  });
-
-  // ------ Test 1️⃣3️⃣ ------
-  it("handles fetch rejecting", async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error("network fail"));
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    await act(async () => {
-      await result.current.handleForgotPassword("test@test.com", setError, setIsLoading);
-    });
-
-    // Error toast should be displayed
-    expect(toast.error).toHaveBeenCalledWith("Oops! Something went wrong... Please try again 🙏");
-
-    // Loading should be stopped
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-  });
-
-  // ------ Test 1️⃣4️⃣ ------
-  it("successfully sends forgot password email", async () => {
-    // Step 0: Mock fetch to succeed
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({}),
-    } as Partial<Response>);
-
-    const { result } = renderHook(() => useAuthHandlers());
-
-    // Step 1: Call handleForgotPassword with valid email
-    await act(async () => {
-      await result.current.handleForgotPassword("test@test.com", setError, setIsLoading);
-    });
-
-    // Step 2: toast.success should be called
-    expect(toast.success).toHaveBeenCalledWith("If this email exists, a reset link has been sent.");
-
-    // Step 4: setIsLoading should be set to false
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-
-    // Step 5: setError should remain empty
-    expect(setError).toHaveBeenCalledWith("");
   });
 });

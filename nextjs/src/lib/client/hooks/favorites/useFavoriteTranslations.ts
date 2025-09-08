@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useTranslationContext } from "@/context/TranslationContext";
@@ -11,7 +11,7 @@ import { Translation } from "@traduxo/packages/types/translation";
 type UseFavoriteTranslationsArgs = {
   fetcher?: typeof fetch;
   router?: ReturnType<typeof useRouter>;
-  session?: ReturnType<typeof useSession>;
+  session?: AuthContextType;
   toaster?: typeof toast;
 };
 
@@ -25,12 +25,12 @@ export function useFavoriteTranslations({
   const { translationId, setTranslationId, setIsFavorite } = useTranslationContext();
 
   // --- Always call hooks unconditionally ---
-  const defaultSession = useSession();
+  const defaultSession = useAuth();
   const defaultRouter = useRouter();
 
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;
-  const { status } = effectiveSession;
+  const { status, token } = effectiveSession;
   const effectiveRouter = router ?? defaultRouter;
 
   // ---- Step 2: Local state for favorites and loading state ----
@@ -48,7 +48,10 @@ export function useFavoriteTranslations({
     try {
       const res = await fetcher("/api/favorite", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+        },
         body: JSON.stringify({ id }),
       });
 
@@ -73,7 +76,12 @@ export function useFavoriteTranslations({
 
     async function fetchData() {
       try {
-        const res = await fetcher("/api/favorite");
+        const res = await fetcher("/api/favorite", {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+          },
+        });
 
         if (res.status === 204) {
           // No favorites
@@ -92,7 +100,7 @@ export function useFavoriteTranslations({
     }
 
     fetchData();
-  }, [status, fetcher]);
+  }, [status, token, fetcher]);
 
   // ---- Step 5: Return everything needed by the component ----
   return {

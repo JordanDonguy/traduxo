@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { useTranslationContext } from "@/context/TranslationContext";
-import { useSession } from "next-auth/react";
+import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites/favorites";
 
 // Injected dependencies for testing
 type UseFavoriteToggleArgs = {
-  session?: ReturnType<typeof useSession>;
+  session?: AuthContextType;
   addToFavoriteFn?: typeof addToFavorite;
   deleteFromFavoriteFn?: typeof deleteFromFavorite;
   toaster?: typeof toast;
@@ -32,7 +32,7 @@ export function useFavoriteToggle({
   } = useTranslationContext();
 
   // --- Always call hooks unconditionally ---
-  const defaultSession = useSession();
+  const defaultSession = useAuth();
 
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;

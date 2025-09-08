@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
 
@@ -18,6 +19,7 @@ export default function Login({ showMenu }: LoginProps) {
   const [isSignup, setIsSignup] = useState(false);
 
   const { handleLogin, handleSignup, handleGoogleButton, handleForgotPassword } = useAuthHandlers();
+  const { refresh } = useAuth();
 
   return (
     <form
@@ -25,8 +27,8 @@ export default function Login({ showMenu }: LoginProps) {
       onSubmit={(e) => {
         e.preventDefault();
         setError("");
-        if (isSignup) handleSignup(email, password, confirmPassword, setError, setIsSignup);
-        else handleLogin(email, password, setError, setIsLoading);
+        if (isSignup) handleSignup(email, password, confirmPassword, setError, setIsSignup, refresh);
+        else handleLogin(email, password, setError, setIsLoading, refresh);
       }}
       className={`
         max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]

@@ -3,7 +3,7 @@
  */
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useFavoriteTranslations } from "@/lib/client/hooks/favorites/useFavoriteTranslations";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
 
 // ---- Mocks ----
@@ -17,9 +17,9 @@ jest.mock("@/context/TranslationContext", () => ({
   }),
 }));
 
-// Mock NextAuth + Router
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+// Mock useAuth + Router
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 const mockRouter = { push: jest.fn() };
@@ -39,7 +39,10 @@ describe("useFavoriteTranslations", () => {
 
   beforeEach(() => {
     mockFetch = jest.fn();
-    (useSession as jest.Mock).mockReturnValue({ status: "authenticated" });
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "authenticated",
+      token: "fake-jwt-token",
+    });
   });
 
   // ------ Test 1️⃣ ------
@@ -68,7 +71,10 @@ describe("useFavoriteTranslations", () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/favorite");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/favorite",
+      { "headers": { "Authorization": "Bearer fake-jwt-token", "Content-Type": "application/json" } }
+    );
     expect(result.current.favoriteTranslations).toEqual(mockData);
     expect(result.current.isLoading).toBe(false);
   });
@@ -172,7 +178,7 @@ describe("useFavoriteTranslations", () => {
 
   // ------ Test 8️⃣ ------
   it("does nothing when session status is loading", () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "loading" });
+    (useAuth as jest.Mock).mockReturnValue({ status: "loading", token: undefined });
 
     const { result } = renderHook(() =>
       useFavoriteTranslations({ fetcher: mockFetch })
@@ -184,7 +190,7 @@ describe("useFavoriteTranslations", () => {
 
   // ------ Test 9️⃣ ------
   it("sets isLoading to false immediately when session is unauthenticated", async () => {
-    (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated" });
+    (useAuth as jest.Mock).mockReturnValue({ status: "unauthenticated", token: undefined });
 
     const { result } = renderHook(() =>
       useFavoriteTranslations({ fetcher: mockFetch })

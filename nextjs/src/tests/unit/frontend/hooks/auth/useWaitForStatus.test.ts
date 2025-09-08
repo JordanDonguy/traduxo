@@ -3,11 +3,11 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useWaitForAuthStatus } from "@/lib/client/hooks/auth/useWaitForAuthStatus";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
 // ---- Mocks ----
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 
@@ -23,11 +23,12 @@ describe("useWaitForAuthStatus", () => {
 
   // ------ Test 1️⃣ ------
   it("resolves immediately if status is not loading", async () => {
-    // Mock a session with status "authenticated"
-    (useSession as jest.Mock).mockReturnValue({
-      data: null,
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
-      update: jest.fn(),
+      token: "fake-token",
+      providers: [],
+      language: "en",
+      refresh: jest.fn(),
     });
 
     // Render the hook
@@ -51,11 +52,13 @@ describe("useWaitForAuthStatus", () => {
     // Initial status is "loading"
     let currentStatus: "loading" | "authenticated" = "loading";
 
-    // Mock useSession to return currentStatus dynamically
-    (useSession as jest.Mock).mockImplementation(() => ({
-      data: null,
+    // Mock useAuth to return currentStatus dynamically
+    (useAuth as jest.Mock).mockImplementation(() => ({
       status: currentStatus,
-      update: jest.fn(),
+      token: null,
+      providers: [],
+      language: null,
+      refresh: jest.fn(),
     }));
 
     // ---- Mock setInterval to capture the callback ----

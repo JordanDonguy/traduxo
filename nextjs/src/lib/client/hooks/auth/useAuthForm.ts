@@ -12,39 +12,76 @@ export function useAuthHandlers() {
     email: string,
     password: string,
     setError: (err: string) => void,
-    setIsLoading: (loading: boolean) => void
+    setIsLoading: (loading: boolean) => void,
+    refresh: () => Promise<void>,
   ) => {
-    // ---- step 1: validate password length ----
     if (password.length < 8) {
       setError("Password length must be at least 8 characters");
       return;
     }
 
-    // ---- step 2: set loading ----
     setIsLoading(true);
+    setError("");
 
     try {
-      // ---- step 3: attempt sign in ----
-      const res = await signIn("credentials", {
-        callbackUrl: "/?login=true",
-        email,
-        password,
+      const res = await fetch("/api/auth/jwt-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      // ---- step 4: handle success or error ----
-      if (res?.error) {
-        setError(res.error);
-      } else {
-        router.push("/");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid credentials");
+        return;
       }
+
+      // ---- store tokens ----
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      // ---- redirect ----
+      await refresh();
+      router.push("/?login=true");
     } catch (err) {
       console.error("Login failed:", err);
       setError("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
     } finally {
-      // ---- step 5: stop loading ----
       setIsLoading(false);
     }
   };
+
+  const handleLogout = async (
+    refresh: () => Promise<void>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) return false;
+
+      // Call logout API
+      const res = await fetch("/api/auth/jwt-logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) return false;
+
+      // Clear tokens from localStorage
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      await refresh();
+      router.push("/?logout=true");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      return false;
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   // ---- handleGoogleButton ----
   const handleGoogleButton = async () => {
@@ -63,44 +100,56 @@ export function useAuthHandlers() {
     password: string,
     confirmPassword: string,
     setError: (err: string) => void,
-    setIsSignup: (val: boolean) => void
+    setIsSignup: (val: boolean) => void,
+    refresh: () => Promise<void>,
   ) => {
-    // ---- step 1: validate password length ----
+    // Step 1: validate passwords
     if (password.length < 8 || confirmPassword.length < 8) {
       setError("Passwords length must be at least 8 characters");
       return;
     }
 
-    // ---- step 2: check passwords match ----
     if (password !== confirmPassword) {
       setError("Password and confirm password don't match");
       return;
     }
 
     try {
-      // ---- step 3: register user to db ----
+      // Step 2: register user
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
 
-      // ---- step 4: handle API error ----
       if (!res.ok) {
-        setError(data.error);
+        setError(data.error || "Signup failed");
         return;
       }
 
-      // ---- step 5: login after successful signup ----
-      await signIn("credentials", {
-        callbackUrl: "/?login=true",
-        email,
-        password,
+      // Step 3: immediately login using JWT endpoint
+      const loginRes = await fetch("/api/auth/jwt-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      // ---- step 5: reset isSignup state ----
+      const loginData = await loginRes.json();
+
+      if (!loginRes.ok) {
+        setError(loginData.error || "Login failed after signup");
+        return;
+      }
+
+      // Step 4: store tokens
+      localStorage.setItem("accessToken", loginData.accessToken);
+      localStorage.setItem("refreshToken", loginData.refreshToken);
+
+      // Step 5: refresh auth context & redirect
+      await refresh();
+      router.push("/?login=true");
+
       setIsSignup(false);
     } catch (err) {
       console.error("Signup failed:", err);
@@ -153,6 +202,7 @@ export function useAuthHandlers() {
 
   return {
     handleLogin,
+    handleLogout,
     handleSignup,
     handleGoogleButton,
     handleForgotPassword,

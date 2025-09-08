@@ -3,7 +3,6 @@
  */
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useTranslationHistory } from "@/lib/client/hooks/translation/useTranslationHistory";
-import { useSession } from "next-auth/react";
 import { Translation } from "@traduxo/packages/types/translation";
 
 // ---- Mocks ----
@@ -18,9 +17,9 @@ jest.mock("@/context/TranslationContext", () => ({
   }),
 }));
 
-// Mock next-auth session
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+// Mock useAuth
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(() => ({ status: "authenticated", token: "fake-token" })),
 }));
 
 // Mock toast
@@ -46,9 +45,6 @@ describe("useTranslationHistory", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockFetcher = jest.fn();
-    (useSession as jest.Mock).mockReturnValue({
-      status: "authenticated",
-    });
   });
 
   // ------ Test 1️⃣ ------

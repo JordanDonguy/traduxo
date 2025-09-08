@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/server/prisma";
-import { PrismaClient } from "@prisma/client/extension";
 import { authorizeUser } from "@/lib/server/auth/authorizeUser";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-// Relax types for DI
+// DI-friendly types
 export interface JwtLoginDeps {
   authorizeUserFn: typeof authorizeUser;
-  prismaClient: Partial<PrismaClient>;
+  prismaClient?: typeof prisma;
   cryptoFn?: Pick<typeof crypto, "randomBytes">;
   bcryptFn?: Pick<typeof bcrypt, "hash">;
   jwtFn?: Pick<typeof jwt, "sign">;
@@ -23,7 +22,7 @@ export async function jwtLoginHandler(
     cryptoFn = crypto,
     bcryptFn = bcrypt,
     jwtFn = jwt,
-  }: Partial<JwtLoginDeps>
+  }: Partial<JwtLoginDeps> = {}
 ) {
   const body = await req.json();
   const { email, password } = body;
@@ -32,30 +31,38 @@ export async function jwtLoginHandler(
     return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
   }
 
+  // Validate credentials via authorizeUser
   const user = await authorizeUserFn({ email, password });
   if (!user) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
+  // Generate JWT access token including language
   const accessToken = jwtFn.sign(
-    { sub: user.id, email: user.email },
+    { sub: user.id, email: user.email, language: user.language, providers: user.providers },
     process.env.JWT_SECRET!,
     { expiresIn: "1h" }
   );
 
+  // Generate refresh token
   const refreshToken = cryptoFn.randomBytes(64).toString("hex");
   const hashedToken = await bcryptFn.hash(refreshToken, 10);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 30);
 
+  // Store hashed refresh token in DB
   await prismaClient.refreshToken.create({
-    data: { token: hashedToken, userId: user.id, expiresAt },
+    data: {
+      token: hashedToken,
+      userId: user.id,
+      expiresAt,
+    },
   });
 
   return NextResponse.json({
     accessToken,
     refreshToken,
-    expiresIn: 3600,
+    expiresIn: 3600, // 1 hour in seconds
   });
 }

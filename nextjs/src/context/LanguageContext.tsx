@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useTranslationContext } from "./TranslationContext";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
 type LanguageState = {
   inputLang: string;
@@ -18,7 +18,7 @@ const LanguageContext = createContext<LanguageState | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const { setExpressionPool } = useTranslationContext();
-  const { data: session, status } = useSession();
+  const { language, status } = useAuth();
 
   const [inputLang, setInputLang] = useState<string>("auto");
   const [outputLang, setOutputLang] = useState<string>("en");
@@ -41,11 +41,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      if(session.user.systemLang) {
-        setSystemLang(session.user.systemLang)
+      if(language) {
+        setSystemLang(language)
       }
     }
-  }, [status, session?.user.systemLang])
+  }, [status, language])
 
   return (
     <LanguageContext.Provider

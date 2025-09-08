@@ -4,12 +4,12 @@
 
 import { renderHook, act } from "@testing-library/react";
 import { LanguageProvider, useLanguageContext } from "@/context/LanguageContext";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 
 // ---- Mocks ----
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
 jest.mock("@/context/TranslationContext", () => ({
@@ -26,7 +26,15 @@ describe("LanguageContext", () => {
     (useTranslationContext as jest.Mock).mockReturnValue({
       setExpressionPool: mockSetExpressionPool,
     });
-    (useSession as jest.Mock).mockReturnValue({ data: null, status: "unauthenticated" });
+
+    // Default: unauthenticated
+    (useAuth as jest.Mock).mockReturnValue({
+      status: "unauthenticated",
+      token: null,
+      providers: [],
+      language: "en",
+      refresh: jest.fn(),
+    });
   });
 
   afterEach(() => {
@@ -127,10 +135,13 @@ describe("LanguageContext", () => {
   });
 
   // ------ Test 8️⃣ ------
-  it("sets systemLang from session.user.systemLang when authenticated", () => {
-    (useSession as jest.Mock).mockReturnValue({
-      data: { user: { systemLang: "jp" } },
+  it("sets systemLang from language when authenticated", () => {
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
+      token: null,
+      providers: [],
+      language: "jp",
+      refresh: jest.fn(),
     });
 
     const { result } = renderHook(() => useLanguageContext(), {
@@ -143,10 +154,13 @@ describe("LanguageContext", () => {
   });
 
   // ------ Test 9️⃣ ------
-  it("does not change systemLang if session.user.systemLang is undefined", () => {
-    (useSession as jest.Mock).mockReturnValue({
-      data: { user: {} },
+  it("does not change systemLang if language is undefined", () => {
+    (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
+      token: null,
+      providers: [],
+      language: undefined,
+      refresh: jest.fn(),
     });
 
     const { result } = renderHook(() => useLanguageContext(), {
