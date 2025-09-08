@@ -40,12 +40,6 @@ jest.mock("@/lib/client/hooks/translation/useSwitchTranslations", () => ({
   }),
 }));
 
-// --------- Mock utils ---------
-// Authentication toasts utility
-jest.mock("@/lib/client/utils/ui/authToasts", () => ({
-  showAuthToasts: jest.fn(),
-}));
-
 // --------- Mock child components ---------
 // Error Section
 jest.mock("@/components/main-section/ErrorSection", () => {

@@ -1,12 +1,10 @@
 "use client"
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
 import { useTranslationContext } from "@/context/TranslationContext";
 import { useFavoriteToggle } from "@/lib/client/hooks/favorites/useFavoriteToggle";
 import { useSwitchTranslations } from "@/lib/client/hooks/translation/useSwitchTranslations";
-import { showAuthToasts } from "@/lib/client/utils/ui/authToasts";
 import { replaceQuotesInHTML } from "@/lib/client/utils/ui/replaceQuotesInHTML";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";
@@ -32,13 +30,6 @@ function MainDisplay() {
     setTranslatedText,
     timeoutFn: setTimeout
   });
-
-  const router = useRouter();
-
-  // Display a toast message if there's an error or success message in url params
-  useEffect(() => {
-    showAuthToasts(router)
-  }, [router])
 
   useEffect(() => {
     const paragraphs = document.querySelectorAll('p');

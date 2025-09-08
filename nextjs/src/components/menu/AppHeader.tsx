@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
+import { showAuthToasts } from "@/lib/client/utils/ui/authToasts";
 import { User, Dices } from "lucide-react";
 import UserMenu from "./UserMenu";
 import Logo from "../Logo";
-
 
 function AppHeader() {
   const router = useRouter();
@@ -32,6 +32,11 @@ function AppHeader() {
       router.replace(`${pathname}?${params.toString()}`);
     }
   }, [searchParams, pathname, router]);
+
+  // Display a toast message if there's an error or success message in url params
+  useEffect(() => {
+    showAuthToasts(router);
+  }, [searchParams, router]);
 
   return (
     <header className="w-full h-full flex justify-center">

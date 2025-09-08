@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import LoadingAnimation from "./LoadingAnimation";
 import ErrorSection from "./ErrorSection";
 import { useExplanation } from "@/lib/client/hooks/explanation/useExplanation";
-import { TranslationItem } from "../../../types/translation";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 type ExplanationSectionProps = {
   explanation: string;

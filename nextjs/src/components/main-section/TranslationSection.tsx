@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Star } from "lucide-react";
-import { TranslationItem } from "../../../types/translation";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 type TranslationSectionProps = {
   translatedText: TranslationItem[];

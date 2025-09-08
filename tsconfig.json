@@ -26,6 +26,6 @@
     "nextjs/src/**/*",
     "packages/**/*",
     "tests/**/*"
-, "packages/.eslintrc.cjs"  ],
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -6,12 +6,8 @@ import { useChangePassword } from "@/lib/client/hooks/auth/useChangePassword";
 import { toast } from "react-toastify";
 
 // ---- Mocks ----
-jest.mock("next-auth/react", () => ({
-  useSession: () => ({
-    data: null,
-    status: "unauthenticated",
-    update: jest.fn().mockResolvedValue(undefined),
-  }),
+jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
+  useAuth: jest.fn(() => ({ status: "authenticated", token: "fake-token", refresh: jest.fn() })),
 }));
 
 jest.mock("next/navigation", () => ({
