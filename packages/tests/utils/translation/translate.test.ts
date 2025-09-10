@@ -2,14 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { translationHelper } from "@packages/utils/translation/translate";
+import { translationHelper } from "@traduxo/packages/utils/translation/translate";
 import { TextEncoder, TextDecoder } from "util";
-import { blurActiveInput } from "@packages/utils/ui/blurActiveInput";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 
 (globalThis as any).TextEncoder = TextEncoder;
 (globalThis as any).TextDecoder = TextDecoder;
 
-jest.mock("@packages/utils/ui/blurActiveInput");
+jest.mock("@traduxo/packages/utils/ui/blurActiveInput");
 
 describe("translationHelper", () => {
   const setInputText = jest.fn();

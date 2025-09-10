@@ -1,8 +1,9 @@
 
 import { getPoolPrompt } from "../geminiPrompts";
 import { cleanGeminiResponse } from "../formatting/cleanGeminiResponse";
-import { SetState } from "@packages/types/reactSetState";
-import { SuggestionResult } from "@packages/types/suggestionResult";
+import { SetState } from "@traduxo/packages/types/reactSetState";
+import { SuggestionResult } from "@traduxo/packages/types/suggestionResult";
+import { API_BASE_URL } from "../config/apiBase";
 
 type PoolHelperArgs = {
   suggestionLang: string;
@@ -25,7 +26,7 @@ export async function fetchExpressionPoolHelper({
   try {
     const poolPrompt = promptGetter(suggestionLang);
 
-    const res = await fetcher("/api/gemini/complete", {
+    const res = await fetcher(`${API_BASE_URL}/api/gemini/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: poolPrompt }),

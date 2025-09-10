@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { TranslationProvider } from '@/context/TranslationContext';
 import { LanguageProvider } from "@/context/LanguageContext";
-import { AuthProvider } from "@traduxo/packages/contexts/AuthContext";
+import { AuthProvider } from '@traduxo/packages/contexts/AuthContext';
 import { ThemeProvider } from "next-themes";
 import { ToastContainer } from "react-toastify";
 

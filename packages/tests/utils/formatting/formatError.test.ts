@@ -1,4 +1,4 @@
-import { formatError } from "@packages/utils/formatting/formatError";
+import { formatError } from "@traduxo/packages/utils/formatting/formatError";
 
 describe("formatError", () => {
   // ------ Test 1️⃣ ------

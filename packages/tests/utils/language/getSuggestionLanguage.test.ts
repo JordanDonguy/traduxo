@@ -1,4 +1,4 @@
-import getSuggestionLanguage from "@packages/utils/language/getSuggestionLanguage";
+import getSuggestionLanguage from "@traduxo/packages/utils/language/getSuggestionLanguage";
 
 describe("getSuggestionLanguage", () => {
   // ------ Test 1️⃣ ------

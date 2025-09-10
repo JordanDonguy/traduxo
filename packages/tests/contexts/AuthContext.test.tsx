@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { renderHook, waitFor } from "@testing-library/react";
-import { useAuth, AuthProvider } from "@packages/contexts/AuthContext";
+import { useAuth, AuthProvider } from "@traduxo/packages/contexts/AuthContext";
 import { getToken } from "@traduxo/packages/utils/auth";
 
 // ---- Mocks ----

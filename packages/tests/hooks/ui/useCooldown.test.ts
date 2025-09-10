@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act } from "@testing-library/react";
-import { useCooldown } from "@packages/hooks/ui/useCooldown";
+import { useCooldown } from "@traduxo/packages/hooks/ui/useCooldown";
 
 describe("useCooldown hook", () => {
   beforeAll(() => {

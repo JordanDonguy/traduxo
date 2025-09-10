@@ -1,4 +1,4 @@
-import { replaceQuotesWithBold } from "@packages/utils/formatting/replaceQuotesWithBold";
+import { replaceQuotesWithBold } from "@traduxo/packages/utils/formatting/replaceQuotesWithBold";
 
 describe("replaceQuotesWithBold", () => {
   // ------ Test 1️⃣ ------

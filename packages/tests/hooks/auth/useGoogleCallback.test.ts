@@ -3,7 +3,7 @@
  */
 
 import { renderHook, waitFor } from "@testing-library/react";
-import { useGoogleCallback } from "@packages/hooks/auth/useGoogleCallback";
+import { useGoogleCallback } from "@traduxo/packages/hooks/auth/useGoogleCallback";
 import * as authUtils from "@traduxo/packages/utils/auth";
 
 // ---- Mocks ----

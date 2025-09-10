@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { clearToken } from "@packages/utils/auth";
+import { clearToken } from "@traduxo/packages/utils/auth";
 
 beforeAll(() => {
   let store: Record<string, string> = {};

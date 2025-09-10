@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import { refreshToken } from "@packages/utils/auth/refreshToken.web";
-import { API_BASE_URL } from "@packages/utils/config/apiBase";
+import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.web";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 beforeAll(() => {
   // Polyfill localStorage

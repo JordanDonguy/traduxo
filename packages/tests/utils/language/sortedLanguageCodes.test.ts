@@ -1,5 +1,5 @@
 import ISO6391 from "iso-639-1";
-import { getSortedLanguageCodes } from "@packages/utils/language/sortedLanguageCodes";
+import { getSortedLanguageCodes } from "@traduxo/packages/utils/language/sortedLanguageCodes";
 
 jest.mock("iso-639-1", () => ({
   getAllCodes: jest.fn(),

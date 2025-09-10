@@ -1,8 +1,9 @@
 import { getTranslationPrompt } from "../geminiPrompts";
 import { TranslationItem } from "@traduxo/packages/types/translation";
-import { blurActiveInput } from "@packages/utils/ui/blurActiveInput";
-import { SetState } from "@packages/types/reactSetState";
-import { decodeStream } from "@packages/utils/formatting/decodeStream";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
+import { SetState } from "@traduxo/packages/types/reactSetState";
+import { decodeStream } from "@traduxo/packages/utils/formatting/decodeStream";
+import { API_BASE_URL } from "../config/apiBase";
 
 type TranslateHelperArgs = {
   inputText: string;
@@ -60,7 +61,7 @@ export async function translationHelper({
   if (inputLang !== "auto") setInputTextLang(inputLang);
 
   try {
-    const res = await fetcher("/api/gemini/stream", {
+    const res = await fetcher(`${API_BASE_URL}/api/gemini/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, mode: "translation" }),

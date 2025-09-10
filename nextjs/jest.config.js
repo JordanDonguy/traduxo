@@ -3,6 +3,7 @@ module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/tests/unit/**/*.test.ts?(x)'],
   moduleNameMapper: {
+    "^@traduxo/packages/(.*)$": "<rootDir>/../packages/$1",
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   resetModules: false,
@@ -17,7 +18,7 @@ module.exports = {
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
-    transform: {
+  transform: {
     "^.+\\.(ts|tsx)$": ["ts-jest", {
       tsconfig: "tsconfig.jest.json",
     }],

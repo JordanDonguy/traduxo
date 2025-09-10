@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { renderHook, act } from "@testing-library/react";
-import { useLanguageSwitch } from "@packages/hooks/translation/useLanguageSwitch";
+import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
 
 describe("useLanguageSwitch", () => {
   // ---- Use fake timers to simulate the 80ms animation timeout ----

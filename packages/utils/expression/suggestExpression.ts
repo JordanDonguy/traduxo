@@ -2,7 +2,8 @@ import { getSuggestionPrompt } from "../geminiPrompts";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { blurActiveInput } from "../ui/blurActiveInput";
 import { decodeStream } from "../formatting/decodeStream";
-import { SetState } from "@packages/types/reactSetState";
+import { SetState } from "@traduxo/packages/types/reactSetState";
+import { API_BASE_URL } from "../config/apiBase";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
@@ -54,7 +55,7 @@ export async function suggestExpressionHelper({
   const prompt = promptGetter({ detectedLang, outputLang });
 
   try {
-    const res = await fetcher("/api/gemini/stream", {
+    const res = await fetcher(`${API_BASE_URL}/api/gemini/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, mode: "suggestion" }),

@@ -1,4 +1,4 @@
-import { Platform } from "@packages/types/platform";
+import { Platform } from "@traduxo/packages/types/platform";
 
 /**
  * Blur the active input element (web) or dismiss keyboard (React Native)

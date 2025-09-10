@@ -1,22 +1,31 @@
 import { Translation } from "@traduxo/packages/types/translation";
+import { API_BASE_URL } from "../config/apiBase";
 
 type FetchHistoryDeps = {
   status: string;
   setTranslationHistory: (data: Translation[]) => void;
   fetchFn?: typeof fetch; // for testing/mock
   url?: string; // default API URL
+  token?: string | null
 };
 
 export async function fetchHistory({
   status,
   setTranslationHistory,
   fetchFn = fetch,
-  url = "/api/history",
+  url = `${API_BASE_URL}/api/history`,
+  token = null
 }: FetchHistoryDeps) {
   if (status === "loading") return;
 
   try {
-    const res = await fetchFn(url);
+    const res = await fetchFn(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
 
     if (res.status === 204) {
       setTranslationHistory([]);

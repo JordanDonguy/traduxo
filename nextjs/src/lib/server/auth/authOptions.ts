@@ -7,7 +7,6 @@ import { authEnvSchema } from "@/lib/shared/schemas/auth/authEnv.schemas";
 import { handleGoogleSignIn } from "./handleGoogleSignIn";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
-import { User, Session } from "next-auth";
 
 type EnvVars = {
   GOOGLE_CLIENT_ID: string;
@@ -16,10 +15,6 @@ type EnvVars = {
 };
 
 const parsedEnv = authEnvSchema.parse(process.env);
-
-interface UserWithRefreshToken extends User {
-  refreshToken?: string;
-}
 
 export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
   return {
@@ -92,8 +87,7 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
           });
 
           // Attach refresh token to user object so JWT callback can include it
-          const userWithToken = user as UserWithRefreshToken;
-          userWithToken.refreshToken = refreshToken;
+          user.refreshToken = refreshToken;
         }
         return true; // Allow sign-in for other providers (e.g. credentials)
       },
@@ -101,7 +95,7 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
       // Customize session object returned to client
       async session({ session }) {
         // Ensure session.user always exists
-        session.user = session.user || {} as Partial<Session["user"]>;
+        session.user = session.user || {};
 
         if (session.user.email) {
           const data = await prisma.user.findUnique({
@@ -122,9 +116,8 @@ export function createAuthOptions(env: EnvVars = parsedEnv): NextAuthOptions {
       async jwt({ token, user }) {
         if (user) {
           token.sub = user.id;
-          // Cast user to include refreshToken
-          const u = user as UserWithRefreshToken;
-          if (u.refreshToken) token.refreshToken = u.refreshToken
+          token.systemLang = user.systemLang;
+          token.refreshToken = user.refreshToken;
         }
         return token;
       },

@@ -1,16 +1,16 @@
 /**
  * @jest-environment jsdom
  */
-import { suggestExpressionHelper } from "@packages/utils/expression/suggestExpression";
+import { suggestExpressionHelper } from "@traduxo/packages/utils/expression/suggestExpression";
 import { TextEncoder, TextDecoder } from "util";
-import { blurActiveInput } from "@packages/utils/ui/blurActiveInput";
-import { TranslationItem } from "@packages/types/translation";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 (globalThis as unknown as { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
 (globalThis as unknown as { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder;
 
 // ---- Mocks ----
-jest.mock("@packages/utils/ui/blurActiveInput");
+jest.mock("@traduxo/packages/utils/ui/blurActiveInput");
 
 const fetchMock = jest.fn();
 const setTranslatedText = jest.fn();

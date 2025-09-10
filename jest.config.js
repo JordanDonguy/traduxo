@@ -11,6 +11,7 @@ module.exports = {
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/nextjs/src/$1',
+    "^@traduxo/packages/(.*)$": "<rootDir>/packages/$1"
   },
   resetModules: false,
   setupFilesAfterEnv: [

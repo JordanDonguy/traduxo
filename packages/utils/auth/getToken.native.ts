@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "@packages/utils/auth/refreshToken.native";
+import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.native";
 
 export type JwtPayload = {
   exp?: number;

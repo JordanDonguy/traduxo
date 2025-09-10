@@ -1,4 +1,4 @@
-import { decodeStream } from "@packages/utils/formatting/decodeStream";
+import { decodeStream } from "@traduxo/packages/utils/formatting/decodeStream";
 
 describe("decodeStream", () => {
   // ------ Test 1️⃣ ------

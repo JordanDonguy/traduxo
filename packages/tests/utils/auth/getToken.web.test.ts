@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 
-import { getToken } from "@packages/utils/auth";
-import * as refreshTokenModule from "@packages/utils/auth";
+import { getToken } from "@traduxo/packages/utils/auth";
+import * as refreshTokenModule from "@traduxo/packages/utils/auth";
 import { jwtDecode } from "jwt-decode";
 
-jest.mock("@packages/utils/auth/refreshToken.web");
+jest.mock("@traduxo/packages/utils/auth/refreshToken.web");
 jest.mock("jwt-decode");
 
 const mockJwtDecode = jwtDecode as unknown as jest.Mock;

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { useGoogleLinking } from "@packages/hooks/auth/useGoogleLinking";
+import { useGoogleLinking } from "@traduxo/packages/hooks/auth/useGoogleLinking";
 import * as authUtils from "@traduxo/packages/utils/auth";
 
 describe("useGoogleLinking", () => {

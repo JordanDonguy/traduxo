@@ -1,4 +1,4 @@
-import { fetchExpressionPoolHelper } from "@packages/utils/expression/fetchExpressionPool";
+import { fetchExpressionPoolHelper } from "@traduxo/packages/utils/expression/fetchExpressionPool";
 
 describe("fetchExpressionPoolHelper", () => {
   let setExpressionPool: jest.Mock;

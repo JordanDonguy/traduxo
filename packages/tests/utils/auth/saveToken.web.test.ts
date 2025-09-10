@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { saveToken } from "@packages/utils/auth";
+import { saveToken } from "@traduxo/packages/utils/auth";
 
 beforeAll(() => {
   let store: Record<string, string> = {};

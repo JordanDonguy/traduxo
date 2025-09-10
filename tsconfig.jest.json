@@ -5,6 +5,7 @@
     "module": "commonjs", // Ensure Jest can handle imports
     "baseUrl": ".",
     "paths": {
+      "@traduxo/packages/*": ["../packages/*"],
       "@/*": [
         "src/*"
       ]

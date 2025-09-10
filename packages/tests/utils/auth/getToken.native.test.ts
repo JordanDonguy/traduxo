@@ -1,6 +1,6 @@
-import { getToken } from "@packages/utils/auth/getToken.native";
+import { getToken } from "@traduxo/packages/utils/auth/getToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { refreshToken } from "@packages/utils/auth/refreshToken.native";
+import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.native";
 import { jwtDecode } from "jwt-decode";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -11,7 +11,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   },
 }));
 
-jest.mock("@packages/utils/auth/refreshToken.native", () => ({
+jest.mock("@traduxo/packages/utils/auth/refreshToken.native", () => ({
   refreshToken: jest.fn(),
 }));
 

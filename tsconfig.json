@@ -18,7 +18,7 @@
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./nextjs/src/*"],
-      "@packages/*": ["./packages/*"]
+      "@traduxo/packages/*": ["./packages/*"]
     }
   },
   "include": [

@@ -1,4 +1,4 @@
-import { clearToken } from "@packages/utils/auth/clearToken.native";
+import { clearToken } from "@traduxo/packages/utils/auth/clearToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
