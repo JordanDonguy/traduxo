@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
@@ -52,19 +51,21 @@ export function useAuthHandlers() {
     }
   };
 
+  // ---- handleLogout ----
   const handleLogout = async (
+    token: string | undefined,
     refresh: () => Promise<void>,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
   ) => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) return false;
+      if (!refreshToken || !token) return false;
 
       // Call logout API
       const res = await fetch("/api/auth/jwt-logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
+        body: JSON.stringify({ refreshToken, accessToken: token }),
       });
 
       if (!res.ok) return false;
@@ -84,15 +85,23 @@ export function useAuthHandlers() {
   }
 
   // ---- handleGoogleButton ----
-  const handleGoogleButton = async () => {
-    try {
-      // ---- step 1: start OAuth sign in ----
-      await signIn("google", { callbackUrl: "/?login=true" });
-    } catch (err) {
-      // ---- step 2: log error if sign in fails ----
-      console.error("Google sign-in failed:", err);
-    }
-  };
+  const handleGoogleButton = async (redirectUri?: string) => {
+    if (typeof window === "undefined") return;
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
+    const redirect = encodeURIComponent(redirectUri || `${process.env.NEXT_PUBLIC_APP_URL}/auth/google/callback`);
+    const scope = encodeURIComponent("openid email profile");
+
+    const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `response_type=code&` +
+      `client_id=${clientId}&` +
+      `redirect_uri=${redirect}&` +
+      `scope=${scope}&` +
+      `access_type=offline&prompt=consent`;
+
+    // Redirect user to Google login page
+    window.location.href = googleUrl;
+  }
 
   // ---- handleSignup ----
   const handleSignup = async (

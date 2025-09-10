@@ -3,14 +3,15 @@ import type { PrismaClient } from "@prisma/client/extension";
 import bcrypt from "bcrypt";
 import sanitizeHtml from "sanitize-html";
 import { loginSchema } from "@/lib/shared/schemas/auth/login.schemas";
+import { generateToken } from "@/lib/server/auth/generateToken";
 
 export async function linkGoogle(
-    req: Request,
-    {
-      prismaClient,
-    }: {
-      prismaClient: Partial<PrismaClient>;
-    }) {
+  req: Request,
+  {
+    prismaClient,
+  }: {
+    prismaClient: Partial<PrismaClient>;
+  }) {
   try {
     const body = await req.json();
 
@@ -59,7 +60,7 @@ export async function linkGoogle(
     }
 
     // 5. Add Google provider
-    await prismaClient.user.update({
+    const updatedUser = await prismaClient.user.update({
       where: { email },
       data: {
         providers: {
@@ -69,10 +70,18 @@ export async function linkGoogle(
       },
     });
 
-    return NextResponse.json(
-      { message: "Google account linked successfully" },
-      { status: 200 }
-    );
+    // 6. Generate JWT tokens
+    const tokens = await generateToken({
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      language: updatedUser.systemLang || null,
+      providers: updatedUser.providers,
+      accessTokenExpiresIn: "1h",
+      refreshTokenExpiryDays: 30,
+    });
+
+    // 7. Return tokens
+    return NextResponse.json(tokens, { status: 200 });
   } catch (err) {
     console.error("Error linking Google account:", err);
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { linkGoogle } from "@/lib/server/handlers/auth/linkGoogle";
 import { mockPrisma } from "@/tests/jest.setup";
 import bcrypt from "bcrypt";
+import * as tokenModule from "@/lib/server/auth/generateToken";
 
 jest.mock("bcrypt");
 
@@ -8,10 +9,6 @@ describe("linkGoogle handler", () => {
   const mockReq = (body: unknown) => ({
     json: async () => body,
   } as unknown as Request);
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
   // ------ Test 1️⃣ ------
   it("returns 400 if input fails Zod validation", async () => {
@@ -72,18 +69,32 @@ describe("linkGoogle handler", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("adds Google provider and returns 200", async () => {
+  it("adds Google provider and returns 200 with tokens", async () => {
     const recentDate = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user1",
       email: "user@example.com",
       password: "hashed-password",
       google_linking: recentDate,
+      providers: [],
     });
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    mockPrisma.user.update.mockResolvedValue({});
+    mockPrisma.user.update.mockResolvedValue({
+      id: "user1",
+      email: "user@example.com",
+      providers: ["Google"],
+      systemLang: "en",
+    });
+
+    jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
+      accessToken: "jwt-access",
+      refreshToken: "new-refresh",
+      expiresIn: 3600,
+    });
 
     const req = mockReq({ email: "user@example.com", password: "correctpass" });
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
+    const json = await response.json();
 
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { email: "user@example.com" },
@@ -94,9 +105,11 @@ describe("linkGoogle handler", () => {
     });
 
     expect(response.status).toBe(200);
-    const json = await response.json();
-    expect(json.message).toBe("Google account linked successfully");
+    expect(json.accessToken).toBe("jwt-access");
+    expect(json.refreshToken).toBe("new-refresh");
+    expect(json.expiresIn).toBe(3600);
   });
+
 
   // ------ Test 6️⃣ ------
   it("returns 500 if unexpected error occurs", async () => {

@@ -1,59 +1,21 @@
-"use client"
+"use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useApp } from "@/context/AppContext";
+import { useGoogleLinking } from "@traduxo/packages/hooks/auth/useGoogleLinking"
 import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import { Mail, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const { error, setError } = useApp();
-
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  async function handleSubmit() {
-    setError("");
-    setIsLoading(true);
-
-    if (!email.length || !password.length) {
-      setError("Please enter both email and password.");
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/auth/google-linking", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong... Please try again later");
-        setIsLoading(false);
-        return;
-      }
-
-      // Sign in with credentials after linking
-      await signIn("credentials", {
-        email,
-        password,
-        callbackUrl: "/?login=true",
-      });
-      setIsLoading(false);
-    } catch (error) {
-      console.log(error);
-      setError("Something went wrong... Please try again later");
-      setIsLoading(false);
-    }
-  }
+  const router = useRouter();
+  const { isLoading, error, handleSubmit } = useGoogleLinking({ navigateFn: router.push });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)]">
 
-       <AppHeaderSuspenseWrapper />
+      <AppHeaderSuspenseWrapper />
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
@@ -75,7 +37,7 @@ export default function Page() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            handleSubmit(email, password);
           }}
           className="flex flex-col w-full items-center justify-center gap-4"
         >

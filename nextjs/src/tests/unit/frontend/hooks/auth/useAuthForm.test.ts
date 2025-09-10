@@ -11,7 +11,7 @@ jest.mock("next-auth/react", () => ({
 }));
 
 jest.mock("next/navigation", () => ({
-   useRouter: jest.fn(),
+  useRouter: jest.fn(),
 }));
 
 jest.mock("react-toastify", () => ({
@@ -70,6 +70,108 @@ describe("useAuthHandlers split tests", () => {
       expect(refresh).toHaveBeenCalled();
       expect(pushMock).toHaveBeenCalledWith("/?login=true");
     });
+
+    it("sets error when response is not ok", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "Invalid credentials from server" }),
+      });
+
+      await act(async () => {
+        await result.current.handleLogin(
+          "a@b.com",
+          "12345678",
+          setError,
+          setIsLoading,
+          jest.fn()
+        );
+      });
+
+      expect(setError).toHaveBeenCalledWith("Invalid credentials from server");
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+      expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it("handles network error in catch block", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+
+      (global.fetch as jest.Mock).mockRejectedValue(new Error("network down"));
+
+      await act(async () => {
+        await result.current.handleLogin(
+          "a@b.com",
+          "12345678",
+          setError,
+          setIsLoading,
+          jest.fn()
+        );
+      });
+
+      expect(setError).toHaveBeenCalledWith(
+        "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
+      );
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+      expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it("handles network error in catch block", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+
+      (global.fetch as jest.Mock).mockRejectedValue(new Error("network down"));
+
+      await act(async () => {
+        await result.current.handleLogin(
+          "a@b.com",
+          "12345678",
+          setError,
+          setIsLoading,
+          jest.fn()
+        );
+      });
+
+      expect(setError).toHaveBeenCalledWith(
+        "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
+      );
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+      expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it("handles refresh() failure in catch block", async () => {
+      const { result } = renderHook(() => useAuthHandlers());
+      const setError = jest.fn();
+      const setIsLoading = jest.fn();
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ accessToken: "a", refreshToken: "b" }),
+      });
+
+      const refresh = jest.fn().mockRejectedValue(new Error("refresh failed"));
+
+      await act(async () => {
+        await result.current.handleLogin(
+          "a@b.com",
+          "12345678",
+          setError,
+          setIsLoading,
+          refresh
+        );
+      });
+
+      expect(setError).toHaveBeenCalledWith(
+        "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
+      );
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+      expect(pushMock).not.toHaveBeenCalled();
+    });
   });
 
   // -------------------- handleLogout --------------------
@@ -79,7 +181,7 @@ describe("useAuthHandlers split tests", () => {
       const setIsLoading = jest.fn();
       const refresh = jest.fn();
 
-      const res = await result.current.handleLogout(refresh, setIsLoading);
+      const res = await result.current.handleLogout("fake-token", refresh, setIsLoading);
       expect(res).toBe(false);
     });
 
@@ -92,13 +194,51 @@ describe("useAuthHandlers split tests", () => {
       (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
 
       await act(async () => {
-        await result.current.handleLogout(refresh, setIsLoading);
+        await result.current.handleLogout("fake-token", refresh, setIsLoading);
       });
 
       expect(localStorage.getItem("refreshToken")).toBeNull();
       expect(localStorage.getItem("accessToken")).toBeNull();
       expect(refresh).toHaveBeenCalled();
       expect(pushMock).toHaveBeenCalledWith("/?logout=true");
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
+
+    it("returns false if response not ok", async () => {
+      localStorage.setItem("refreshToken", "token123");
+      const { result } = renderHook(() => useAuthHandlers());
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
+
+      (global.fetch as jest.Mock).mockResolvedValue({ ok: false });
+
+      const res = await act(async () =>
+        result.current.handleLogout("fake-token", refresh, setIsLoading)
+      );
+
+      expect(res).toBe(false);
+      expect(localStorage.getItem("refreshToken")).toBe("token123"); // still there
+      expect(pushMock).not.toHaveBeenCalled();
+      expect(refresh).not.toHaveBeenCalled();
+      expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
+
+    it("handles errors in catch block", async () => {
+      localStorage.setItem("refreshToken", "token123");
+      const { result } = renderHook(() => useAuthHandlers());
+      const setIsLoading = jest.fn();
+      const refresh = jest.fn();
+
+      (global.fetch as jest.Mock).mockRejectedValue(new Error("network down"));
+
+      const res = await act(async () =>
+        result.current.handleLogout("fake-token", refresh, setIsLoading)
+      );
+
+      expect(res).toBe(false);
+      expect(localStorage.getItem("refreshToken")).toBe("token123"); // not cleared
+      expect(refresh).not.toHaveBeenCalled();
+      expect(pushMock).not.toHaveBeenCalled();
       expect(setIsLoading).toHaveBeenCalledWith(false);
     });
   });
