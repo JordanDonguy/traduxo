@@ -31,15 +31,15 @@ export function useFavoriteToggle({
     setIsFavorite,
   } = useTranslationContext();
 
+
+  // ---- Step 2: Local loading state ----
+  const [isFavLoading, setIsFavLoading] = useState(false);
   // --- Always call hooks unconditionally ---
   const defaultSession = useAuth();
 
   // --- Use injected values for testing if provided ---
   const effectiveSession = session ?? defaultSession;
-  const { status } = effectiveSession;
-
-  // ---- Step 2: Local loading state ----
-  const [isFavLoading, setIsFavLoading] = useState(false);
+  const { status, token } = effectiveSession;
 
   // ---- Step 3: Toggle favorite handler ----
   async function handleFavorite() {
@@ -49,13 +49,14 @@ export function useFavoriteToggle({
 
     try {
       if (status !== "authenticated") {
-        toaster.error("You need to be logged in to add translations to favorites.")
+        toaster.error("You need to be logged in to add translations to favorites.");
+        setIsFavLoading(false);
         return;
       }
 
       if (isFavorite) {
         // ---- Step 3a: Delete favorite ----
-        await deleteFromFavoriteFn(translationId, setTranslationId, setIsFavorite);
+        await deleteFromFavoriteFn(translationId, setTranslationId, setIsFavorite, token);
       } else {
         // ---- Step 3b: Add favorite ----
         const res = await addToFavoriteFn(
@@ -63,7 +64,8 @@ export function useFavoriteToggle({
           inputTextLang,
           translatedTextLang,
           setTranslationId,
-          setIsFavorite
+          setIsFavorite,
+          token
         );
         if (res) toaster.error(res); // API returned an error message
       }
@@ -76,6 +78,5 @@ export function useFavoriteToggle({
     }
   }
 
-  // ---- Step 4: Expose API ----
   return { handleFavorite, isFavLoading };
 }

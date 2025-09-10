@@ -44,5 +44,6 @@ export async function authorizeUser(credentials: Record<string, string> | undefi
       throw new Error("InvalidInput");
     }
     throw error;
+    return null
   }
 }

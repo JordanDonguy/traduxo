@@ -97,7 +97,7 @@ describe("useFavoriteToggle", () => {
     });
 
     expect(mockAdd).toHaveBeenCalledWith(
-      "Hello", "en", "fr", mockSetTranslationId, mockSetIsFavorite
+      "Hello", "en", "fr", mockSetTranslationId, mockSetIsFavorite, "fake-token"
     );
     expect(mockDelete).not.toHaveBeenCalled();
   });
@@ -118,7 +118,7 @@ describe("useFavoriteToggle", () => {
       await result.current.handleFavorite();
     });
 
-    expect(mockDelete).toHaveBeenCalledWith("123", mockSetTranslationId, mockSetIsFavorite);
+    expect(mockDelete).toHaveBeenCalledWith("123", mockSetTranslationId, mockSetIsFavorite, "fake-token");
     expect(mockAdd).not.toHaveBeenCalled();
   });
 

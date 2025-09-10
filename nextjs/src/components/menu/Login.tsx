@@ -114,11 +114,11 @@ export default function Login({ showMenu }: LoginProps) {
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
 
-        {/* Google OAuth button */}
+        {/* -------------- Google OAuth button -------------- */}
         <button
           id="google-btn"
           type="button"
-          onClick={handleGoogleButton}
+          onClick={() => handleGoogleButton()}
           className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--border)] bg-[var(--menu)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
         >
           <Image

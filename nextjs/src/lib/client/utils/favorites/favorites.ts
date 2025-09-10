@@ -8,7 +8,7 @@ export async function addToFavorite(
   outputLang: string,
   setTranslationId: SetState<string | undefined>,
   setIsFavorite: SetState<boolean>,
-  // Injected dependencies for testing
+  token?: string,
   fetcher: typeof fetch = fetch
 ) {
   try {
@@ -16,7 +16,10 @@ export async function addToFavorite(
 
     const res = await fetcher("/api/favorite", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ translations, inputLang, outputLang }),
     });
 
@@ -41,6 +44,7 @@ export async function deleteFromFavorite(
   translationId: string | undefined,
   setTranslationId: SetState<string | undefined>,
   setIsFavorite: SetState<boolean>,
+  token?: string,
   fetcher: typeof fetch = fetch
 ) {
   if (!translationId) return;
@@ -48,7 +52,10 @@ export async function deleteFromFavorite(
   try {
     const res = await fetcher("/api/favorite", {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify({ id: translationId }),
     });
 

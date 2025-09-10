@@ -1,8 +1,16 @@
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites/favorites";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 describe("addToFavorite", () => {
   let setTranslationId: jest.Mock;
   let setIsFavorite: jest.Mock;
+  const mockTranslation: TranslationItem[] = [
+    { type: "expression", value: "Hello" },
+    { type: "main_translation", value: "Bonjour" },
+    { type: "alternative", value: "Salut" },
+    { type: "alternative", value: "Bonsoir" },
+    { type: "alternative", value: "Coucou" },
+  ]
 
   beforeEach(() => {
     setTranslationId = jest.fn();
@@ -19,12 +27,13 @@ describe("addToFavorite", () => {
     });
 
     await addToFavorite(
-      ["Hello"],
+      mockTranslation,
       "en",
       "fr",
       setTranslationId,
       setIsFavorite,
-      fetcher
+      "fake-token",
+      fetcher,
     );
 
     // Favorite is set and translation ID is saved
@@ -40,12 +49,13 @@ describe("addToFavorite", () => {
     });
 
     const result = await addToFavorite(
-      ["Hello"],
+      mockTranslation,
       "en",
       "fr",
       setTranslationId,
       setIsFavorite,
-      fetcher
+      "fake-token",
+      fetcher,
     );
 
     // Should reset favorite and return login message
@@ -62,12 +72,13 @@ describe("addToFavorite", () => {
     });
 
     await addToFavorite(
-      ["Hello"],
+      mockTranslation,
       "en",
       "fr",
       setTranslationId,
       setIsFavorite,
-      fetcher
+      "fake-token",
+      fetcher,
     );
 
     // Should reset favorite but not set translation ID
@@ -92,6 +103,7 @@ describe("deleteFromFavorite", () => {
       undefined,
       setTranslationId,
       setIsFavorite,
+      "fake-token",
       fetcher
     );
 
@@ -108,7 +120,7 @@ describe("deleteFromFavorite", () => {
       status: 200,
     });
 
-    await deleteFromFavorite("abc123", setTranslationId, setIsFavorite, fetcher);
+    await deleteFromFavorite("abc123", setTranslationId, setIsFavorite, "fake-token", fetcher);
 
     // State should be cleared
     expect(setTranslationId).toHaveBeenCalledWith(undefined);
@@ -117,13 +129,13 @@ describe("deleteFromFavorite", () => {
 
   // ------ Test 6️⃣ ------
   it("logs error on failure", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     const fetcher = jest.fn().mockResolvedValue({
       ok: false,
       status: 500,
     });
 
-    await deleteFromFavorite("abc123", setTranslationId, setIsFavorite, fetcher);
+    await deleteFromFavorite("abc123", setTranslationId, setIsFavorite, "fake-token", fetcher);
 
     // Error should be logged and state not mutated
     expect(consoleSpy).toHaveBeenCalled();

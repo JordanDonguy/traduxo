@@ -17,7 +17,6 @@ describe("ErrorSection component", () => {
   const setShowLoginForm = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
     (useApp as jest.Mock).mockReturnValue({ setShowLoginForm });
   });
 
