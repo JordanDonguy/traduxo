@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "./refreshToken";
+import { refreshToken } from "@packages/utils/auth/refreshToken.native";
 
 export type JwtPayload = {
   exp?: number;
@@ -27,7 +27,7 @@ export async function getToken(): Promise<{ token: string; language?: string; pr
     const refresh = await AsyncStorage.getItem("refreshToken");
     if (!refresh) return null;
 
-    const newToken = await refreshToken(refresh);
+    const newToken = await refreshToken(refresh, token);
     if (!newToken) return null;
 
     await AsyncStorage.setItem("accessToken", newToken);

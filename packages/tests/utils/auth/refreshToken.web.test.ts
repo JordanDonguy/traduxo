@@ -26,6 +26,7 @@ beforeEach(() => {
 
 describe("refreshToken.web", () => {
   const oldRefresh = "old.refresh";
+  const oldAccess = "old.access";
 
   // ------ Test 1️⃣ ------
   it("returns accessToken and saves new refresh token if successful", async () => {
@@ -37,12 +38,12 @@ describe("refreshToken.web", () => {
       json: async () => ({ accessToken: newAccess, refreshToken: newRefresh }),
     });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
 
-    expect(global.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/jwt-refresh`, {
+    expect(global.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/auth/jwt-refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: oldRefresh }),
+      body: JSON.stringify({ refreshToken: oldRefresh, accessToken: oldAccess }),
     });
 
     expect(localStorage.getItem("refreshToken")).toBe(newRefresh);
@@ -53,7 +54,7 @@ describe("refreshToken.web", () => {
   it("returns null if response not ok", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 
@@ -64,7 +65,7 @@ describe("refreshToken.web", () => {
       json: async () => ({ accessToken: null, refreshToken: null }),
     });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 
@@ -72,7 +73,7 @@ describe("refreshToken.web", () => {
   it("returns null if fetch throws", async () => {
     (global.fetch as jest.Mock).mockRejectedValue(new Error("network error"));
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 });

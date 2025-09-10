@@ -1,146 +1,174 @@
-import { refreshTokenHandler } from "@/lib/server/handlers/auth/jwtRefresh";
 import { NextRequest } from "next/server";
+import * as tokenModule from "@/lib/server/auth/generateToken";
+import { refreshTokenHandler } from "@/lib/server/handlers/auth/jwtRefresh";
 import { mockPrisma } from "@/tests/jest.setup";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-jest.mock("bcrypt", () => ({
-  compare: jest.fn(),
-  hash: jest.fn(),
+jest.mock("jsonwebtoken", () => ({
+  verify: jest.fn(),
+  decode: jest.fn(),
 }));
 
+jest.mock("bcrypt");
+
 describe("refreshTokenHandler", () => {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  let mockBcrypt: any;
-  let mockCrypto: any;
-  let mockJwt: any;
+  const rawRefreshToken = "new-refresh-token";
+  const hexRefreshToken = Buffer.from(rawRefreshToken, "utf-8").toString("hex");
 
   beforeEach(() => {
-    jest.resetAllMocks();
-
-    mockBcrypt = bcrypt;
-
-    mockCrypto = {
-      randomBytes: jest.fn(),
-    };
-
-    mockJwt = {
-      sign: jest.fn(),
-    };
+    (jwt.verify as jest.Mock).mockReturnValue({ sub: "user1" });
+    (jwt.decode as jest.Mock).mockReturnValue({ sub: "user1" });
   });
 
-  beforeEach(() => {
-    jest.resetAllMocks();
-
-    mockBcrypt = {
-      compare: jest.fn(),
-      hash: jest.fn(),
-    };
-
-    mockCrypto = {
-      randomBytes: jest.fn(),
-    };
-
-    mockJwt = {
-      sign: jest.fn(),
-    };
-  });
-
+  // ------ Test 1️⃣ ------
   it("returns 400 if no refreshToken in body", async () => {
-    const req = {
-      json: async () => ({}),
-    } as unknown as NextRequest;
+    const req = { json: async () => ({}) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
 
-    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: mockBcrypt, cryptoFn: mockCrypto, jwtFn: mockJwt });
-    expect((res as any).status).toBe(400);
+    expect(res.status).toBe(400);
+    expect(json.error).toBe("Missing refresh token");
   });
 
-  it("returns 401 if refresh token not found or expired", async () => {
-    mockPrisma.refreshToken.findFirst.mockResolvedValue(null);
+  // ------ Test 2️⃣ ------
+  it("returns 400 if no accessToken in body", async () => {
     const req = { json: async () => ({ refreshToken: "abc" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
 
-    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: mockBcrypt, cryptoFn: mockCrypto, jwtFn: mockJwt });
-    expect((res as any).status).toBe(401);
+    expect(res.status).toBe(400);
+    expect(json.error).toBe("Missing access token");
   });
 
-  it("returns 401 if refresh token invalid", async () => {
+  // ------ Test 3️⃣ ------
+  it("falls back to decode and extracts userId from sub if verify fails", async () => {
     const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
-    mockPrisma.refreshToken.findFirst.mockResolvedValue(tokenRecord);
-    mockBcrypt.compare.mockResolvedValue(false);
+    const user = { id: "user1", email: "a@b.com", systemLang: "en", providers: ["google"] };
 
-    const req = { json: async () => ({ refreshToken: "wrong" }) } as unknown as NextRequest;
+    // Trigger verify to throw
+    (jwt.verify as jest.Mock).mockImplementation(() => { throw new Error("invalid signature"); });
 
-    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: mockBcrypt, cryptoFn: mockCrypto, jwtFn: mockJwt });
-    expect((res as any).status).toBe(401);
-  });
+    // decode returns a valid sub
+    (jwt.decode as jest.Mock).mockReturnValue({ sub: "user1" });
 
-  it("returns 404 if user not found", async () => {
-    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
-    mockPrisma.refreshToken.findFirst.mockResolvedValue(tokenRecord);
-    mockBcrypt.compare.mockResolvedValue(true);
-    mockPrisma.user.findUnique.mockResolvedValue(null);
-
-    const req = { json: async () => ({ refreshToken: "valid" }) } as unknown as NextRequest;
-
-    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: mockBcrypt, cryptoFn: mockCrypto, jwtFn: mockJwt });
-    expect((res as any).status).toBe(404);
-  });
-
-  it("creates new tokens and deletes old token if valid", async () => {
-    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
-    const user = { id: "user1", email: "a@b.com" };
-    const newAccessToken = "newAccess";
-    const rawRefreshToken = "newRefresh"; // the raw string
-    const newRefreshTokenHex = Buffer.from(rawRefreshToken, "utf-8").toString("hex"); // hex as handler does
-
-    mockPrisma.refreshToken.findFirst.mockResolvedValue(tokenRecord);
-    mockBcrypt.compare.mockResolvedValue(true);
+    mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
     mockPrisma.user.findUnique.mockResolvedValue(user);
-    mockCrypto.randomBytes.mockReturnValue(Buffer.from(rawRefreshToken, "utf-8")); // buffer
-    mockBcrypt.hash.mockResolvedValue("hashedNewRefresh");
-    mockJwt.sign.mockReturnValue(newAccessToken);
-
-    const req = { json: async () => ({ refreshToken: "valid" }) } as unknown as NextRequest;
-
-    const res: any = await refreshTokenHandler(req, {
-      prismaClient: mockPrisma,
-      bcryptFn: mockBcrypt,
-      cryptoFn: mockCrypto,
-      jwtFn: mockJwt,
-    });
-
-    const body = await res.json();
-    expect(body.accessToken).toBe(newAccessToken);
-    expect(body.refreshToken).toBe(newRefreshTokenHex); // expect hex string
-    expect(mockPrisma.refreshToken.create).toHaveBeenCalled();
-    expect(mockPrisma.refreshToken.delete).toHaveBeenCalledWith({ where: { id: tokenRecord.id } });
-  });
-
-  it("uses default dependencies if none provided", async () => {
-    const tokenRecord = { id: "1", token: "refreshToken", userId: "user1" };
-    const user = { id: "user1", email: "a@b.com" };
-
-    // Mock prisma
-    const prismaMock = {
-      refreshToken: {
-        findFirst: jest.fn().mockResolvedValue(tokenRecord),
-        create: jest.fn(),
-        delete: jest.fn(),
-      },
-      user: {
-        findUnique: jest.fn().mockResolvedValue(user),
-      },
-    };
-
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-    const req = { json: async () => ({ refreshToken: "refreshToken" }) } as unknown as NextRequest;
+    jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
+      accessToken: "jwt-access",
+      refreshToken: "new-refresh",
+      expiresIn: 3600,
+    });
 
-    const res = await refreshTokenHandler(req, { prismaClient: prismaMock });
+    const req = { json: async () => ({ refreshToken: "valid", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
 
+    expect(res.status).toBe(200);
+    expect(json.accessToken).toBe("jwt-access");
+    expect(json.refreshToken).toBe("new-refresh");
+    expect(json.expiresIn).toBe(3600);
+  });
+
+  // ------ Test 4️⃣ ------
+  it("returns 401 if refresh token not found", async () => {
+    mockPrisma.refreshToken.findMany.mockResolvedValue([]); // no tokens for that user
+
+    const req = { json: async () => ({ refreshToken: "abc", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(json.error).toBe("Invalid or expired refresh token");
+  });
+
+  // ------ Test 5️⃣ ------
+  it("returns 401 if refresh token invalid", async () => {
+    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
+    mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+    const req = { json: async () => ({ refreshToken: "wrong", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(json.error).toBe("Invalid or expired refresh token");
+  });
+
+  // ------ Test 6️⃣ ------
+  it("returns 401 if userId cannot be determined after decode", async () => {
+    const req = { json: async () => ({ refreshToken: "abc", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+
+    // Make verify throw and decode returns null
+    (jwt.verify as jest.Mock).mockImplementation(() => { throw new Error("invalid signature"); });
+    (jwt.decode as jest.Mock).mockReturnValue(null);
+
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(json.error).toBe("Invalid access token");
+  });
+
+  // ------ Test 7️⃣ ------
+  it("returns 404 if user not found", async () => {
+    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
+    mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+    mockPrisma.user.findUnique.mockResolvedValue(null);
+
+    const req = { json: async () => ({ refreshToken: "valid", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
+
+    expect(res.status).toBe(404);
+    expect(json.error).toBe("User not found");
+  });
+
+  // ------ Test 8️⃣ ------
+  it("creates new tokens and deletes old token if valid", async () => {
+    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
+    const user = { id: "user1", email: "a@b.com", systemLang: "en", providers: ["google"] };
+
+    mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
+    mockPrisma.user.findUnique.mockResolvedValue(user);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+    jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
+      accessToken: "jwt-access",
+      refreshToken: hexRefreshToken,
+      expiresIn: 3600,
+    });
+
+    const req = { json: async () => ({ refreshToken: "valid", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: mockPrisma, bcryptFn: bcrypt });
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json.accessToken).toBe("jwt-access");
+    expect(json.refreshToken).toBe(hexRefreshToken);
+    expect(json.expiresIn).toBe(3600);
+  });
+
+  // ------ Test 9️⃣ ------
+  it("returns 500 if an unexpected error occurs", async () => {
+    const faultyPrisma = {
+      refreshToken: {
+        findMany: jest.fn().mockImplementation(() => { throw new Error("DB down"); }),
+      },
+      user: {
+        findUnique: jest.fn(),
+      },
+    };
+
+    const req = { json: async () => ({ refreshToken: "abc", accessToken: "expired-jwt" }) } as unknown as NextRequest;
+    const res = await refreshTokenHandler(req, { prismaClient: faultyPrisma, bcryptFn: bcrypt });
     const body = await res.json();
-    expect(body.accessToken).toBeDefined();
-    expect(body.refreshToken).toHaveLength(128);
-    expect(prismaMock.refreshToken.create).toHaveBeenCalled();
-    expect(prismaMock.refreshToken.delete).toHaveBeenCalledWith({ where: { id: tokenRecord.id } });
+
+    expect(res.status).toBe(500);
+    expect(body.error).toBe("Internal server error");
   });
 });

@@ -3,6 +3,7 @@
  */
 import { refreshToken } from "@packages/utils/auth/refreshToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { access } from "fs";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -20,6 +21,7 @@ beforeEach(() => {
 
 describe("refreshToken.native", () => {
   const oldRefresh = "old.refresh";
+  const oldAccess = "old.access";
 
   // ------ Test 1️⃣ ------
   it("returns accessToken and saves new refresh token if successful", async () => {
@@ -31,12 +33,12 @@ describe("refreshToken.native", () => {
       json: async () => ({ accessToken: newAccess, refreshToken: newRefresh }),
     });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
 
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/jwt-refresh"), {
+    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/auth/jwt-refresh"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: oldRefresh }),
+      body: JSON.stringify({ refreshToken: oldRefresh, accessToken: oldAccess }),
     });
 
     expect(AsyncStorage.setItem).toHaveBeenCalledWith("refreshToken", newRefresh);
@@ -47,7 +49,7 @@ describe("refreshToken.native", () => {
   it("returns null if response not ok", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: false });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 
@@ -58,7 +60,7 @@ describe("refreshToken.native", () => {
       json: async () => ({ accessToken: null, refreshToken: null }),
     });
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 
@@ -66,7 +68,7 @@ describe("refreshToken.native", () => {
   it("returns null if fetch throws", async () => {
     (global.fetch as jest.Mock).mockRejectedValue(new Error("network error"));
 
-    const token = await refreshToken(oldRefresh);
+    const token = await refreshToken(oldRefresh, oldAccess);
     expect(token).toBeNull();
   });
 });

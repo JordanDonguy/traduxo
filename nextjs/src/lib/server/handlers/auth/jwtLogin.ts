@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/server/prisma";
 import { authorizeUser } from "@/lib/server/auth/authorizeUser";
-import crypto from "crypto";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { generateToken } from "@/lib/server/auth/generateToken";
 
-// DI-friendly types
 export interface JwtLoginDeps {
-  authorizeUserFn: typeof authorizeUser;
+  authorizeUserFn?: typeof authorizeUser;
   prismaClient?: typeof prisma;
-  cryptoFn?: Pick<typeof crypto, "randomBytes">;
-  bcryptFn?: Pick<typeof bcrypt, "hash">;
-  jwtFn?: Pick<typeof jwt, "sign">;
+  cryptoFn?: typeof import("crypto");
+  bcryptFn?: typeof import("bcrypt");
+  jwtFn?: typeof import("jsonwebtoken");
 }
 
 export async function jwtLoginHandler(
@@ -19,50 +16,42 @@ export async function jwtLoginHandler(
   {
     authorizeUserFn = authorizeUser,
     prismaClient = prisma,
-    cryptoFn = crypto,
-    bcryptFn = bcrypt,
-    jwtFn = jwt,
-  }: Partial<JwtLoginDeps> = {}
+    cryptoFn,
+    bcryptFn,
+    jwtFn,
+  }: Partial<JwtLoginDeps>
 ) {
-  const body = await req.json();
-  const { email, password } = body;
+  try {
+    const body = await req.json();
+    const { email, password } = body;
 
-  if (!email || !password) {
-    return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
-  }
+    if (!email || !password) {
+      return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
+    }
 
-  // Validate credentials via authorizeUser
-  const user = await authorizeUserFn({ email, password });
-  if (!user) {
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-  }
+    // Validate credentials
+    const user = await authorizeUserFn({ email, password });
+    if (!user) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
 
-  // Generate JWT access token including language
-  const accessToken = jwtFn.sign(
-    { sub: user.id, email: user.email, language: user.language, providers: user.providers },
-    process.env.JWT_SECRET!,
-    { expiresIn: "1h" }
-  );
-
-  // Generate refresh token
-  const refreshToken = cryptoFn.randomBytes(64).toString("hex");
-  const hashedToken = await bcryptFn.hash(refreshToken, 10);
-
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 30);
-
-  // Store hashed refresh token in DB
-  await prismaClient.refreshToken.create({
-    data: {
-      token: hashedToken,
+    // Generate access + refresh tokens
+    const tokens = await generateToken({
       userId: user.id,
-      expiresAt,
-    },
-  });
+      email: user.email,
+      language: user.language,
+      providers: user.providers,
+      prismaClient,
+      cryptoFn,
+      bcryptFn,
+      jwtFn,
+      accessTokenExpiresIn: "1h",
+      refreshTokenExpiryDays: 30,
+    });
 
-  return NextResponse.json({
-    accessToken,
-    refreshToken,
-    expiresIn: 3600, // 1 hour in seconds
-  });
+    return NextResponse.json(tokens);
+  } catch (err) {
+    console.error("JWT login error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

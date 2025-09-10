@@ -15,18 +15,24 @@ const errorMessages: Record<string, string> = {
   InvalidInput: "Invalid form input. Please check and try again.",
 };
 
+let lastHandled: string = "";
+
 export function showAuthToasts(router: Router) {
   if (typeof window === "undefined") return;
 
   // Always use a URL instance (works better in tests)
   const url = new URL(window.location.toString());
-  const params = url.searchParams;
+  const paramsString = url.search;
 
-  const error = params.get("error");
-  const login = params.get("login");
-  const logout = params.get("logout");
-  const accountDeleted = params.get("delete");
-  const resetPassword = params.get("reset-password");
+  // Prevent double toasts for same params
+  if (lastHandled === paramsString) return;
+  lastHandled = paramsString;
+
+  const error = url.searchParams.get("error");
+  const login = url.searchParams.get("login");
+  const logout = url.searchParams.get("logout");
+  const accountDeleted = url.searchParams.get("delete");
+  const resetPassword = url.searchParams.get("reset-password");
 
   let shouldClean = false;
 

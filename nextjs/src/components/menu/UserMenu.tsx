@@ -40,7 +40,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { handleLogout } = useAuthHandlers();
-  const { status, providers , refresh } = useAuth();
+  const { status, providers, refresh, token } = useAuth();
   const isCredentials = providers?.includes("Credentials");
 
   const router = useRouter();
@@ -241,7 +241,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                     <button
                       onClick={async () => {
                         setIsLoading(true);
-                        await handleLogout(refresh, setIsLoading);
+                        await handleLogout(token, refresh, setIsLoading);
                       }}
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                     >

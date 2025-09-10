@@ -6,6 +6,7 @@ import "@testing-library/jest-dom"
 import AppHeader from "@/components/menu/AppHeader"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion"
+import { AuthProvider } from "@traduxo/packages/contexts/AuthContext";
 
 // --- Mocks ---
 jest.mock("next/navigation", () => ({
@@ -33,6 +34,10 @@ const push = jest.fn()
 const replace = jest.fn()
 const suggestTranslation = jest.fn()
 
+function renderWithAuth(ui: React.ReactNode) {
+  return render(<AuthProvider>{ui}</AuthProvider>);
+}
+
 beforeEach(() => {
   (useRouter as jest.Mock).mockReturnValue({ push, replace });
   (usePathname as jest.Mock).mockReturnValue("/current-path");
@@ -48,14 +53,14 @@ beforeEach(() => {
 describe("AppHeader component", () => {
   // ------ Test 1️⃣ ------
   it("renders UserMenu and Logo", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
     expect(screen.getByText("UserMenu")).toBeInTheDocument()
     expect(screen.getByText("Logo")).toBeInTheDocument()
   })
 
   // ------ Test 2️⃣ ------
   it("calls suggestTranslation when dice buttons are clicked", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const diceButtons = screen.getAllByRole("button").filter(btn =>
       btn.querySelector("svg")?.classList.contains("lucide-dices")
@@ -67,7 +72,7 @@ describe("AppHeader component", () => {
 
   // ------ Test 3️⃣ ------
   it("toggles menu when user button is clicked", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const userButtons = screen.getAllByRole("button").filter(btn =>
       btn.querySelector("svg")?.classList.contains("lucide-user")
@@ -83,7 +88,7 @@ describe("AppHeader component", () => {
   // ------ Test 4️⃣ ------
   it("opens menu automatically if searchParams has menu=open", () => {
     (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams("menu=open"))
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
     expect(screen.getByText("UserMenu")).toBeInTheDocument()
   })
 
@@ -93,7 +98,7 @@ describe("AppHeader component", () => {
       new URLSearchParams("submenu=login")
     )
 
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
     expect(replace).toHaveBeenCalledWith("/current-path?")
   })
 
@@ -103,7 +108,7 @@ describe("AppHeader component", () => {
       suggestTranslation,
       isRolling: true,
     })
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const diceSvgs = document.querySelectorAll("svg.lucide-dices.animate-dice-roll")
 

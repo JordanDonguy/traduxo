@@ -1,6 +1,6 @@
 import { getToken } from "@packages/utils/auth/getToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { refreshToken } from "@packages/utils/auth/refreshToken";
+import { refreshToken } from "@packages/utils/auth/refreshToken.native";
 import { jwtDecode } from "jwt-decode";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -11,7 +11,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   },
 }));
 
-jest.mock("@packages/utils/auth/refreshToken", () => ({
+jest.mock("@packages/utils/auth/refreshToken.native", () => ({
   refreshToken: jest.fn(),
 }));
 
@@ -104,7 +104,7 @@ describe("getToken.native", () => {
 
     const result = await getToken();
 
-    expect(refreshToken).toHaveBeenCalledWith(refresh);
+    expect(refreshToken).toHaveBeenCalledWith(refresh, oldToken);
     expect(mockSetItem).toHaveBeenCalledWith("accessToken", newToken);
     expect(result).toEqual({ token: newToken, language: "fr", providers: ["github"] });
   });

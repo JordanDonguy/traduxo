@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { getToken } from "@packages/utils/auth/getToken.web";
-import * as refreshTokenModule from "@packages/utils/auth/refreshToken.web";
+import { getToken } from "@packages/utils/auth";
+import * as refreshTokenModule from "@packages/utils/auth";
 import { jwtDecode } from "jwt-decode";
 
 jest.mock("@packages/utils/auth/refreshToken.web");
@@ -81,7 +81,7 @@ describe("getToken.web", () => {
 
     const tokenData = await getToken();
 
-    expect(mockRefreshToken).toHaveBeenCalledWith(refresh);
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh, oldToken);
     expect(localStorage.getItem("accessToken")).toBe(newToken);
     expect(tokenData).toEqual({ token: newToken, language: "fr", providers: ["github"] });
   });

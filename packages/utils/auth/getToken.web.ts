@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "./refreshToken";
+import { refreshToken } from "./refreshToken.web";
 
 export type JwtPayload = {
   exp?: number;
@@ -25,7 +25,7 @@ export async function getToken(): Promise<{ token: string; language?: string; pr
     const refresh = localStorage.getItem("refreshToken");
     if (!refresh) return null;
 
-    const newToken = await refreshToken(refresh);
+    const newToken = await refreshToken(refresh, token);
     if (!newToken) return null;
 
     localStorage.setItem("accessToken", newToken);

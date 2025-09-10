@@ -3,10 +3,10 @@
  */
 import { renderHook, waitFor } from "@testing-library/react";
 import { useAuth, AuthProvider } from "@packages/contexts/AuthContext";
-import { getToken } from "@traduxo/packages/utils/auth/getToken";
+import { getToken } from "@traduxo/packages/utils/auth";
 
 // ---- Mocks ----
-jest.mock("@traduxo/packages/utils/auth/getToken");
+jest.mock("@traduxo/packages/utils/auth");
 const mockGetToken = getToken as jest.Mock;
 
 // ---- Tests ----

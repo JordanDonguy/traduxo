@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
 import { showAuthToasts } from "@/lib/client/utils/ui/authToasts";
 import { User, Dices } from "lucide-react";
@@ -14,6 +15,7 @@ function AppHeader() {
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
+  const { refresh } = useAuth();
   const { suggestTranslation, isRolling } = useSuggestion();
 
   // -------- Menu opening / closing section --------
@@ -36,7 +38,8 @@ function AppHeader() {
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {
     showAuthToasts(router);
-  }, [searchParams, router]);
+    refresh();
+  }, [searchParams, router, refresh]);
 
   return (
     <header className="w-full h-full flex justify-center">

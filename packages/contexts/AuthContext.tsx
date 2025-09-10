@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { getToken } from "@traduxo/packages/utils/auth/getToken";
+import { getToken } from "@traduxo/packages/utils/auth";
 
 export type Auth = {
   status: "authenticated" | "unauthenticated" | "loading";
