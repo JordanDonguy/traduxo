@@ -8,8 +8,15 @@ import AppProvider from "@traduxo/packages/contexts/AppProvider.native";
 
 // ---- Mocks ----
 jest.mock("@traduxo/packages/contexts/AppContext", () => ({
-  AppProviderBase: ({ children }: { children: ReactNode }) => <div data-testid="app-provider-base">{children}</div>,
+  AppProviderBase: ({ children }: { children: ReactNode }) => (
+    <div data-testid="app-provider-base">{children}</div>
+  ),
 }));
+
+// Mock react-native-toast-message
+jest.mock("react-native-toast-message", () => {
+  return () => <div data-testid="toast-root" />;
+});
 
 // ---- Helper Wrappers ----
 const renderWithProvider = (ui: ReactNode) => render(<AppProvider>{ui}</AppProvider>);
@@ -27,5 +34,11 @@ describe("AppProvider (React Native)", () => {
   it("renders AppProviderBase wrapper", () => {
     renderWithProvider(<div>Test</div>);
     expect(screen.getByTestId("app-provider-base")).toBeInTheDocument();
+  });
+
+  // ------ Test 3️⃣ ------
+  it("renders Toast root", () => {
+    renderWithProvider(<div>Test</div>);
+    expect(screen.getByTestId("toast-root")).toBeInTheDocument();
   });
 });

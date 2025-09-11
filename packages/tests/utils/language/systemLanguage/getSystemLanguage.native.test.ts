@@ -2,10 +2,10 @@
  * @jest-environment node
  */
 import { getSystemLanguage } from "@traduxo/packages/utils/language/systemLanguage/getSystemLanguage.native";
-import { getLocales } from "@react-native-localize";
+import { getLocales } from "react-native-localize";
 
 // ---- Mock RNLocalize ----
-jest.mock("@react-native-localize", () => ({
+jest.mock("react-native-localize", () => ({
   getLocales: jest.fn(),
 }));
 

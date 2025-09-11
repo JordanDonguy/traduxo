@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
-import { showAuthToasts } from "@/lib/client/utils/ui/authToasts";
+import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
 import { User, Dices } from "lucide-react";
 import UserMenu from "./UserMenu";
 import Logo from "../Logo";
@@ -37,7 +37,20 @@ function AppHeader() {
 
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {
-    showAuthToasts(router);
+    // Convert URLSearchParams to a plain object
+    const paramsObj: Record<string, string | boolean> = {};
+    searchParams.forEach((value, key) => {
+      paramsObj[key] = value === "true" ? true : value === "false" ? false : value;
+    });
+
+    // Cleanup only auth-related keys
+    showAuthToasts(paramsObj, () => {
+      const url = new URL(window.location.toString());
+      const authKeys = ["login", "logout", "error", "delete", "reset-password"];
+      authKeys.forEach((key) => url.searchParams.delete(key));
+      router.replace(url.toString(), undefined);
+    });
+
     refresh();
   }, [searchParams, router, refresh]);
 

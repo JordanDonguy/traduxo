@@ -1,4 +1,4 @@
-declare module "@react-native-localize" {
+declare module "react-native-localize" {
   export type Locale = {
     languageCode: string;
     countryCode?: string;

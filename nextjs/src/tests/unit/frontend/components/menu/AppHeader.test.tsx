@@ -38,10 +38,26 @@ function renderWithAuth(ui: React.ReactNode) {
   return render(<AuthProvider>{ui}</AuthProvider>);
 }
 
+const createSearchParamsMock = (params: Record<string, string>) => {
+  const urlParams = new URLSearchParams(params);
+
+  // Patch get to match object-like API
+  urlParams.get = (key: string) => params[key] || null;
+
+  // Patch forEach with correct signature
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  urlParams.forEach = (callback: (value: string, key: string, parent: URLSearchParams) => void, thisArg?: any) => {
+    Object.entries(params).forEach(([key, value]) => callback.call(thisArg, value, key, urlParams));
+  };
+
+  return urlParams;
+};
+
+
 beforeEach(() => {
   (useRouter as jest.Mock).mockReturnValue({ push, replace });
   (usePathname as jest.Mock).mockReturnValue("/current-path");
-  (useSearchParams as jest.Mock).mockReturnValue({ get: () => null });
+  (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock({}));
   (useSuggestion as jest.Mock).mockReturnValue({ suggestTranslation, isRolling: false });
 
   push.mockClear();
@@ -87,7 +103,7 @@ describe("AppHeader component", () => {
 
   // ------ Test 4️⃣ ------
   it("opens menu automatically if searchParams has menu=open", () => {
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams("menu=open"))
+    (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock({ menu: "open" }));
     renderWithAuth(<AppHeader />)
     expect(screen.getByText("UserMenu")).toBeInTheDocument()
   })
@@ -95,7 +111,7 @@ describe("AppHeader component", () => {
   // ------ Test 5️⃣ ------
   it("removes submenu param via router.replace if menu not open", () => {
     (useSearchParams as jest.Mock).mockReturnValue(
-      new URLSearchParams("submenu=login")
+      createSearchParamsMock({ submenu: "login" })
     )
 
     renderWithAuth(<AppHeader />)
