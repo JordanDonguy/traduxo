@@ -13,7 +13,7 @@ const mockSetIsFavorite = jest.fn();
 const mockSetTranslationId = jest.fn();
 
 // Mock TranslationContext
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     translationId: mockTranslationId,
     setTranslationId: mockSetTranslationId,

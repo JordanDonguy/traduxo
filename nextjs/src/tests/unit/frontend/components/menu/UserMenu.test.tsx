@@ -16,7 +16,7 @@ const mockReplace = jest.fn();
 const mockSetTheme = jest.fn();
 
 // Mock AppContext
-jest.mock("@/context/AppContext", () => ({
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   useApp: () => ({
     showLoginForm: false,
     setShowLoginForm: mockSetShowLoginForm,
@@ -204,7 +204,7 @@ describe("<UserMenu />", () => {
 
     // Spy on useApp and override its return value
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const useAppSpy = jest.spyOn(require("@/context/AppContext"), "useApp");
+    const useAppSpy = jest.spyOn(require("@traduxo/packages/contexts/AppContext"), "useApp");
     useAppSpy.mockReturnValue({
       showLoginForm: true,
       setShowLoginForm: mockSetShowLoginFormLocal,

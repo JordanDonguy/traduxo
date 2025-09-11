@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 
 // Injected dependencies for testing
 type UseExplanationLanguageArgs = {

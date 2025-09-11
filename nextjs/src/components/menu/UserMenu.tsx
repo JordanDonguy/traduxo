@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTheme } from "next-themes";
 import Login from "./Login";
 import ChangePassword from "./ChangePassword";

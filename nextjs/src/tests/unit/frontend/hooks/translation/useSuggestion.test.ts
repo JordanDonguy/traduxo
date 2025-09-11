@@ -3,7 +3,7 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import * as nextNavigation from "next/navigation";
 
@@ -21,11 +21,11 @@ const mockSetExpressionPool = jest.fn();
 const mockSetSaveToHistory = jest.fn();
 
 // ---- Mocks ----
-jest.mock("@/context/AppContext", () => ({
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   useApp: () => ({ setIsLoading: mockSetIsLoading, setError: mockSetError }),
 }));
 
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     setInputText: mockSetInputText,
     setTranslatedText: mockSetTranslatedText,
@@ -40,7 +40,7 @@ jest.mock("@/context/TranslationContext", () => ({
   }),
 }));
 
-jest.mock("@/context/LanguageContext", () => ({
+jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   useLanguageContext: () => ({
     outputLang: "fr",
     detectedLang: "en",

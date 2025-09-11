@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 // ---- Mocks ----
 const mockSetTranslationId = jest.fn();
 const mockSetIsFavorite = jest.fn();
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     translationId: "1",
     setTranslationId: mockSetTranslationId,

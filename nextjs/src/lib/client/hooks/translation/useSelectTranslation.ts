@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 
 import type { Translation } from "@traduxo/packages/types/translation";
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { Translation } from "@traduxo/packages/types/translation";
 
 // Injected dependencies for testing

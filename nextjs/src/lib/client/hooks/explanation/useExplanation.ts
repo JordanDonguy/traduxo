@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { getExplanationPrompt as defaultGetExplanationPrompt } from "@/lib/shared/geminiPrompts";
 
 // Injected dependencies for testing

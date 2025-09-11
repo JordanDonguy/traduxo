@@ -10,7 +10,7 @@ import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 let mockSystemLang = "en";
 const mockSetSystemLang = jest.fn((code: string) => { mockSystemLang = code; });
 
-jest.mock("@/context/LanguageContext", () => ({
+jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   useLanguageContext: () => ({
     systemLang: mockSystemLang,
     setSystemLang: mockSetSystemLang,

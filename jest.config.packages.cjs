@@ -5,6 +5,7 @@ module.exports = {
   moduleNameMapper: {
     '^@traduxo/packages/(.*)$': '<rootDir>/packages/$1',
     "^@react-native-async-storage/async-storage$": "<rootDir>/packages/tests/mocks/asyncStorageMock.ts",
+    "^@react-native-localize$": "<rootDir>/packages/tests/mocks/reactNativeLocalizeMock.ts"
   },
   transform: {
     "^.+\\.(ts|tsx)$": ["ts-jest", {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
 import { addToFavorite, deleteFromFavorite } from "@/lib/client/utils/favorites/favorites";

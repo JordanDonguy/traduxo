@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";

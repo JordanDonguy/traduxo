@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
 import { toast } from "react-toastify";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { fetchHistory } from "@/lib/client/utils/history/fetchHistory";
 import { useSelectTranslation } from "./useSelectTranslation";
 import { Translation } from "@traduxo/packages/types/translation";

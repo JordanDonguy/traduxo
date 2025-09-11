@@ -14,12 +14,12 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Mock AppContext
-jest.mock("@/context/AppContext", () => ({
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   useApp: jest.fn(),
 }));
 
 // Mock TranslationContext
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: jest.fn(),
 }));
 
@@ -87,8 +87,8 @@ jest.mock("@/components/main-section/ExplanationSection", () => {
 });
 
 // ---- Import Contexts ----
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 
 // ---- Tests ----
 describe("<MainDisplay />", () => {

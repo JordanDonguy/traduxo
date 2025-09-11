@@ -10,7 +10,7 @@ const mockSetTranslationHistory = jest.fn();
 const mockSelectTranslation = jest.fn();
 
 // Mock TranslationContext
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     translationHistory: [{ id: "1", inputText: "foo" }],
     setTranslationHistory: mockSetTranslationHistory,

@@ -1,8 +1,8 @@
 "use client"
 
 import { useEffect } from "react";
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useFavoriteToggle } from "@/lib/client/hooks/favorites/useFavoriteToggle";
 import { useSwitchTranslations } from "@/lib/client/hooks/translation/useSwitchTranslations";
 import { replaceQuotesInHTML } from "@/lib/client/utils/ui/replaceQuotesInHTML";

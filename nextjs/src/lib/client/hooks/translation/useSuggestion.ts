@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, type AuthContextType } from "@traduxo/packages/contexts/AuthContext";
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { useWaitForAuthStatus } from "@/lib/client/hooks/auth/useWaitForAuthStatus";
 import { translationHelper } from "../../utils/translation/translate";
 import { suggestExpressionHelper } from "../../utils/expression/suggestExpression";

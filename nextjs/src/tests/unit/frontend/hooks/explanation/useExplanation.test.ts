@@ -13,7 +13,7 @@ const mockTranslatedTextLang = "fr";
 const mockSystemLang = "en";
 
 // Mock TranslationContext
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     translatedText: mockTranslatedText,
     setExplanation: mockSetExplanation,
@@ -23,7 +23,7 @@ jest.mock("@/context/TranslationContext", () => ({
 }));
 
 // Mock LanguageContext
-jest.mock("@/context/LanguageContext", () => ({
+jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   useLanguageContext: () => ({
     systemLang: mockSystemLang,
   }),
