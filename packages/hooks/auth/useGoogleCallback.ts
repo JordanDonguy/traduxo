@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { saveToken } from "@traduxo/packages/utils/auth";
+import { saveToken } from "@traduxo/packages/utils/auth/token";
 
 interface GoogleCallbackOptions {
   fetchFn?: typeof fetch;

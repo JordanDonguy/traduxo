@@ -1,4 +1,4 @@
-import { saveToken } from "@traduxo/packages/utils/auth/saveToken.native";
+import { saveToken } from "@traduxo/packages/utils/auth/token/saveToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({

@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.web";
+import { refreshToken } from "@traduxo/packages/utils/auth/token/refreshToken.web";
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 beforeAll(() => {

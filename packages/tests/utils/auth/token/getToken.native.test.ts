@@ -1,6 +1,6 @@
-import { getToken } from "@traduxo/packages/utils/auth/getToken.native";
+import { getToken } from "@traduxo/packages/utils/auth/token/getToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.native";
+import { refreshToken } from "@traduxo/packages/utils/auth/token/refreshToken.native";
 import { jwtDecode } from "jwt-decode";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -11,7 +11,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
   },
 }));
 
-jest.mock("@traduxo/packages/utils/auth/refreshToken.native", () => ({
+jest.mock("@traduxo/packages/utils/auth/token/refreshToken.native", () => ({
   refreshToken: jest.fn(),
 }));
 
@@ -102,10 +102,15 @@ describe("getToken.native", () => {
       .mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) + 60, language: "fr", providers: ["github"] });
     (refreshToken as jest.Mock).mockResolvedValueOnce(newToken);
 
-    const result = await getToken();
+    const result = await getToken(true);
 
     expect(refreshToken).toHaveBeenCalledWith(refresh, oldToken);
     expect(mockSetItem).toHaveBeenCalledWith("accessToken", newToken);
-    expect(result).toEqual({ token: newToken, language: "fr", providers: ["github"] });
+    expect(result).toEqual({
+      token: newToken,
+      refreshToken: refresh,
+      language: "fr",
+      providers: ["github"],
+    });
   });
 });

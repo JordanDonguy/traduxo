@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../config/apiBase";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 let refreshing: boolean = false;
 
@@ -20,8 +20,9 @@ export async function refreshToken(oldRefreshToken: string, oldAccessToken: stri
 
     if (!accessToken || !newRefreshToken) return null;
 
-    const { default: AsyncStorage } = await import("@react-native-async-storage/async-storage");
-    await AsyncStorage.setItem("refreshToken", newRefreshToken);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("refreshToken", newRefreshToken);
+    }
 
     return accessToken;
   } catch (err) {

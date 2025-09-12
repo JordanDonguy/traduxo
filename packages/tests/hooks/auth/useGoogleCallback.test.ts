@@ -4,7 +4,7 @@
 
 import { renderHook, waitFor } from "@testing-library/react";
 import { useGoogleCallback } from "@traduxo/packages/hooks/auth/useGoogleCallback";
-import * as authUtils from "@traduxo/packages/utils/auth";
+import * as authUtils from "@traduxo/packages/utils/auth/token";
 
 // ---- Mocks ----
 const mockReplace = jest.fn();

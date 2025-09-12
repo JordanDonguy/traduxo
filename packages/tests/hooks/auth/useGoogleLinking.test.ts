@@ -3,7 +3,7 @@
  */
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useGoogleLinking } from "@traduxo/packages/hooks/auth/useGoogleLinking";
-import * as authUtils from "@traduxo/packages/utils/auth";
+import * as authUtils from "@traduxo/packages/utils/auth/token";
 
 describe("useGoogleLinking", () => {
   let mockFetch: jest.Mock;

@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 
-import { getToken } from "@traduxo/packages/utils/auth";
-import * as refreshTokenModule from "@traduxo/packages/utils/auth";
+import { getToken } from "@traduxo/packages/utils/auth/token";
+import * as refreshTokenModule from "@traduxo/packages/utils/auth/token";
 import { jwtDecode } from "jwt-decode";
 
-jest.mock("@traduxo/packages/utils/auth/refreshToken.web");
+jest.mock("@traduxo/packages/utils/auth/token/refreshToken.web");
 jest.mock("jwt-decode");
 
 const mockJwtDecode = jwtDecode as unknown as jest.Mock;
@@ -31,13 +31,11 @@ beforeEach(() => {
 });
 
 describe("getToken.web", () => {
-  // ------ Test 1️⃣ ------
   it("returns null if no accessToken", async () => {
     const tokenData = await getToken();
     expect(tokenData).toBeNull();
   });
 
-  // ------ Test 2️⃣ ------
   it("returns token if valid and not expired", async () => {
     const token = "valid.token";
     localStorage.setItem("accessToken", token);
@@ -52,7 +50,6 @@ describe("getToken.web", () => {
     expect(tokenData).toEqual({ token, language: "en", providers: ["google"] });
   });
 
-  // ------ Test 3️⃣ ------
   it("returns null if token is malformed", async () => {
     const token = "malformed.token";
     localStorage.setItem("accessToken", token);
@@ -63,7 +60,6 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
-  // ------ Test 4️⃣ ------
   it("refreshes expired token and returns new token", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
@@ -72,7 +68,6 @@ describe("getToken.web", () => {
     localStorage.setItem("accessToken", oldToken);
     localStorage.setItem("refreshToken", refresh);
 
-    // First decode = expired, second decode = valid
     mockJwtDecode
       .mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10, language: "fr", providers: ["github"] })
       .mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) + 60, language: "fr", providers: ["github"] });
@@ -86,7 +81,6 @@ describe("getToken.web", () => {
     expect(tokenData).toEqual({ token: newToken, language: "fr", providers: ["github"] });
   });
 
-  // ------ Test 5️⃣ ------
   it("returns null if expired and no refresh token", async () => {
     const oldToken = "expired.token";
     localStorage.setItem("accessToken", oldToken);
@@ -97,7 +91,6 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
-  // ------ Test 6️⃣ ------
   it("returns null if refresh fails", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
@@ -111,7 +104,6 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
-  // ------ Test 7️⃣ ------
   it("returns null if new token after refresh is malformed", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
@@ -120,16 +112,28 @@ describe("getToken.web", () => {
     localStorage.setItem("accessToken", oldToken);
     localStorage.setItem("refreshToken", refresh);
 
-    // First decode = expired
     mockJwtDecode.mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10, language: "fr" });
-
-    // refreshToken returns new token
     mockRefreshToken.mockResolvedValueOnce(newToken);
-
-    // Second decode (new token) throws
     mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid new token"); });
 
     const tokenData = await getToken();
     expect(tokenData).toBeNull();
+  });
+
+  it("includes refreshToken when returnRefreshToken is true", async () => {
+    const token = "valid.token";
+    const refresh = "refresh.token";
+
+    localStorage.setItem("accessToken", token);
+    localStorage.setItem("refreshToken", refresh);
+
+    mockJwtDecode.mockReturnValueOnce({
+      exp: Math.floor(Date.now() / 1000) + 60,
+      language: "en",
+      providers: ["google"],
+    });
+
+    const tokenData = await getToken(true);
+    expect(tokenData).toEqual({ token, language: "en", providers: ["google"], refreshToken: refresh });
   });
 });

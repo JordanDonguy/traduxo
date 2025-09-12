@@ -1,6 +1,6 @@
 // hooks/useGoogleLinking.ts
 import { useState } from "react";
-import { saveToken } from "@traduxo/packages/utils/auth";
+import { saveToken } from "@traduxo/packages/utils/auth/token";
 
 interface UseGoogleLinkingResult {
   isLoading: boolean;

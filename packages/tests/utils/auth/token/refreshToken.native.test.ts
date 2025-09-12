@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { refreshToken } from "@traduxo/packages/utils/auth/refreshToken.native";
+import { refreshToken } from "@traduxo/packages/utils/auth/token/refreshToken.native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { access } from "fs";
 
