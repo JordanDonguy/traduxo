@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useCooldown } from "@/lib/client/hooks/ui/useCooldown";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { formatError } from "@/lib/client/utils/ui/formatError";
 
 type ErrorSectionProps = {

@@ -45,14 +45,16 @@ function AppHeader() {
 
     // Cleanup only auth-related keys
     showAuthToasts(paramsObj, () => {
-      const url = new URL(window.location.toString());
+      const params = new URLSearchParams(searchParams);
       const authKeys = ["login", "logout", "error", "delete", "reset-password"];
-      authKeys.forEach((key) => url.searchParams.delete(key));
-      router.replace(url.toString(), undefined);
+      authKeys.forEach((key) => params.delete(key));
+
+      const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      router.replace(newUrl);
     });
 
     refresh();
-  }, [searchParams, router, refresh]);
+  }, [searchParams, pathname, router, refresh]);
 
   return (
     <header className="w-full h-full flex justify-center">

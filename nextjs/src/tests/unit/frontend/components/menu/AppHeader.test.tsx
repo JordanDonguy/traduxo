@@ -130,4 +130,38 @@ describe("AppHeader component", () => {
 
     expect(diceSvgs.length).toBeGreaterThan(0)
   })
+
+  // ------ Test 7️⃣ ------
+  it("opens menu automatically if menu=open in searchParams and does not replace URL", () => {
+    (useSearchParams as jest.Mock).mockReturnValue(
+      createSearchParamsMock({ menu: "open", submenu: "history" })
+    )
+
+    renderWithAuth(<AppHeader />)
+
+    // Menu should be open
+    const menuDiv = screen.getByText("UserMenu")
+    expect(menuDiv).toBeInTheDocument()
+
+    // replace should be called only for submenu removal when menu is NOT open
+    // but here menu is open, so replace shouldn't be called
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  // ------ Test 8️⃣ ------
+  it("cleans up auth-related searchParams after showing toast", () => {
+    const authParams = {
+      login: "true",
+      logout: "true",
+      error: "Some error",
+      delete: "true",
+    };
+
+    (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock(authParams))
+
+    renderWithAuth(<AppHeader />)
+
+    // The effect should call replace() to remove auth keys
+    expect(replace).toHaveBeenLastCalledWith("/current-path")
+  })
 })

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
 

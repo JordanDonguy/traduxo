@@ -18,7 +18,7 @@ jest.mock("next/image", () => {
 
 // ---- Mock next/router ----
 const mockPush = jest.fn();
-jest.mock("next/router", () => ({
+jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
   }),

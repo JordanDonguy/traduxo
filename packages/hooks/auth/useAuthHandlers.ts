@@ -1,5 +1,3 @@
-"use client";
-
 import { toast } from "react-toastify";
 import { loginUser } from "@traduxo/packages/utils/auth/login";
 import { logoutUser } from "@traduxo/packages/utils/auth/logout";

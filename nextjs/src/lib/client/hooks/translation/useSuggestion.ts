@@ -6,7 +6,7 @@ import { useAuth, type AuthContextType } from "@traduxo/packages/contexts/AuthCo
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
-import { useWaitForAuthStatus } from "@/lib/client/hooks/auth/useWaitForAuthStatus";
+import { useWaitForAuthStatus } from "@traduxo/packages/hooks/auth/useWaitForAuthStatus";
 import { translationHelper } from "../../utils/translation/translate";
 import { suggestExpressionHelper } from "../../utils/expression/suggestExpression";
 import { fetchExpressionPoolHelper } from "../../utils/expression/fetchExpressionPool";
