@@ -1,15 +1,17 @@
 "use client"
 
-import { useFavoriteTranslations } from "@/lib/client/hooks/favorites/useFavoriteTranslations";
+import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFavoriteTranslations";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { CircleX } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface FavoriteTranslationProps {
   showMenu: boolean
 };
 
 function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
-  const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations();
+  const router = useRouter();
+  const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations({});
   const { selectTranslation } = useSelectTranslation();
 
   return (
@@ -41,9 +43,10 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
               "
               >
                 <div
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation(); // Prevent triggering loadTranslation
-                    deleteTranslation(t.id);
+                    const success = await deleteTranslation(t.id);
+                    if (!success) router.push("/");
                   }}
                   className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--input-placeholder)] hover:scale-115 active:scale-90 duration-100"
                 >

@@ -25,7 +25,7 @@ jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
 
 // --------- Mock hooks ---------
 // Favorite toggle hook
-jest.mock("@/lib/client/hooks/favorites/useFavoriteToggle", () => ({
+jest.mock("@traduxo/packages/hooks/favorites/useFavoriteToggle", () => ({
   useFavoriteToggle: () => ({
     handleFavorite: jest.fn(),
     isFavLoading: false,
@@ -33,7 +33,7 @@ jest.mock("@/lib/client/hooks/favorites/useFavoriteToggle", () => ({
 }));
 
 // Switch translations hook
-jest.mock("@/lib/client/hooks/translation/useSwitchTranslations", () => ({
+jest.mock("@traduxo/packages/hooks/translation/useSwitchTranslations", () => ({
   useSwitchTranslations: () => ({
     switchTranslations: jest.fn(),
     fading: false,
