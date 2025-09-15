@@ -6,11 +6,11 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FavoriteTranslation from "@/components/menu/FavoriteTranslations";
 import { useFavoriteTranslations } from "@/lib/client/hooks/favorites/useFavoriteTranslations";
-import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
+import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 
 // --- Mocks ---
 jest.mock("@/lib/client/hooks/favorites/useFavoriteTranslations");
-jest.mock("@/lib/client/hooks/translation/useSelectTranslation");
+jest.mock("@traduxo/packages/hooks/translation/useSelectTranslation");
 jest.mock("lucide-react", () => ({
   CircleX: () => <svg data-testid="circle-x" />,
 }));

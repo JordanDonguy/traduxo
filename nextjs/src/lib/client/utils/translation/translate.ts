@@ -75,6 +75,15 @@ export async function translationHelper({
       return { success: false, error };
     }
 
+    // Handle Gemini overload (503)
+    if (res.status === 503) {
+      const errorMsg =
+        "Oops! 😰\nOur AI is a bit overloaded right now ⚡️\nPlease try again shortly 🙏";
+      setError(errorMsg);
+      setIsLoading(false);
+      return { success: false, error: errorMsg };
+    }
+
     if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
 
     // --- Streaming decode (NDJSON) ---

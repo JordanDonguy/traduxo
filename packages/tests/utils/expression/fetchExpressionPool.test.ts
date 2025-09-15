@@ -35,7 +35,7 @@ describe("fetchExpressionPoolHelper", () => {
 
     // Ensures prompt is generated, fetch is called, response is cleaned, and state updated
     expect(promptGetter).toHaveBeenCalledWith("en");
-    expect(fetcher).toHaveBeenCalledWith("/api/gemini/complete", expect.any(Object));
+    expect(fetcher).toHaveBeenCalledWith("/gemini/complete", expect.any(Object));
     expect(responseCleaner).toHaveBeenCalled();
     expect(setExpressionPool).toHaveBeenCalledWith(["hello", "world"]);
     expect(result).toEqual({ success: true, data: ["hello", "world"] });

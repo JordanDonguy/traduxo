@@ -61,7 +61,7 @@ export async function translationHelper({
   if (inputLang !== "auto") setInputTextLang(inputLang);
 
   try {
-    const res = await fetcher(`${API_BASE_URL}/api/gemini/stream`, {
+    const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt, mode: "translation" }),

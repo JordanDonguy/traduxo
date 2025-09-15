@@ -9,7 +9,7 @@ export const runtime = "edge";
 // ---------------- Schema ----------------
 const BodySchema = z.object({
   prompt: z.string().min(1, "Prompt is required"),
-  model: z.string().optional().default("gemini-2.5-flash-lite-preview-06-17"),
+  model: z.string().optional().default("gemini-2.5-flash-lite"),
   mode: z.enum(["translation", "explanation", "suggestion"]).default("translation"),
 });
 
@@ -115,14 +115,29 @@ export async function geminiStream(
     return res;
   } catch (err: unknown) {
     console.error(err);
+
+    const message = String((err as Error).message);
+
+    // Detect Gemini overload
+    if (message.includes('"code": 503') || message.includes("503")) {
+      return new Response(
+        JSON.stringify({ error: "Gemini overloaded" }),
+        {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Default server error
     return new Response(
       JSON.stringify({
-        error: 'Gemini API error',
-        details: String((err as Error).message),
+        error: "Gemini API error",
+        details: message,
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

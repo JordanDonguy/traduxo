@@ -31,11 +31,13 @@ beforeEach(() => {
 });
 
 describe("getToken.web", () => {
+  // ------ Test 1️⃣ ------
   it("returns null if no accessToken", async () => {
     const tokenData = await getToken();
     expect(tokenData).toBeNull();
   });
 
+  // ------ Test 2️⃣ ------
   it("returns token if valid and not expired", async () => {
     const token = "valid.token";
     localStorage.setItem("accessToken", token);
@@ -50,6 +52,7 @@ describe("getToken.web", () => {
     expect(tokenData).toEqual({ token, language: "en", providers: ["google"] });
   });
 
+  // ------ Test 3️⃣ ------
   it("returns null if token is malformed", async () => {
     const token = "malformed.token";
     localStorage.setItem("accessToken", token);
@@ -60,6 +63,7 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
+  // ------ Test 4️⃣ ------
   it("refreshes expired token and returns new token", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
@@ -81,6 +85,7 @@ describe("getToken.web", () => {
     expect(tokenData).toEqual({ token: newToken, language: "fr", providers: ["github"] });
   });
 
+  // ------ Test 5️⃣ ------
   it("returns null if expired and no refresh token", async () => {
     const oldToken = "expired.token";
     localStorage.setItem("accessToken", oldToken);
@@ -91,6 +96,7 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
+  // ------ Test 6️⃣ ------
   it("returns null if refresh fails", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
@@ -104,22 +110,45 @@ describe("getToken.web", () => {
     expect(tokenData).toBeNull();
   });
 
+  // ------ Test 7️⃣ ------
   it("returns null if new token after refresh is malformed", async () => {
-    const oldToken = "expired.token";
+    const oldToken = "malformed.token";
     const refresh = "refresh.token";
     const newToken = "new.token";
 
     localStorage.setItem("accessToken", oldToken);
     localStorage.setItem("refreshToken", refresh);
 
-    mockJwtDecode.mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10, language: "fr" });
+    // First decode fails → triggers refresh
+    mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid token"); });
+    // After refresh, decoding also fails
     mockRefreshToken.mockResolvedValueOnce(newToken);
     mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid new token"); });
 
     const tokenData = await getToken();
+
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh, oldToken);
     expect(tokenData).toBeNull();
   });
 
+  // ------ Test 8️⃣ ------
+  it("returns null if refresh fails for malformed token", async () => {
+    const oldToken = "malformed.token";
+    const refresh = "refresh.token";
+
+    localStorage.setItem("accessToken", oldToken);
+    localStorage.setItem("refreshToken", refresh);
+
+    mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid token"); });
+    mockRefreshToken.mockResolvedValueOnce(null); // refresh fails
+
+    const tokenData = await getToken();
+
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh, oldToken);
+    expect(tokenData).toBeNull();
+  });
+
+  // ------ Test 9️⃣ ------
   it("includes refreshToken when returnRefreshToken is true", async () => {
     const token = "valid.token";
     const refresh = "refresh.token";

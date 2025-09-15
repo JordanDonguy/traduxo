@@ -20,6 +20,7 @@ type SuggestionHelperArgs = {
   fetcher?: typeof fetch;
   promptGetter?: typeof getSuggestionPrompt;
   keyboardModule?: { dismiss: () => void };
+  token: string | undefined;
 };
 
 // Get one normal suggestion with translation
@@ -38,6 +39,7 @@ export async function suggestExpressionHelper({
   fetcher = fetch,
   promptGetter = getSuggestionPrompt,
   keyboardModule,
+  token,
 }: SuggestionHelperArgs) {
   // Blur active input
   blurActiveInput(keyboardModule);
@@ -55,9 +57,12 @@ export async function suggestExpressionHelper({
   const prompt = promptGetter({ detectedLang, outputLang });
 
   try {
-    const res = await fetcher(`${API_BASE_URL}/api/gemini/stream`, {
+    const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+      },
       body: JSON.stringify({ prompt, mode: "suggestion" }),
     });
 

@@ -13,7 +13,7 @@ describe("fetchHistory", () => {
     const fetchFn = jest.fn();
 
     // Should skip fetching when status is 'loading'
-    await fetchHistory({ status: "loading", setTranslationHistory, fetchFn });
+    await fetchHistory({ status: "loading", setTranslationHistory, fetchFn, token: "mock-token" });
 
     expect(fetchFn).not.toHaveBeenCalled();
     expect(setTranslationHistory).not.toHaveBeenCalled();
@@ -26,7 +26,7 @@ describe("fetchHistory", () => {
       ok: true,
     });
 
-    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn });
+    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn, token: "mock-token" });
 
     // 204 indicates no content, state should be empty array
     expect(setTranslationHistory).toHaveBeenCalledWith([]);
@@ -45,7 +45,7 @@ describe("fetchHistory", () => {
       json: async () => fakeData,
     });
 
-    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn });
+    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn, token: "mock-token" });
 
     // Should set the fetched translation history
     expect(setTranslationHistory).toHaveBeenCalledWith(fakeData);
@@ -60,7 +60,7 @@ describe("fetchHistory", () => {
       statusText: "Internal Server Error",
     });
 
-    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn });
+    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn, token: "mock-token" });
 
     // Error should be logged, state unchanged
     expect(setTranslationHistory).not.toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe("fetchHistory", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     const fetchFn = jest.fn().mockRejectedValue(new Error("network down"));
 
-    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn });
+    await fetchHistory({ status: "idle", setTranslationHistory, fetchFn, token: "mock-token" });
 
     // Network or other fetch errors should be logged, state unchanged
     expect(setTranslationHistory).not.toHaveBeenCalled();
@@ -95,9 +95,25 @@ describe("fetchHistory", () => {
     });
     (globalThis as any).fetch = mockFetch;
 
-    await fetchHistory({ status: "idle", setTranslationHistory });
+    await fetchHistory({ status: "idle", setTranslationHistory, token: "mock-token" });
 
     expect(mockFetch).toHaveBeenCalled(); // confirms default fetch was used
     expect(setTranslationHistory).toHaveBeenCalledWith([{ id: 1, text: "test" }]);
+  });
+
+  // ------ Test 7️⃣ ------
+  it("returns false immediately if no token is provided", async () => {
+    const fetchFn = jest.fn();
+
+    const result = await fetchHistory({
+      status: "idle",
+      setTranslationHistory,
+      fetchFn,
+      token: null, // no token
+    });
+
+    expect(result).toBe(false);
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(setTranslationHistory).not.toHaveBeenCalled();
   });
 });

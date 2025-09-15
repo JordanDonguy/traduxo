@@ -26,7 +26,7 @@ export async function fetchExpressionPoolHelper({
   try {
     const poolPrompt = promptGetter(suggestionLang);
 
-    const res = await fetcher(`${API_BASE_URL}/api/gemini/complete`, {
+    const res = await fetcher(`${API_BASE_URL}/gemini/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: poolPrompt }),

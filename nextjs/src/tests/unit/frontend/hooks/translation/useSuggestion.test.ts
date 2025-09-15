@@ -2,10 +2,9 @@
  * @jest-environment jsdom
  */
 import { renderHook, act } from "@testing-library/react";
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
-import * as nextNavigation from "next/navigation";
 
 // ---- Mock helpers ----
 const mockSetIsLoading = jest.fn();
@@ -51,10 +50,6 @@ jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn() }),
-}));
-
 jest.mock("@/lib/client/hooks/auth/useWaitForAuthStatus", () => ({
   useWaitForAuthStatus: () => ({ waitForStatus: jest.fn().mockResolvedValue(undefined) }),
 }));
@@ -68,12 +63,9 @@ const mockGetSuggestionLanguage = jest.fn(() => "en");
 
 // ---- Tests ----
 describe("useSuggestion", () => {
-  let mockRouter: ReturnType<typeof nextNavigation.useRouter>;
-
   beforeAll(() => jest.useFakeTimers());
   afterAll(() => jest.useRealTimers());
   beforeEach(() => {
-    mockRouter = { push: jest.fn() } as unknown as ReturnType<typeof nextNavigation.useRouter>;
     (useAuth as jest.Mock).mockReturnValue({
       status: "authenticated",
       token: "fake-token",
@@ -84,10 +76,9 @@ describe("useSuggestion", () => {
   });
 
   // ------ Test 1️⃣ ------
-  it("toggles isRolling and calls router.push", async () => {
+  it("toggles isRolling", async () => {
     const { result } = renderHook(() =>
       useSuggestion({
-        router: mockRouter,
         translationHelperFn: mockTranslationHelper,
         suggestExpressionHelperFn: mockSuggestExpressionHelper,
         fetchExpressionPoolHelperFn: mockFetchExpressionPoolHelper,
@@ -101,7 +92,6 @@ describe("useSuggestion", () => {
 
     // Immediately after calling
     expect(result.current.isRolling).toBe(true);
-    expect(mockRouter.push).toHaveBeenCalledWith("/");
 
     // Fast-forward timeout
     act(() => jest.advanceTimersByTime(600));

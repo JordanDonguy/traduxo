@@ -13,17 +13,19 @@ export async function fetchHistory({
   status,
   setTranslationHistory,
   fetchFn = fetch,
-  url = `${API_BASE_URL}/api/history`,
-  token = null
+  url = `${API_BASE_URL}/history`,
+  token
 }: FetchHistoryDeps) {
   if (status === "loading") return;
 
   try {
+    if (!token) return false;
+
     const res = await fetchFn(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        "Authorization": `Bearer ${token}`,
       },
     });
 

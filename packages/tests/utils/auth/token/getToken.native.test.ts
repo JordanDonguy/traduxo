@@ -113,4 +113,21 @@ describe("getToken.native", () => {
       providers: ["github"],
     });
   });
+
+  // ------ Test 8️⃣ ------
+  it("returns null if initial token is malformed but refresh returns a malformed token", async () => {
+    const oldToken = "malformed.token";
+    const refresh = "refresh.token";
+    const newToken = "new.token";
+
+    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(refresh);
+    mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid old token"); });
+    (refreshToken as jest.Mock).mockResolvedValueOnce(newToken);
+    mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid new token"); });
+
+    const result = await getToken(true);
+
+    expect(refreshToken).toHaveBeenCalledWith(refresh, oldToken);
+    expect(result).toBeNull();
+  });
 });
