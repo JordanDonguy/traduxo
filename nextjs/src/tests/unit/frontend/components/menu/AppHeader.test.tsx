@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import "@testing-library/jest-dom"
 import AppHeader from "@/components/menu/AppHeader"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion"
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion"
 import { AuthProvider } from "@traduxo/packages/contexts/AuthContext";
 
 // --- Mocks ---
@@ -15,7 +15,7 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }))
 
-jest.mock("@/lib/client/hooks/translation/useSuggestion", () => ({
+jest.mock("@traduxo/packages/hooks/suggestion/useSuggestion", () => ({
   useSuggestion: jest.fn(),
 }))
 

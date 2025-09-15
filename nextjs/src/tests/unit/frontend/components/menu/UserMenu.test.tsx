@@ -48,7 +48,7 @@ jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
 
 // Mock useAuthHandlers
 const handleLogoutMock = jest.fn();
-jest.mock("@/lib/client/hooks/auth/useAuthForm", () => ({
+jest.mock("@traduxo/packages/hooks/auth/useAuthHandlers", () => ({
   useAuthHandlers: () => ({
     handleLogout: handleLogoutMock,
   }),

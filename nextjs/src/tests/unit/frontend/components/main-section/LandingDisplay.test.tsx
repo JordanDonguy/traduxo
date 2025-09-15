@@ -4,9 +4,9 @@
 import "@testing-library/jest-dom"
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import LandingDisplay from "@/components/main-section/LandingDisplay";
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 
-jest.mock("@/lib/client/hooks/translation/useSuggestion");
+jest.mock("@traduxo/packages/hooks/suggestion/useSuggestion");
 
 describe("LandingDisplay", () => {
   const suggestTranslation = jest.fn();

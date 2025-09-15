@@ -53,7 +53,7 @@ jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   }),
 }));
 
-jest.mock("@/lib/client/hooks/ui/useLanguageSwitch", () => ({
+jest.mock("@traduxo/packages/hooks/translation/useLanguageSwitch", () => ({
   useLanguageSwitch: () => ({
     isSwitching: false,
     switchLanguage: jest.fn(),
@@ -71,7 +71,7 @@ jest.mock("@/lib/client/hooks/ui/useVoiceInput", () => ({
 }));
 
 const mockTranslationHelper = jest.fn();
-jest.mock("@/lib/client/utils/translation/translate", () => ({
+jest.mock("@traduxo/packages/utils/translation/translate", () => ({
   translationHelper: (args: Parameters<typeof mockTranslationHelper>[0]) => mockTranslationHelper(args),
 }));
 

@@ -9,12 +9,12 @@ import TranslationHistory from "@/components/menu/TranslationHistory";
 
 // ---- Mock hooks ----
 // Mock translation history hook
-jest.mock("@/lib/client/hooks/translation/useTranslationHistory", () => ({
+jest.mock("@traduxo/packages/hooks/history/useTranslationHistory", () => ({
   useTranslationHistory: jest.fn(),
 }));
 
 // Mock translation selection hook
-jest.mock("@/lib/client/hooks/translation/useSelectTranslation", () => ({
+jest.mock("@traduxo/packages/hooks/translation/useSelectTranslation", () => ({
   useSelectTranslation: jest.fn(),
 }));
 
@@ -24,8 +24,8 @@ jest.mock("lucide-react", () => ({
   CircleX: () => <div>CircleXIcon</div>
 }));
 
-import { useTranslationHistory } from "@/lib/client/hooks/translation/useTranslationHistory";
-import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
+import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
+import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 
 
 // ---- Tests ----

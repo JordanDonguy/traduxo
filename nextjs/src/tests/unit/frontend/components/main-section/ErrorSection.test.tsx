@@ -5,11 +5,11 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ErrorSection from "@/components/main-section/ErrorSection";
-import { useCooldown } from "@/lib/client/hooks/ui/useCooldown";
+import { useCooldown } from "@traduxo/packages/hooks/ui/useCooldown";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 
 // ------ Mocks ------
-jest.mock("@/lib/client/hooks/ui/useCooldown");
+jest.mock("@traduxo/packages/hooks/ui/useCooldown");
 jest.mock("@traduxo/packages/contexts/AppContext");
 
 describe("ErrorSection component", () => {

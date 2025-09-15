@@ -1,7 +1,7 @@
 "use client"
 
 import { useFavoriteTranslations } from "@/lib/client/hooks/favorites/useFavoriteTranslations";
-import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
+import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { CircleX } from "lucide-react";
 
 interface FavoriteTranslationProps {

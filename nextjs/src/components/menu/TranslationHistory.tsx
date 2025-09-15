@@ -1,7 +1,7 @@
 "use client"
 
-import { useTranslationHistory } from "@/lib/client/hooks/translation/useTranslationHistory";
-import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
+import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
+import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { CircleX } from "lucide-react";
 
 interface TranslationHistoryProps {
@@ -9,7 +9,7 @@ interface TranslationHistoryProps {
 }
 
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
-  const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory();
+  const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory({});
   const { selectTranslation } = useSelectTranslation();
 
   return (

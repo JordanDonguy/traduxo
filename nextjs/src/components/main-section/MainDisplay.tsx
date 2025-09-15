@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useFavoriteToggle } from "@/lib/client/hooks/favorites/useFavoriteToggle";
-import { useSwitchTranslations } from "@/lib/client/hooks/translation/useSwitchTranslations";
+import { useSwitchTranslations } from "@traduxo/packages/hooks/translation/useSwitchTranslations";
 import { replaceQuotesInHTML } from "@/lib/client/utils/ui/replaceQuotesInHTML";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";

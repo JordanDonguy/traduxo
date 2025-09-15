@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react";
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { Dices, Languages } from "lucide-react";
 
 function LandingDisplay() {
-  const { suggestTranslation } = useSuggestion();
+  const { suggestTranslation } = useSuggestion({});
 
   const [showWarning, setShowWarning] = useState<boolean>(false);
 

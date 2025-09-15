@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
-import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
+import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTheme } from "next-themes";
 import Login from "./Login";
@@ -40,7 +40,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { handleLogout } = useAuthHandlers();
-  const { status, providers, refresh, token } = useAuth();
+  const { status, providers, refresh } = useAuth();
   const isCredentials = providers?.includes("Credentials");
 
   const router = useRouter();
@@ -241,7 +241,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                     <button
                       onClick={async () => {
                         setIsLoading(true);
-                        const success = await handleLogout(token, refresh, setIsLoading);
+                        const success = await handleLogout(refresh, setIsLoading);
                         if (success) router.push("/?logout=true");
                       }}
                       className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
