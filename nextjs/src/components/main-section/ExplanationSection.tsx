@@ -3,8 +3,9 @@
 import ReactMarkdown from "react-markdown";
 import LoadingAnimation from "./LoadingAnimation";
 import ErrorSection from "./ErrorSection";
-import { useExplanation } from "@/lib/client/hooks/explanation/useExplanation";
+import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
 import { TranslationItem } from "@traduxo/packages/types/translation";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 
 type ExplanationSectionProps = {
   explanation: string;
@@ -15,7 +16,7 @@ export default function ExplanationSection({
   explanation,
   translatedText
 }: ExplanationSectionProps) {
-  const { handleExplanation, isExpLoading, explanationError, setExplanationError } = useExplanation();
+  const { handleExplanation, isExpLoading, explanationError, setExplanationError } = useExplanation({});
 
   if (explanationError.length) {
     return <ErrorSection error={explanationError} setError={setExplanationError} />;
@@ -47,7 +48,10 @@ export default function ExplanationSection({
         }`}
     >
       <button
-        onClick={handleExplanation}
+        onClick={() => {
+          blurActiveInput();
+          handleExplanation();
+        }}
         className="w-full max-w-xl py-4 rounded-full border border-[var(--border)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
       >
         ✨ AI explanations

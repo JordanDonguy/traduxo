@@ -191,4 +191,40 @@ describe("suggestExpressionHelper", () => {
 
     expect(globalThis.fetch).toHaveBeenCalled();
   });
+
+  // ------ Test 9️⃣ ------
+  it("adds Authorization header when token is provided", async () => {
+    const token = "fake-token-123";
+
+    const fakeFetcher = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      body: {
+        getReader: () => ({
+          read: jest
+            .fn()
+            .mockResolvedValueOnce({
+              done: false,
+              value: new TextEncoder().encode(
+                JSON.stringify({ type: "expression", value: "hola" }) + "\n"
+              ),
+            })
+            .mockResolvedValueOnce({ done: true, value: undefined }),
+        }),
+      },
+    });
+
+    const result = await suggestExpressionHelper({
+      ...defaultArgs,
+      fetcher: fakeFetcher,
+      token,
+    });
+
+    // Check that fetcher was called with Authorization header
+    const fetchCallArgs = fakeFetcher.mock.calls[0][1]; // second argument of first call
+    expect(fetchCallArgs?.headers).toMatchObject({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    });
+  });
 });

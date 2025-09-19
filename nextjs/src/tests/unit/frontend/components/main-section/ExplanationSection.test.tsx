@@ -5,11 +5,11 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ExplanationSection from "@/components/main-section/ExplanationSection";
-import { useExplanation } from "@/lib/client/hooks/explanation/useExplanation";
-import { TranslationItem } from "../../../../../../types/translation";
+import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 
 // ------ Mocks ------
-jest.mock("@/lib/client/hooks/explanation/useExplanation");
+jest.mock("@traduxo/packages/hooks/explanation/useExplanation");
 jest.mock("@/components/main-section/ErrorSection", () => ({
   __esModule: true,
   default: () => <div>ErrorSection</div>,

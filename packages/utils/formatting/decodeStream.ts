@@ -1,21 +1,20 @@
-import { Buffer } from "buffer";
-
 type ReaderLike = {
   read: () => Promise<{ done: boolean; value?: Uint8Array }>;
 };
 
 export async function* decodeStream(reader: ReaderLike) {
-  let buffer = Buffer.from([]);
+  const decoder = new TextDecoder();
+  let buffer = "";
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
     if (value) {
-      buffer = Buffer.concat([buffer, Buffer.from(value)]);
+      buffer += decoder.decode(value, { stream: true });
       // Split by newline
-      const parts = buffer.toString("utf-8").split("\n");
-      buffer = Buffer.from(parts.pop() || ""); // keep last incomplete chunk
+      const parts = buffer.split("\n");
+      buffer = parts.pop() || ""; // keep last incomplete chunk
 
       for (const part of parts) {
         if (!part.trim()) continue;
@@ -25,6 +24,6 @@ export async function* decodeStream(reader: ReaderLike) {
   }
 
   // Yield any remaining chunk
-  const remaining = buffer.toString("utf-8");
-  if (remaining.trim()) yield remaining;
+  if (buffer.trim()) yield buffer;
 }
+
