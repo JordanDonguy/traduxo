@@ -1,4 +1,7 @@
-import { toast } from "@traduxo/packages/utils/ui/toast";
+export type ToastApi = {
+  success: (msg: string) => void;
+  error: (msg: string) => void;
+};
 
 const errorMessages: Record<string, string> = {
   NoMailOrPassword: "Please enter an email and a password",
@@ -17,6 +20,7 @@ let lastHandled: string = "";
  * @param cleanCallback - optional function to clean URL/query params (used on Web)
  */
 export function showAuthToasts(
+  toast: ToastApi,
   params: Record<string, string | boolean | undefined>,
   cleanCallback?: () => void
 ) {

@@ -4,7 +4,7 @@
 import "@testing-library/jest-dom";
 import React, { ReactNode } from "react";
 import { render, screen } from "@testing-library/react";
-import AppProvider from "@traduxo/packages/contexts/AppProvider.web";
+import AppProvider from "@/contexts/AppProvider.web";
 
 // ---- Mocks ----
 jest.mock("react-toastify", () => ({
@@ -19,9 +19,7 @@ jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   AppProviderBase: ({ children }: { children: ReactNode }) => <div data-testid="app-provider-base">{children}</div>,
 }));
 
-// ---- Helper Wrappers ----
-const wrapper = ({ children }: { children: ReactNode }) => <AppProvider>{children}</AppProvider>;
-
+// ---- Helper ----
 const renderWithProvider = (ui: ReactNode) => render(<AppProvider>{ui}</AppProvider>);
 
 // ---- Tests ----

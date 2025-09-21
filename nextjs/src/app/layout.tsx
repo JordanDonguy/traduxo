@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
-import AppProvider from "@traduxo/packages/contexts/AppProvider.web";
+import AppProvider from "@/contexts/AppProvider.web";
 
 const openSans = Open_Sans({
   variable: "--font-open_sans",

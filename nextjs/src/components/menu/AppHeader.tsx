@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
+import { toast } from "react-toastify";
 import { User, Dices } from "lucide-react";
 import UserMenu from "./UserMenu";
 import Logo from "../Logo";
@@ -44,7 +45,7 @@ function AppHeader() {
     });
 
     // Cleanup only auth-related keys
-    showAuthToasts(paramsObj, () => {
+    showAuthToasts(toast, paramsObj, () => {
       const params = new URLSearchParams(searchParams);
       const authKeys = ["login", "logout", "error", "delete", "reset-password"];
       authKeys.forEach((key) => params.delete(key));
