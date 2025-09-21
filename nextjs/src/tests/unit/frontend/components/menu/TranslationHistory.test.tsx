@@ -18,6 +18,12 @@ jest.mock("@traduxo/packages/hooks/translation/useSelectTranslation", () => ({
   useSelectTranslation: jest.fn(),
 }));
 
+// ---- Mock next/navigation ----
+const mockPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 // ---- Mock lucide-react icon ----
 // Mock CircleX icon
 jest.mock("lucide-react", () => ({

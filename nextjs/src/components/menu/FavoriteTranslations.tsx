@@ -12,7 +12,7 @@ interface FavoriteTranslationProps {
 function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
   const router = useRouter();
   const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations({});
-  const { selectTranslation } = useSelectTranslation();
+  const { selectTranslation } = useSelectTranslation({router});
 
   return (
     <div

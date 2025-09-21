@@ -2,6 +2,7 @@
 
 import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
+import { useRouter } from "next/navigation";
 import { CircleX } from "lucide-react";
 
 interface TranslationHistoryProps {
@@ -9,8 +10,9 @@ interface TranslationHistoryProps {
 }
 
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
+  const router = useRouter();
   const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory({});
-  const { selectTranslation } = useSelectTranslation();
+  const { selectTranslation } = useSelectTranslation({router});
 
   return (
     <div
