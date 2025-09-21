@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -24,16 +27,18 @@ jobs:
         run: npm ci
 
       - name: Run lint
-        run: npm run lint:web
+        run: npm run lint
 
       - name: Run tests
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: npm run test:web
+        run: npm run test
 
   deploy:
+    # Only run deploy when pushing or merging to main (doesn't run on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
 

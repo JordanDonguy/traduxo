@@ -1,4 +1,3 @@
-"use client";
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { TranslationProvider } from "@traduxo/packages/contexts/TranslationContext";
 import { LanguageProvider } from "@traduxo/packages/contexts/LanguageContext";

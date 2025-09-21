@@ -1,5 +1,3 @@
-"use client"
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useApp } from "./AppContext";
 import { fetchHistory } from "@traduxo/packages/utils/history/fetchHistory";
