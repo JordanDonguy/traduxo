@@ -5,13 +5,13 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ExplanationLanguage from "@/components/menu/ExplanationLanguage";
-import { useExplanationLanguage } from "@/lib/client/hooks/explanation/useExplanationLanguage";
-import { getSortedLanguageCodes } from "@/lib/client/utils/language/sortedLanguageCodes";
+import { useExplanationLanguage } from "@traduxo/packages/hooks/explanation/useExplanationLanguage";
+import { getSortedLanguageCodes } from "@traduxo/packages/utils/language/sortedLanguageCodes";
 import ISO6391 from "iso-639-1";
 
 // ------ Mocks ------
-jest.mock("@/lib/client/hooks/explanation/useExplanationLanguage");
-jest.mock("@/lib/client/utils/language/sortedLanguageCodes");
+jest.mock("@traduxo/packages/hooks/explanation/useExplanationLanguage");
+jest.mock("@traduxo/packages/utils/language/sortedLanguageCodes");
 jest.mock("iso-639-1", () => ({
   getName: jest.fn(),
 }));
