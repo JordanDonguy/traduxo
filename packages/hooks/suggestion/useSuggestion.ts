@@ -29,7 +29,7 @@ export function useSuggestion({
 }: UseSuggestionArgs) {
 
   // ---- Step 0: Initialize hooks and context ----
-  const defaultWaitForAuthStatus = useWaitForAuthStatus();
+  const defaultWaitForAuthStatus = useWaitForAuthStatus({});
   const defaultTranslationContext = useTranslationContext();
 
   // ---- Step 0b: Use injected values for testing if provided ----

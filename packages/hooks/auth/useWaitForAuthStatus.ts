@@ -14,9 +14,9 @@ export function useWaitForAuthStatus({
   sessionHook = useAuth,
   intervalFn = setInterval,
   clearIntervalFn = clearInterval,
-}: UseWaitForAuthStatusArgs = {}) {
+}: UseWaitForAuthStatusArgs) {
   // ---- Step 1: Get NextAuth session status ----
-  const { status } = sessionHook();
+  const { status, refresh } = sessionHook();
 
   // ---- Step 2: Track if the auth status is ready (not loading) ----
   const [ready, setReady] = useState(status !== "loading");
@@ -31,21 +31,30 @@ export function useWaitForAuthStatus({
   }, [status]);
 
   // ---- Step 5: Promise-based function to wait until auth status is ready ----
-  const waitForStatus = () =>
-    new Promise<void>((resolve) => {
+  const waitForStatus = (timeout = 5000) =>
+    new Promise<void>((resolve, reject) => {
       // If already ready, resolve immediately
       if (ready) {
         resolve();
         return;
       }
 
-      // Otherwise, poll every 50ms until status is no longer loading
-      const interval = intervalFn(() => {
+      // Timeout to prevent infinite waiting
+      const timer = setTimeout(() => {
+        clearIntervalFn(interval);
+        reject(new Error("Auth status timeout"));
+      }, timeout);
+
+      // Poll every 200ms and refresh auth status
+      const interval = intervalFn(async () => {
+        await refresh();
+
         if (statusRef.current !== "loading") {
-          clearIntervalFn(interval); // Stop polling
-          resolve();                 // Resolve promise
+          clearIntervalFn(interval);  // Stop polling
+          clearTimeout(timer);
+          resolve();                  // Resolve promise
         }
-      }, 50);
+      }, 200);
     });
 
   // ---- Step 6: Return the API ----

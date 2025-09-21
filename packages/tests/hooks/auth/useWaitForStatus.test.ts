@@ -3,106 +3,96 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useWaitForAuthStatus } from "@traduxo/packages/hooks/auth/useWaitForAuthStatus";
-import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 
-// ---- Mocks ----
-jest.mock("@traduxo/packages/contexts/AuthContext", () => ({
-  useAuth: jest.fn(),
-}));
+// Use fake timers to control hook's interval/timeout behavior
+jest.useFakeTimers();
 
-
-// ---- Tests ----
 describe("useWaitForAuthStatus", () => {
-  beforeAll(() => {
-    // Use fake timers to control setInterval behavior
-    jest.useFakeTimers();
-  });
-  afterAll(() => {
-    jest.useRealTimers();
+  afterEach(() => {
+    jest.clearAllTimers();
   });
 
   // ------ Test 1️⃣ ------
-  it("resolves immediately if status is not loading", async () => {
-    (useAuth as jest.Mock).mockReturnValue({
+  it("resolves immediately when status is not 'loading' (ready initially)", async () => {
+    // Verify hook is ready immediately when session status !== "loading"
+    const sessionHook = (): { status: "authenticated" | "loading" | "unauthenticated"; refresh: () => Promise<void> } => ({
       status: "authenticated",
-      token: "fake-token",
-      providers: [],
-      language: "en",
-      refresh: jest.fn(),
+      refresh: jest.fn(async () => { }),
     });
 
-    // Render the hook
-    const { result } = renderHook(() => useWaitForAuthStatus());
+    const { result } = renderHook(() => useWaitForAuthStatus({ sessionHook }));
 
-    // The hook should already be ready
     expect(result.current.ready).toBe(true);
-
-    // Call waitForStatus and ensure it resolves immediately
-    let resolved = false;
-    await act(async () => {
-      await result.current.waitForStatus();
-      resolved = true;
-    });
-
-    expect(resolved).toBe(true);
+    await expect(result.current.waitForStatus()).resolves.toBeUndefined();
   });
 
   // ------ Test 2️⃣ ------
-  it("polls until status changes from 'loading' and clears interval", async () => {
+  it("polls (calls refresh) and resolves after status flips from 'loading' to ready", async () => {
+    // Simulate refresh flipping status from "loading" -> "authenticated"
+    // and ensure polling calls refresh and resolves after rerender
+
     // Initial status is "loading"
-    let currentStatus: "loading" | "authenticated" = "loading";
+    let statusValue: "loading" | "authenticated" = "loading";
+    let rerenderFn: () => void;
 
-    // Mock useAuth to return currentStatus dynamically
-    (useAuth as jest.Mock).mockImplementation(() => ({
-      status: currentStatus,
-      token: null,
-      providers: [],
-      language: null,
-      refresh: jest.fn(),
-    }));
-
-    // ---- Mock setInterval to capture the callback ----
-    let intervalCallback: () => void;
-    const mockInterval = ((cb: () => void) => {
-      intervalCallback = cb; // store callback for manual triggering
-      return {} as NodeJS.Timeout; // fake interval ID
-    }) as unknown as typeof setInterval;
-
-    // Mock clearInterval to track when the interval is cleared
-    const mockClearInterval = jest.fn();
-
-    // Render the hook with injected mocks
-    const { result, rerender } = renderHook(() =>
-      useWaitForAuthStatus({
-        intervalFn: mockInterval,
-        clearIntervalFn: mockClearInterval,
-      })
-    );
-
-    // Initially ready should be false
-    expect(result.current.ready).toBe(false);
-
-    // Call waitForStatus (it should poll because ready = false)
-    let resolved = false;
-    act(() => {
-      result.current.waitForStatus().then(() => {
-        resolved = true;
+    // Mock refresh flips status and triggers a rerender so the hook sees the new status
+    const mockRefresh = jest.fn(async () => {
+      statusValue = "authenticated";
+      act(() => {
+        rerenderFn?.();
       });
+      return Promise.resolve();
     });
 
-    // ---- Simulate status changing after some time ----
-    currentStatus = "authenticated";
-    rerender(); // rerender to reflect status change
+    // sessionHook returns current status and refresh function
+    const sessionHook = (): { status: "loading" | "authenticated"; refresh: () => Promise<void> } => ({
+      status: statusValue,
+      refresh: mockRefresh,
+    });
 
-    // Manually trigger the interval callback to simulate polling
-    act(() => intervalCallback());
+    // Render hook and capture rerender function for later use in mockRefresh
+    // We have to assign rerender fn after calling the hook because we have to grab it from there
+    const { result, rerender } = renderHook(() => useWaitForAuthStatus({ sessionHook }));
+    rerenderFn = rerender;
 
-    // Allow any pending promises to resolve
-    await act(() => Promise.resolve());
+    // Initially not ready
+    expect(result.current.ready).toBe(false);
 
-    // ---- Assertions ----
-    expect(resolved).toBe(true); // waitForStatus resolved
-    expect(mockClearInterval).toHaveBeenCalled(); // interval cleared
-    expect(result.current.status).toBe("authenticated"); // status updated
+    // Start waitForStatus, which polls every 200ms
+    const waitPromise = result.current.waitForStatus(5000);
+
+    await act(async () => {
+      jest.advanceTimersByTime(200); // trigger one interval tick
+      await Promise.resolve();       // flush async/mockRefresh
+    });
+
+    // After status flips and rerender, promise resolves
+    await expect(waitPromise).resolves.toBeUndefined();
+
+    // Hook state updated and refresh was called
+    expect(result.current.ready).toBe(true);
+    expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  // ------ Test 3️⃣ ------
+  it("rejects with timeout if status remains 'loading'", async () => {
+    // Ensure waitForStatus rejects on timeout and avoid unhandled rejection
+    const sessionHook = (): { status: "loading" | "authenticated"; refresh: () => Promise<void> } => ({
+      status: "loading",
+      refresh: jest.fn(async () => { }),
+    });
+
+    const { result } = renderHook(() => useWaitForAuthStatus({ sessionHook }));
+
+    // Attach rejection expectation BEFORE advancing timers to prevent unhandled rejection
+    const waitPromise = result.current.waitForStatus(1000);
+    const assertion = expect(waitPromise).rejects.toThrow("Auth status timeout");
+
+    await act(async () => {
+      jest.advanceTimersByTime(1200); // pass the timeout
+      await Promise.resolve();
+    });
+
+    await assertion;
   });
 });
