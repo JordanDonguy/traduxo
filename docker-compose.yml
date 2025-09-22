@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: nextjs/Dockerfile
+    image: traduxo-app:v1
+    env_file:
+      - nextjs/.env
+    ports:
+      - "3000:3000"
