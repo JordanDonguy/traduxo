@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useAuthHandlers } from "@/lib/client/hooks/auth/useAuthForm";
+import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
 
@@ -10,6 +12,7 @@ interface LoginProps {
 }
 
 export default function Login({ showMenu }: LoginProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,15 +21,22 @@ export default function Login({ showMenu }: LoginProps) {
   const [isSignup, setIsSignup] = useState(false);
 
   const { handleLogin, handleSignup, handleGoogleButton, handleForgotPassword } = useAuthHandlers();
+  const { refresh } = useAuth();
 
   return (
     <form
       data-testid="login-form"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         setError("");
-        if (isSignup) handleSignup(email, password, confirmPassword, setError, setIsSignup);
-        else handleLogin(email, password, setError, setIsLoading);
+        if (isSignup) {
+          const success = await handleSignup(email, password, confirmPassword, setError, setIsSignup, refresh);
+          if (success) router.push("/?login=true");
+        }
+        else {
+          const success = await handleLogin(email, password, setError, setIsLoading, refresh);
+          if (success) router.push("/?login=true");
+        }
       }}
       className={`
         max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
@@ -112,11 +122,11 @@ export default function Login({ showMenu }: LoginProps) {
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
 
-        {/* Google OAuth button */}
+        {/* -------------- Google OAuth button -------------- */}
         <button
           id="google-btn"
           type="button"
-          onClick={handleGoogleButton}
+          onClick={() => handleGoogleButton()}
           className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--border)] bg-[var(--menu)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
         >
           <Image

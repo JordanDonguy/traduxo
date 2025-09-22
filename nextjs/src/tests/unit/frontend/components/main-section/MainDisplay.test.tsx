@@ -14,18 +14,18 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Mock AppContext
-jest.mock("@/context/AppContext", () => ({
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   useApp: jest.fn(),
 }));
 
 // Mock TranslationContext
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: jest.fn(),
 }));
 
 // --------- Mock hooks ---------
 // Favorite toggle hook
-jest.mock("@/lib/client/hooks/favorites/useFavoriteToggle", () => ({
+jest.mock("@traduxo/packages/hooks/favorites/useFavoriteToggle", () => ({
   useFavoriteToggle: () => ({
     handleFavorite: jest.fn(),
     isFavLoading: false,
@@ -33,17 +33,11 @@ jest.mock("@/lib/client/hooks/favorites/useFavoriteToggle", () => ({
 }));
 
 // Switch translations hook
-jest.mock("@/lib/client/hooks/translation/useSwitchTranslations", () => ({
+jest.mock("@traduxo/packages/hooks/translation/useSwitchTranslations", () => ({
   useSwitchTranslations: () => ({
     switchTranslations: jest.fn(),
     fading: false,
   }),
-}));
-
-// --------- Mock utils ---------
-// Authentication toasts utility
-jest.mock("@/lib/client/utils/ui/authToasts", () => ({
-  showAuthToasts: jest.fn(),
 }));
 
 // --------- Mock child components ---------
@@ -93,8 +87,8 @@ jest.mock("@/components/main-section/ExplanationSection", () => {
 });
 
 // ---- Import Contexts ----
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 
 // ---- Tests ----
 describe("<MainDisplay />", () => {

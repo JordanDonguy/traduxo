@@ -1,7 +1,7 @@
 "use client"
 
-import { useExplanationLanguage } from "@/lib/client/hooks/explanation/useExplanationLanguage";
-import { getSortedLanguageCodes } from "@/lib/client/utils/language/sortedLanguageCodes";
+import { useExplanationLanguage } from "@traduxo/packages/hooks/explanation/useExplanationLanguage";
+import { getSortedLanguageCodes } from "@traduxo/packages/utils/language/sortedLanguageCodes";
 import { Check } from "lucide-react";
 import ISO6391 from "iso-639-1";
 
@@ -10,7 +10,7 @@ interface ExplanationLanguageProps {
 }
 
 function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
-  const { systemLang, changeSystemLang } = useExplanationLanguage();
+  const { systemLang, changeSystemLang } = useExplanationLanguage({});
 
   return (
     <div

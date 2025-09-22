@@ -1,41 +1,67 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client/extension";
-import { prisma } from "@/lib/server/prisma";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/server/prisma";
+import { PrismaClient } from "@prisma/client/extension";
+
+export interface LogoutDeps {
+  prismaClient?: Partial<PrismaClient>;
+  bcryptFn?: typeof bcrypt;
+  jwtFn?: typeof jwt;
+}
 
 interface LogoutBody {
   refreshToken: string;
+  accessToken: string;
 }
 
-export interface JwtLogoutDeps {
-  prismaClient?: Partial<PrismaClient>;
-  bcryptFn?: Partial<typeof bcrypt>;
+interface RefreshTokenRecord {
+  id: string;
+  token: string;
 }
 
 export async function jwtLogoutHandler(
   req: NextRequest,
-  { prismaClient = prisma, bcryptFn = bcrypt }: JwtLogoutDeps
+  { prismaClient = prisma, bcryptFn = bcrypt, jwtFn = jwt }: LogoutDeps
 ) {
   try {
     const body: LogoutBody = await req.json();
-    const { refreshToken } = body;
+    const { refreshToken, accessToken } = body;
 
-    if (!refreshToken) {
-      return NextResponse.json({ error: "Missing refresh token" }, { status: 400 });
+    if (!refreshToken || !accessToken) {
+      return NextResponse.json({ error: "Missing refreshToken or accessToken" }, { status: 400 });
     }
 
-    // Find all hashed tokens in DB
-    const tokens: { id: string; token: string }[] = await prismaClient.refreshToken.findMany({
+    // Decode access token to get userId
+    let userId: string | null = null;
+    try {
+      const decoded = jwtFn.verify(accessToken, process.env.JWT_SECRET!, { ignoreExpiration: true }) as jwt.JwtPayload;
+      userId = decoded.sub as string;
+    } catch {
+      const decoded = jwtFn.decode(accessToken) as jwt.JwtPayload | null;
+      userId = decoded?.sub ?? null;
+    }
+
+    if (!userId) {
+      return NextResponse.json({ error: "Invalid access token" }, { status: 401 });
+    }
+
+    // Find all active refresh tokens for this user
+    const tokens = await prismaClient.refreshToken.findMany({
+      where: { userId, expiresAt: { gt: new Date() } },
       select: { id: true, token: true },
     });
 
-    // Compare each hashed token with the one provided
-    const tokenEntry = tokens.find((t) =>
-      bcryptFn.compareSync!(refreshToken, t.token)
+    // Find matching token
+    const tokenToRevoke = tokens.find((t: RefreshTokenRecord) =>
+      bcryptFn.compareSync(refreshToken, t.token)
     );
 
-    if (tokenEntry) {
-      await prismaClient.refreshToken.delete({ where: { id: tokenEntry.id } });
+    if (tokenToRevoke) {
+      await prismaClient.refreshToken.update({
+        where: { id: tokenToRevoke.id },
+        data: { revoked: true },
+      });
     }
 
     return NextResponse.json({ success: true, message: "Logged out" });

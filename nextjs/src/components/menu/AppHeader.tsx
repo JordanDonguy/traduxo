@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
+import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
+import { toast } from "react-toastify";
 import { User, Dices } from "lucide-react";
 import UserMenu from "./UserMenu";
 import Logo from "../Logo";
-
 
 function AppHeader() {
   const router = useRouter();
@@ -14,7 +16,8 @@ function AppHeader() {
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
-  const { suggestTranslation, isRolling } = useSuggestion();
+  const { refresh } = useAuth();
+  const { suggestTranslation, isRolling } = useSuggestion({});
 
   // -------- Menu opening / closing section --------
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -33,6 +36,27 @@ function AppHeader() {
     }
   }, [searchParams, pathname, router]);
 
+  // Display a toast message if there's an error or success message in url params
+  useEffect(() => {
+    // Convert URLSearchParams to a plain object
+    const paramsObj: Record<string, string | boolean> = {};
+    searchParams.forEach((value, key) => {
+      paramsObj[key] = value === "true" ? true : value === "false" ? false : value;
+    });
+
+    // Cleanup only auth-related keys
+    showAuthToasts(toast, paramsObj, () => {
+      const params = new URLSearchParams(searchParams);
+      const authKeys = ["login", "logout", "error", "delete", "reset-password"];
+      authKeys.forEach((key) => params.delete(key));
+
+      const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+      router.replace(newUrl);
+    });
+
+    refresh();
+  }, [searchParams, pathname, router, refresh]);
+
   return (
     <header className="w-full h-full flex justify-center">
 
@@ -40,7 +64,10 @@ function AppHeader() {
 
       <div className="z-50 fixed w-full max-w-6xl h-14 md:h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
-          onClick={suggestTranslation}
+          onClick={() => {
+            router.push("/");
+            suggestTranslation();
+          }}
           className="md:hidden p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"
         >
           <Dices size={28} className={`${isRolling ? "animate-dice-roll" : ""}`} />
@@ -50,7 +77,10 @@ function AppHeader() {
 
         <div>
           <button
-            onClick={suggestTranslation}
+            onClick={() => {
+              router.push("/");
+              suggestTranslation();
+            }}
             className="hidden md:inline p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
           >
             <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
@@ -72,7 +102,7 @@ function AppHeader() {
           </button>
         </div>
       </div>
-    </header>
+    </header >
   )
 }
 

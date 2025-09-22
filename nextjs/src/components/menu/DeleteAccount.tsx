@@ -1,7 +1,8 @@
 "use client"
 
-import { useDeleteAccount } from "@/lib/client/hooks/auth/useDeleteAccount";
+import { useDeleteAccount } from "@traduxo/packages/hooks/auth/useDeleteAccount";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface DeleteAccountProps {
   showMenu: boolean
@@ -10,7 +11,13 @@ interface DeleteAccountProps {
 function DeleteAccount({ showMenu }: DeleteAccountProps) {
   const router = useRouter();
 
-  const { deleteAccount, isLoading } = useDeleteAccount();
+  const { deleteAccount, isLoading } = useDeleteAccount({
+    onSuccess: async () => {
+      toast.success("Your account has been deleted");
+      router.push("/");
+    },
+    onError: (msg) => toast.error(msg),
+  });
 
   return (
     <div className={`max-w-2xl w-full flex justify-center mx-auto ${showMenu ? "opacity-100" : "opacity-0"} duration-200`}>

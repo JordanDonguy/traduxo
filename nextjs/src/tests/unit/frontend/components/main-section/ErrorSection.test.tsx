@@ -5,19 +5,18 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ErrorSection from "@/components/main-section/ErrorSection";
-import { useCooldown } from "@/lib/client/hooks/ui/useCooldown";
-import { useApp } from "@/context/AppContext";
+import { useCooldown } from "@traduxo/packages/hooks/ui/useCooldown";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 
 // ------ Mocks ------
-jest.mock("@/lib/client/hooks/ui/useCooldown");
-jest.mock("@/context/AppContext");
+jest.mock("@traduxo/packages/hooks/ui/useCooldown");
+jest.mock("@traduxo/packages/contexts/AppContext");
 
 describe("ErrorSection component", () => {
   const setError = jest.fn();
   const setShowLoginForm = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
     (useApp as jest.Mock).mockReturnValue({ setShowLoginForm });
   });
 

@@ -5,7 +5,8 @@ import { render, screen, fireEvent } from "@testing-library/react"
 import "@testing-library/jest-dom"
 import AppHeader from "@/components/menu/AppHeader"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useSuggestion } from "@/lib/client/hooks/translation/useSuggestion"
+import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion"
+import { AuthProvider } from "@traduxo/packages/contexts/AuthContext";
 
 // --- Mocks ---
 jest.mock("next/navigation", () => ({
@@ -14,7 +15,7 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }))
 
-jest.mock("@/lib/client/hooks/translation/useSuggestion", () => ({
+jest.mock("@traduxo/packages/hooks/suggestion/useSuggestion", () => ({
   useSuggestion: jest.fn(),
 }))
 
@@ -33,10 +34,30 @@ const push = jest.fn()
 const replace = jest.fn()
 const suggestTranslation = jest.fn()
 
+function renderWithAuth(ui: React.ReactNode) {
+  return render(<AuthProvider>{ui}</AuthProvider>);
+}
+
+const createSearchParamsMock = (params: Record<string, string>) => {
+  const urlParams = new URLSearchParams(params);
+
+  // Patch get to match object-like API
+  urlParams.get = (key: string) => params[key] || null;
+
+  // Patch forEach with correct signature
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  urlParams.forEach = (callback: (value: string, key: string, parent: URLSearchParams) => void, thisArg?: any) => {
+    Object.entries(params).forEach(([key, value]) => callback.call(thisArg, value, key, urlParams));
+  };
+
+  return urlParams;
+};
+
+
 beforeEach(() => {
   (useRouter as jest.Mock).mockReturnValue({ push, replace });
   (usePathname as jest.Mock).mockReturnValue("/current-path");
-  (useSearchParams as jest.Mock).mockReturnValue({ get: () => null });
+  (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock({}));
   (useSuggestion as jest.Mock).mockReturnValue({ suggestTranslation, isRolling: false });
 
   push.mockClear();
@@ -48,14 +69,14 @@ beforeEach(() => {
 describe("AppHeader component", () => {
   // ------ Test 1️⃣ ------
   it("renders UserMenu and Logo", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
     expect(screen.getByText("UserMenu")).toBeInTheDocument()
     expect(screen.getByText("Logo")).toBeInTheDocument()
   })
 
   // ------ Test 2️⃣ ------
   it("calls suggestTranslation when dice buttons are clicked", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const diceButtons = screen.getAllByRole("button").filter(btn =>
       btn.querySelector("svg")?.classList.contains("lucide-dices")
@@ -67,7 +88,7 @@ describe("AppHeader component", () => {
 
   // ------ Test 3️⃣ ------
   it("toggles menu when user button is clicked", () => {
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const userButtons = screen.getAllByRole("button").filter(btn =>
       btn.querySelector("svg")?.classList.contains("lucide-user")
@@ -82,18 +103,18 @@ describe("AppHeader component", () => {
 
   // ------ Test 4️⃣ ------
   it("opens menu automatically if searchParams has menu=open", () => {
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams("menu=open"))
-    render(<AppHeader />)
+    (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock({ menu: "open" }));
+    renderWithAuth(<AppHeader />)
     expect(screen.getByText("UserMenu")).toBeInTheDocument()
   })
 
   // ------ Test 5️⃣ ------
   it("removes submenu param via router.replace if menu not open", () => {
     (useSearchParams as jest.Mock).mockReturnValue(
-      new URLSearchParams("submenu=login")
+      createSearchParamsMock({ submenu: "login" })
     )
 
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
     expect(replace).toHaveBeenCalledWith("/current-path?")
   })
 
@@ -103,10 +124,44 @@ describe("AppHeader component", () => {
       suggestTranslation,
       isRolling: true,
     })
-    render(<AppHeader />)
+    renderWithAuth(<AppHeader />)
 
     const diceSvgs = document.querySelectorAll("svg.lucide-dices.animate-dice-roll")
 
     expect(diceSvgs.length).toBeGreaterThan(0)
+  })
+
+  // ------ Test 7️⃣ ------
+  it("opens menu automatically if menu=open in searchParams and does not replace URL", () => {
+    (useSearchParams as jest.Mock).mockReturnValue(
+      createSearchParamsMock({ menu: "open", submenu: "history" })
+    )
+
+    renderWithAuth(<AppHeader />)
+
+    // Menu should be open
+    const menuDiv = screen.getByText("UserMenu")
+    expect(menuDiv).toBeInTheDocument()
+
+    // replace should be called only for submenu removal when menu is NOT open
+    // but here menu is open, so replace shouldn't be called
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  // ------ Test 8️⃣ ------
+  it("cleans up auth-related searchParams after showing toast", () => {
+    const authParams = {
+      login: "true",
+      logout: "true",
+      error: "Some error",
+      delete: "true",
+    };
+
+    (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock(authParams))
+
+    renderWithAuth(<AppHeader />)
+
+    // The effect should call replace() to remove auth keys
+    expect(replace).toHaveBeenLastCalledWith("/current-path")
   })
 })

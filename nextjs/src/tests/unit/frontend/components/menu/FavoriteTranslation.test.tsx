@@ -5,15 +5,23 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FavoriteTranslation from "@/components/menu/FavoriteTranslations";
-import { useFavoriteTranslations } from "@/lib/client/hooks/favorites/useFavoriteTranslations";
-import { useSelectTranslation } from "@/lib/client/hooks/translation/useSelectTranslation";
+import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFavoriteTranslations";
+import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 
 // --- Mocks ---
-jest.mock("@/lib/client/hooks/favorites/useFavoriteTranslations");
-jest.mock("@/lib/client/hooks/translation/useSelectTranslation");
+jest.mock("@traduxo/packages/hooks/favorites/useFavoriteTranslations");
+
+jest.mock("@traduxo/packages/hooks/translation/useSelectTranslation");
+
 jest.mock("lucide-react", () => ({
   CircleX: () => <svg data-testid="circle-x" />,
 }));
+
+const mockPush = jest.fn();
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+
 
 // ---- Tests ----
 describe("FavoriteTranslation component", () => {
@@ -119,5 +127,29 @@ describe("FavoriteTranslation component", () => {
     expect(inputLangSpans[1]).toHaveTextContent("FR"); // first translation output
     expect(inputLangSpans[2]).toHaveTextContent("FR"); // second translation input
     expect(inputLangSpans[3]).toHaveTextContent("EN"); // second translation output
+  });
+
+  it("navigates to / if deleteTranslation fails", async () => {
+    // Arrange deleteTranslation to returns false
+    (useFavoriteTranslations as jest.Mock).mockReturnValue({
+      favoriteTranslations: [
+        { id: 1, inputLang: "en", inputText: "Hello", outputLang: "fr", translation: "Bonjour" },
+      ],
+      isLoading: false,
+      status: "authenticated",
+      deleteTranslation: jest.fn().mockResolvedValue(false),
+    });
+
+    render(<FavoriteTranslation showMenu={true} />);
+    const deleteBtn = screen.getByTestId("circle-x");
+
+    // Act: click delete button
+    fireEvent.click(deleteBtn);
+
+    // Wait for 
+    await screen.findByText("Favorites"); // just to wait for component update
+
+    // Assert: router.push called
+    expect(mockPush).toHaveBeenCalledWith("/");
   });
 });

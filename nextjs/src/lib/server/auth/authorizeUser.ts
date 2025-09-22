@@ -36,11 +36,14 @@ export async function authorizeUser(credentials: Record<string, string> | undefi
     return {
       id: user.id,
       email: user.email ?? undefined,
+      language: user.systemLang ?? undefined,
+      providers: user.providers,
     };
   } catch (error) {
     if (error instanceof ZodError) {
       throw new Error("InvalidInput");
     }
     throw error;
+    return null
   }
 }

@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx", // Use React JSX transform for Jest
+    "module": "commonjs", // Ensure Jest can handle imports
+    "baseUrl": ".",
+    "paths": {
+      "@traduxo/packages/*": ["../packages/*"],
+      "@/*": [
+        "src/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
+}

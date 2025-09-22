@@ -1,11 +1,11 @@
 "use client";
 
-import { useApp } from "@/context/AppContext";
-import { useTranslationContext } from "@/context/TranslationContext";
-import { useLanguageContext } from "@/context/LanguageContext";
-import { useLanguageSwitch } from "@/lib/client/hooks/ui/useLanguageSwitch";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
+import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
 import { useVoiceInput } from "@/lib/client/hooks/ui/useVoiceInput";
-import { translationHelper } from "@/lib/client/utils/translation/translate";
+import { translationHelper } from "@traduxo/packages/utils/translation/translate";
 import LanguageSelector from "./LanguageSelector";
 import TextInputForm from "./TextInputForm";
 

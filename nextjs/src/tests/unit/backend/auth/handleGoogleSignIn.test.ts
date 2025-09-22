@@ -18,7 +18,7 @@ describe("handleGoogleSignIn", () => {
     expect(mockPrisma.user.create).toHaveBeenCalledWith({
       data: { email: "test@example.com", providers: ["Google"] },
     });
-    expect(result).toEqual({ success: true, userId: "123" });
+    expect(result).toEqual({ success: true, userId: "123", language: null, providers: ["Google"] });
   });
 
   // ------ Test 3️⃣ ------
@@ -26,12 +26,13 @@ describe("handleGoogleSignIn", () => {
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "123",
       email: "test@example.com",
+      language: null,
       providers: ["Google"],
     });
 
     const result = await handleGoogleSignIn("test@example.com");
 
-    expect(result).toEqual({ success: true, userId: "123" });
+    expect(result).toEqual({ success: true, userId: "123", language: null, providers: ["Google"] });
   });
 
   // ------ Test 4️⃣ ------

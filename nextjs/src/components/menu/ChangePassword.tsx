@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useChangePassword } from "@/lib/client/hooks/auth/useChangePassword";
+import { useChangePassword } from "@traduxo/packages/hooks/auth/useChangePassword";
 import { Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 type ChangePasswordProps = {
   isCredentials: boolean | undefined;
@@ -10,7 +12,16 @@ type ChangePasswordProps = {
 }
 
 export default function ChangePassword({ isCredentials, showMenu }: ChangePasswordProps) {
-  const { isLoading, error, handleSubmit } = useChangePassword({ isCredentials });
+  const router = useRouter();
+
+  const { isLoading, error, handleSubmit } = useChangePassword({
+    isCredentials,
+    onSuccess: (msg) => {
+      toast.success(msg);
+      router.push("/");
+    },
+    onError: (msg) => toast.error(msg),
+  });
 
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");

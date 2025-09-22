@@ -23,14 +23,14 @@ const mockSetInputLang = jest.fn();
 const mockSetOutputLang = jest.fn();
 
 // ---- Mock helpers/hooks ----
-jest.mock("@/context/AppContext", () => ({
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
   useApp: () => ({
     setIsLoading: mockSetIsLoading,
     setError: mockSetError,
   }),
 }));
 
-jest.mock("@/context/TranslationContext", () => ({
+jest.mock("@traduxo/packages/contexts/TranslationContext", () => ({
   useTranslationContext: () => ({
     inputText: "Hello",
     setInputText: mockSetInputText,
@@ -43,7 +43,7 @@ jest.mock("@/context/TranslationContext", () => ({
   }),
 }));
 
-jest.mock("@/context/LanguageContext", () => ({
+jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   useLanguageContext: () => ({
     inputLang: "en",
     outputLang: "fr",
@@ -53,7 +53,7 @@ jest.mock("@/context/LanguageContext", () => ({
   }),
 }));
 
-jest.mock("@/lib/client/hooks/ui/useLanguageSwitch", () => ({
+jest.mock("@traduxo/packages/hooks/translation/useLanguageSwitch", () => ({
   useLanguageSwitch: () => ({
     isSwitching: false,
     switchLanguage: jest.fn(),
@@ -71,7 +71,7 @@ jest.mock("@/lib/client/hooks/ui/useVoiceInput", () => ({
 }));
 
 const mockTranslationHelper = jest.fn();
-jest.mock("@/lib/client/utils/translation/translate", () => ({
+jest.mock("@traduxo/packages/utils/translation/translate", () => ({
   translationHelper: (args: Parameters<typeof mockTranslationHelper>[0]) => mockTranslationHelper(args),
 }));
 

@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect } from "react";
-import { useCooldown } from "@/lib/client/hooks/ui/useCooldown";
-import { useApp } from "@/context/AppContext";
-import { formatError } from "@/lib/client/utils/ui/formatError";
+import { useCooldown } from "@traduxo/packages/hooks/ui/useCooldown";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { formatError } from "@traduxo/packages/utils/formatting/formatError";
 
 type ErrorSectionProps = {
   error: string;

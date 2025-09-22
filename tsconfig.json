@@ -14,10 +14,11 @@
     "jsx": "preserve",
     "types": ["jest", "node"],
     "incremental": true,
+    "sourceMap": true,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./nextjs/src/*"],
-      "@utils/*": ["./packages/*"]
+      "@traduxo/packages/*": ["./packages/*"]
     }
   },
   "include": [
@@ -25,6 +26,6 @@
     "nextjs/src/**/*",
     "packages/**/*",
     "tests/**/*"
-, "packages/.eslintrc.cjs"  ],
+  ],
   "exclude": ["node_modules", "dist"]
 }

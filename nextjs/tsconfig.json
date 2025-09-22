@@ -29,13 +29,16 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@traduxo/packages/*": [
+        "../packages/*"
       ]
     }
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [
