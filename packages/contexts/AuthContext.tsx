@@ -19,6 +19,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [auth, setAuth] = useState<Auth>({ status: "loading" });
 
   const refresh = useCallback(async () => {
+    // Set auth status to loading if refresh is called while status is unauthenticated
+    setAuth((prev) => (prev.status === "unauthenticated" ? { status: "loading" } : prev));
+
+    // Get jwt token datas and update auth state
     const tokenData = await getToken();
     setAuth({
       status: tokenData?.token ? "authenticated" : "unauthenticated",

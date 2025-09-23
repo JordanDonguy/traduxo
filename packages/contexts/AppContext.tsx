@@ -31,7 +31,9 @@ export function AppProviderBase({ children }: { children: ReactNode }) {
     >
       <AuthProvider>
         <TranslationProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
         </TranslationProvider>
       </AuthProvider>
     </AppContext.Provider>
