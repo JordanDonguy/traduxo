@@ -34,8 +34,8 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
         handleSubmit({ currentPassword, password, confirmPassword });
       }}
       className={`
-        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
-        ${showMenu ? "opacity-100" : "opacity-0"} duration-200
+        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)] pb-6
+        ${showMenu ? "opacity-100" : "opacity-0"} duration-200 overflow-y-auto scrollbar-hide
         `}
     >
       {/* -------------- Loading spinner -------------- */}

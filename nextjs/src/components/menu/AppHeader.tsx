@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
@@ -16,11 +17,9 @@ function AppHeader() {
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
 
+  const { showMenu, setShowMenu } = useApp();
   const { refresh } = useAuth();
   const { suggestTranslation, isRolling } = useSuggestion({});
-
-  // -------- Menu opening / closing section --------
-  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   // Get url params, if menu-open, open the menu, otherwise close it
   useEffect(() => {
@@ -34,7 +33,7 @@ function AppHeader() {
       params.delete("submenu");
       router.replace(`${pathname}?${params.toString()}`);
     }
-  }, [searchParams, pathname, router]);
+  }, [searchParams, pathname, router, setShowMenu]);
 
   // Display a toast message if there's an error or success message in url params
   useEffect(() => {

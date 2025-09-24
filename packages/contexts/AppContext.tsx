@@ -4,6 +4,8 @@ import { LanguageProvider } from "@traduxo/packages/contexts/LanguageContext";
 import { AuthProvider } from "./AuthContext";
 
 export type AppContextType = {
+  showMenu: boolean;
+  setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
   showLoginForm: boolean;
   setShowLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
   error: string;
@@ -21,13 +23,23 @@ export const useApp = () => {
 };
 
 export function AppProviderBase({ children }: { children: ReactNode }) {
+  const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   return (
     <AppContext.Provider
-      value={{ showLoginForm, setShowLoginForm, error, setError, isLoading, setIsLoading }}
+      value={{
+        showMenu,
+        setShowMenu,
+        showLoginForm,
+        setShowLoginForm,
+        error,
+        setError,
+        isLoading,
+        setIsLoading
+      }}
     >
       <AuthProvider>
         <TranslationProvider>

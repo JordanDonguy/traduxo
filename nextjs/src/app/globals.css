@@ -1,42 +1,53 @@
 @import "tailwindcss";
 
+/* ==============================
+   Light Theme (Default)
+============================== */
 :root {
-  --bg: #ededed;
+  --bg: #ffffff;
   --text: #121212;
-  --bg-2: #d2d2d5;
-  --menu: #dde5e8;
-  --input: #dee5e7;
+  --bg-2: #ededee;
+  --menu: #ffffff;
+  --input: #f5fdff;
   --input-placeholder: #7e7e7e;
   --input-border: #a6a6a6;
   --border: #a6a6a6;
-  --hover: #cacacf;
-  --hover-2: #cacacf;
-  --btn: #dbe0e1;
+  --hover: #e0e0e4;
+  --hover-2: #dddde4;
+  --btn: #f0f6f7;
   --warning: #485a65;
-  --example: #d4d4db;
+  --example: #ececf0;
   --example-border: #cccccc;
 }
 
+/* ==============================
+   Dark Theme (Manual Switch)
+============================== */
 [data-theme='dark'] {
   --bg: #121212;
   --text: #ededed;
-  --bg-2: #232326;
-  --menu: #1a1a1e;
+  --bg-2: #232325;
+  --menu: #121212;
   --input: #0f0f11;
   --input-placeholder: #a3a3a3;
   --input-border: #424242;
-  --border: #7d7d7d;
+  --border: #696969;
   --hover: #3f3f46;
-  --hover-2: #29292e;
+  --hover-2: #29292d;
   --btn: #1b1b1d;
+  --example: #222227;
+  --example-border: #2e2d31;
 }
 
+/* ==============================
+   Dark Theme (System Preference)
+============================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #121212;
     --text: #ededed;
     --bg-2: #232325;
-    --menu: #151617;
+    --menu: #121212;
     --input: #0f0f11;
     --input-placeholder: #a3a3a3;
     --input-border: #424242;
@@ -49,6 +60,9 @@
   }
 }
 
+/* ==============================
+   Base Styles
+============================== */
 .logo {
   color: var(--logo-color);
 }
@@ -57,17 +71,6 @@ body {
   background: var(--bg-2);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-.bg-warning {
-  background-image: url("../../public/warning.svg");
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 100%;
-}
-
-[data-theme="dark"] .bg-warning {
-  background-image: url("../../public/warning-dark.svg");
 }
 
 select {
@@ -80,6 +83,27 @@ input::placeholder {
   /* Fix Safari's default opacity */
 }
 
+strong {
+  font-weight: 800;
+}
+
+/* ==============================
+   Warning Background
+============================== */
+.bg-warning {
+  background-image: url("../../public/warning.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+[data-theme="dark"] .bg-warning {
+  background-image: url("../../public/warning-dark.svg");
+}
+
+/* ==============================
+   Explanation Section
+============================== */
 .explanation {
   min-height: 58px;
 }
@@ -115,10 +139,6 @@ h3::before {
   color: var(--input-placeholder);
 }
 
-strong {
-  font-weight: 800;
-}
-
 .explanation p,
 .explanation li {
   overflow-wrap: break-word;
@@ -137,13 +157,13 @@ strong {
 
 .explanation ul li:nth-child(3) {
   background-color: transparent;
-
 }
 
 .explanation ul li:nth-child(3)::before {
   content: "💡 ";
 }
 
+/* Dark Mode Overrides */
 [data-theme="dark"] .explanation strong {
   font-weight: 800;
   color: white;
@@ -155,6 +175,9 @@ strong {
   text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
+/* ==============================
+   Animations
+============================== */
 @keyframes dice-roll {
   0% {
     transform: rotate(0deg);
@@ -171,6 +194,41 @@ strong {
   animation: dice-roll 0.6s ease-out;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  position: fixed;
+  width: 140px;
+  height: 140px;
+  border: 8px solid #b1b1b1;
+  border-top: 8px solid var(--hover);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.fade-in-item {
+  opacity: 0;
+  animation: fadeIn 0.2s forwards;
+  /* quick fade-in */
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==============================
+   Autofill Fixes
+============================== */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -185,26 +243,9 @@ select:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-.spinner {
-  position: fixed;
-  width: 140px;
-  height: 140px;
-  border: 8px solid #b1b1b1;
-  border-top: 8px solid var(--hover);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
+/* ==============================
+   Scrollbar Styles
+============================== */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -215,33 +256,4 @@ select:-webkit-autofill:focus {
   /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--input-border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--input-placeholder);
-  border-radius: 4px;
-}
-
-.fade-in-item {
-  opacity: 0;
-  animation: fadeIn 0.2s forwards; /* quick fade-in */
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-  }
 }

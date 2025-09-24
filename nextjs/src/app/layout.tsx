@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-y-scroll">
+    <html lang="en" className="overflow-y-hidden">
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta
@@ -31,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${openSans.className} antialiased`}
       >
+        <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>
         <AppProvider>
           {children}
         </AppProvider>

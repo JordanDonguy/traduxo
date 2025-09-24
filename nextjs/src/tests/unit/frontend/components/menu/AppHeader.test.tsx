@@ -29,10 +29,21 @@ jest.mock("@/components/Logo", () => ({
   default: () => <div>Logo</div>,
 }))
 
+// --- Add this with the other mocks ---
+jest.mock("@traduxo/packages/contexts/AppContext", () => {
+  return {
+    useApp: jest.fn(),
+  };
+});
+
+// Import after the mock
+import { useApp } from "@traduxo/packages/contexts/AppContext";
+
 // Mock instances
 const push = jest.fn()
 const replace = jest.fn()
 const suggestTranslation = jest.fn()
+const setShowMenu = jest.fn();
 
 function renderWithAuth(ui: React.ReactNode) {
   return render(<AuthProvider>{ui}</AuthProvider>);
@@ -59,6 +70,10 @@ beforeEach(() => {
   (usePathname as jest.Mock).mockReturnValue("/current-path");
   (useSearchParams as jest.Mock).mockReturnValue(createSearchParamsMock({}));
   (useSuggestion as jest.Mock).mockReturnValue({ suggestTranslation, isRolling: false });
+  (useApp as jest.Mock).mockReturnValue({
+    showMenu: false,
+    setShowMenu,
+  });
 
   push.mockClear();
   replace.mockClear();
@@ -98,7 +113,7 @@ describe("AppHeader component", () => {
     expect(push).toHaveBeenCalledWith("/current-path/?menu=open")
 
     fireEvent.click(userButtons[0])
-    expect(push).toHaveBeenCalledWith("/")
+    expect(setShowMenu).toHaveBeenCalledWith(false);
   })
 
   // ------ Test 4️⃣ ------
