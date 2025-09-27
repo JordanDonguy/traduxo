@@ -7,7 +7,7 @@ export const runtime = 'edge';
 // Schema to validate input
 const BodySchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
-  model: z.string().optional().default('gemini-2.5-flash-lite'),
+  model: z.string().optional().default('gemini-2.5-flash-lite-preview-09-2025'),
 });
 
 // -------------- Edge handler --------------

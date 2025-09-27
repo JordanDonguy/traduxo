@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)]">
+    <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)] overflow-y-scroll max-h-screen">
       <AppHeaderSuspenseWrapper />
       <main className="flex flex-col justify-center items-start w-full flex-1 max-w-2xl mx-auto pt-16 pb-12 gap-4 px-2 md:px-0">
         <Link href="/" className="text-blue-500 hover:cursor-pointer hover:underline">⬅ Back to main</Link>

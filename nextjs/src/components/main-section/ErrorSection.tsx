@@ -23,7 +23,7 @@ function ErrorSection({error, setError}: ErrorSectionProps) {
   }, [cooldown, errorToDisplay, setError]);
 
   return (
-    <div className={`mt-12 max-w-[96%] sm:max-w-xl lg:max-w-3xl  flex flex-col ${errorToDisplay.startsWith("To continue using") ? "gap-8" : "gap-2"}`}>
+    <div className={`mt-12 max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${errorToDisplay.startsWith("To continue using") ? "gap-8" : "gap-2"}`}>
       <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">{errorToDisplay}</p>
 
       {errorToDisplay.startsWith("To continue using") && (

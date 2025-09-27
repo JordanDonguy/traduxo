@@ -68,7 +68,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)]">
+    <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)] overflow-y-scroll max-h-screen">
       <AppHeaderSuspenseWrapper />
 
       {/* -------------- Loading spinner -------------- */}

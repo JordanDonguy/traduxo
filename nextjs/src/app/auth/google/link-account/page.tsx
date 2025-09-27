@@ -25,7 +25,7 @@ export default function Page() {
       ) : null}
 
       {/* -------------- Main -------------- */}
-      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-4 ${isLoading ? "opacity-60" : "opacity-100"}`}>
+      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-4 overflow-y-scroll max-h-screen ${isLoading ? "opacity-60" : "opacity-100"}`}>
         <p className="text-xl">Oups... 😰</p>
         <p className="text-center text-xl">It looks like your account is already registered using email and password.</p>
         <p className="text-center text-xl mb-4">If you want to add Google sign in method, please enter your email and password below.</p>
