@@ -3,15 +3,19 @@
 import { useState } from "react";
 import { getToken } from "@traduxo/packages/utils/auth/token";
 import { logoutUser } from "@traduxo/packages/utils/auth/logout";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
+import { clearToken } from "@traduxo/packages/utils/auth/token";
 
 type UseDeleteAccountArgs = {
   fetcher?: typeof fetch;
+  logoutFn?: typeof logoutUser;
   onSuccess?: () => void;
   onError?: (message: string) => void;
 };
 
 export function useDeleteAccount({
   fetcher = fetch,
+  logoutFn = logoutUser,
   onSuccess,
   onError,
 }: UseDeleteAccountArgs) {
@@ -30,7 +34,7 @@ export function useDeleteAccount({
       }
 
       // Step 2: Delete account
-      const res = await fetcher("/api/auth/delete-account", {
+      const res = await fetcher(`${API_BASE_URL}/auth/delete-account`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -44,11 +48,14 @@ export function useDeleteAccount({
       }
 
       // Step 3: Logout
-      const success = await logoutUser(tokens.token, tokens.refreshToken);
+      const success = await logoutFn(tokens.token, tokens.refreshToken);
       if (!success) {
-        onError?.("Account deleted bu failed to logout, please logout manually.");
+        onError?.("Account deleted but failed to logout, please logout manually.");
         return false
       }
+
+      // Remove tokens from storage
+      await clearToken();
 
       // Step 4: Success callback (redirect, toast, etc.)
       onSuccess?.();

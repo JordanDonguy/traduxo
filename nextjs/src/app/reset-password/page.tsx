@@ -78,7 +78,7 @@ export default function Page() {
         </div>
       )}
 
-      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-4 px-2 md:px-0 ${isLoading ? "opacity-60" : "opacity-100"}`}>
+      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-4 px-2 md:px-0 pt-16 pb-4 ${isLoading ? "opacity-60" : "opacity-100"}`}>
         <p className="text-xl text-center">Please enter your new password here:</p>
 
         {error && <p className="text-red-500 text-center">{error}</p>}

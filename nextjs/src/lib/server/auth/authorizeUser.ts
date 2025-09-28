@@ -6,44 +6,38 @@ import { ZodError } from "zod";
 
 export async function authorizeUser(credentials: Record<string, string> | undefined, prismaClient = prisma) {
   try {
-    // Throw error if email or password is missing, rejects login
-    if (!credentials || !credentials?.email || !credentials?.password) {
-      throw new Error("NoMailOrPassword");
-    };
+    // Return failure if email or password is missing, rejects login
+    if (!credentials || !credentials.email || !credentials.password) {
+      return { success: false, reason: "Please provide your email and password." };
+    }
 
-    // Validate input with zod
+    // Validate input with zod and sanitize html
     const { email, password } = loginSchema.parse(credentials);
-
-    // Sanitize email
     const cleanEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
 
-    // Fetch user by email from Prisma
+    // Find user by email
     const user = await prismaClient.user.findUnique({ where: { email: cleanEmail } });
 
-    // Throw error if user not found or error occurs
-    if (!user) throw new Error("NoUserFound");
+    // Return failure if no user or no password set (OAuth only)
+    if (!user) return { success: false, reason: "No account found with this email, please sign up." };
+    if (!user.password) return { success: false, reason: "This account uses Google sign-in. Log in with Google first, then set a password in your profile." };
 
-    // Check if user is a Google-only user (e.g. no hashed password)
-    if (!user.password) throw new Error("NeedToCreatePassword");
-
-    // Compare provided password with hashed password from DB
+    // Compare passwords
     const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) return { success: false, reason: "The email and password you entered are incorrect." };
 
-    // Throw error if password does not match
-    if (!isValid) throw new Error("PasswordIncorrect");
-
-    // Return user object to create session
+    // Return user data on success
     return {
-      id: user.id,
-      email: user.email ?? undefined,
-      language: user.systemLang ?? undefined,
-      providers: user.providers,
+      success: true, user: {
+        id: user.id,
+        email: user.email,
+        language: user.systemLang ?? undefined,
+        providers: user.providers,
+      }
     };
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("InvalidInput");
-    }
+    if (error instanceof ZodError) return { success: false, reason: "Some of the input fields are invalid." };
+    console.error("authorizeUser unexpected error:", error);
     throw error;
-    return null
   }
 }

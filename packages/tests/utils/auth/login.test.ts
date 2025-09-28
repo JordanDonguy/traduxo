@@ -17,7 +17,7 @@ describe("loginUser", () => {
 
     const result = await loginUser(email, password);
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/auth/jwt-login", {
+    expect(mockFetch).toHaveBeenCalledWith("/auth/jwt-login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

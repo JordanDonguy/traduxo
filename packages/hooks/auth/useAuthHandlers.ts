@@ -78,6 +78,7 @@ export function useAuthHandlers() {
     email: string,
     password: string,
     confirmPassword: string,
+    setIsLoading: (loading: boolean) => void,
     setError: (err: string) => void,
     setIsSignup: (val: boolean) => void,
     refresh: () => Promise<void>
@@ -93,9 +94,12 @@ export function useAuthHandlers() {
     }
 
     try {
+      setIsLoading(true);
+      setError("");
+
       const { res, data } = await signupUser(email, password);
       if (!res.ok) {
-        setError(data.error || "Signup failed");
+        setError(data.message || "Signup failed");
         return false;
       }
 
@@ -114,6 +118,8 @@ export function useAuthHandlers() {
       console.error("Signup failed:", err);
       setError("Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏");
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 

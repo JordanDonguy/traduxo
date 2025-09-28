@@ -15,7 +15,7 @@ describe("logoutUser", () => {
 
     const result = await logoutUser(accessToken, refreshToken);
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/auth/jwt-logout", {
+    expect(mockFetch).toHaveBeenCalledWith("/auth/jwt-logout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ accessToken, refreshToken }),

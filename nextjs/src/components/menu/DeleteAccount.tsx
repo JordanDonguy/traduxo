@@ -16,7 +16,10 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
       toast.success("Your account has been deleted");
       router.push("/");
     },
-    onError: (msg) => toast.error(msg),
+    onError: (msg) => {
+      toast.error(msg);
+      router.push("/");
+    },
   });
 
   return (

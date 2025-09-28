@@ -30,7 +30,15 @@ export async function jwtLoginHandler(
     }
 
     // Validate credentials
-    const user = await authorizeUserFn({ email, password });
+    const result = await authorizeUserFn({ email, password });
+
+    if (!result.success) {
+      const status = result.reason === "MissingCredentials" || result.reason === "InvalidInput" ? 400 : 401;
+      return NextResponse.json({ error: result.reason }, { status });
+    }
+
+    // If success
+    const { user } = result;
     if (!user) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }

@@ -15,7 +15,7 @@ describe("jwtLoginHandler", () => {
 
   // ------ Test 2️⃣ ------
   it("fails if authorizeUser returns null", async () => {
-    jest.spyOn(authModule, "authorizeUser").mockResolvedValue(null);
+    jest.spyOn(authModule, "authorizeUser").mockResolvedValue({ success: false, reason: "Invalid credentials" });
 
     const req = { json: async () => ({ email: "a@b.com", password: "123" }) } as unknown as NextRequest;
     const res = await jwtLoginHandler(req, {});
@@ -27,10 +27,14 @@ describe("jwtLoginHandler", () => {
   // ------ Test 3️⃣ ------
   it("creates tokens successfully", async () => {
     jest.spyOn(authModule, "authorizeUser").mockResolvedValue({
-      id: "user1",
-      email: "a@b.com",
-      language: "en",
-      providers: ["google"],
+      success: true,
+      user:
+      {
+        id: "user1",
+        email: "a@b.com",
+        language: "en",
+        providers: ["google"],
+      }
     });
 
     jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
@@ -61,10 +65,13 @@ describe("jwtLoginHandler", () => {
   // ------ Test 4️⃣ ------
   it("uses default dependencies when none are provided", async () => {
     jest.spyOn(authModule, "authorizeUser").mockResolvedValue({
-      id: "user2",
-      email: "default@user.com",
-      language: "fr",
-      providers: [],
+      success: true,
+      user: {
+        id: "user2",
+        email: "default@user.com",
+        language: "fr",
+        providers: [],
+      },
     });
 
     jest.spyOn(tokenModule, "generateToken").mockResolvedValue({

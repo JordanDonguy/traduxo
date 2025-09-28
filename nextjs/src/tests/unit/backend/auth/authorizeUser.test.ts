@@ -20,49 +20,82 @@ describe("authorizeUser", () => {
   });
 
   // ------ Test 1️⃣ ------
-  it("throws NoMailOrPassword when credentials are missing", async () => {
-    await expect(authorizeUser(undefined)).rejects.toThrow("NoMailOrPassword");
-    await expect(authorizeUser({ email: "test@example.com" })).rejects.toThrow("NoMailOrPassword");
-    await expect(authorizeUser({ password: "pass" })).rejects.toThrow("NoMailOrPassword");
+  it("returns failure when credentials are missing", async () => {
+    const result1 = await authorizeUser(undefined);
+    expect(result1).toEqual({
+      success: false,
+      reason: "Please provide your email and password.",
+    });
+
+    const result2 = await authorizeUser({ email: "test@example.com" });
+    expect(result2).toEqual({
+      success: false,
+      reason: "Please provide your email and password.",
+    });
+
+    const result3 = await authorizeUser({ password: "pass" });
+    expect(result3).toEqual({
+      success: false,
+      reason: "Please provide your email and password.",
+    });
   });
 
   // ------ Test 2️⃣ ------
-  it("throws InvalidInput when credentials fail zod validation", async () => {
-    await expect(authorizeUser({ email: "invalid", password: "123" }))
-      .rejects.toThrow("InvalidInput");
+  it("returns failure when credentials fail zod validation", async () => {
+    const result = await authorizeUser({ email: "invalid", password: "123" });
+    expect(result).toEqual({
+      success: false,
+      reason: "Some of the input fields are invalid.",
+    });
   });
 
   // ------ Test 3️⃣ ------
-  it("throws NoUserFound when prisma returns null", async () => {
+  it("returns failure when prisma returns null (no user found)", async () => {
     mockFindUnique.mockResolvedValue(null);
-    await expect(
-      authorizeUser({ email: "test@example.com", password: "password123" })
-    ).rejects.toThrow("NoUserFound");
-    expect(mockFindUnique).toHaveBeenCalledWith({ where: { email: "test@example.com" } });
+    const result = await authorizeUser({ email: "test@example.com", password: "password123" });
+    expect(result).toEqual({
+      success: false,
+      reason: "No account found with this email, please sign up.",
+    });
   });
 
   // ------ Test 4️⃣ ------
-  it("throws NeedToCreatePassword when user has no password", async () => {
+  it("returns failure when user has no password", async () => {
     mockFindUnique.mockResolvedValue({ id: "u1", email: "test@example.com", password: null });
-    await expect(
-      authorizeUser({ email: "test@example.com", password: "password123" })
-    ).rejects.toThrow("NeedToCreatePassword");
+    const result = await authorizeUser({ email: "test@example.com", password: "password123" });
+    expect(result).toEqual({
+      success: false,
+      reason: "This account uses Google sign-in. Log in with Google first, then set a password in your profile.",
+    });
   });
 
   // ------ Test 5️⃣ ------
-  it("throws PasswordIncorrect when bcrypt.compare fails", async () => {
+  it("returns failure when bcrypt.compare fails", async () => {
     mockFindUnique.mockResolvedValue({ id: "u1", email: "test@example.com", password: "hashed" });
     mockBcryptCompare.mockResolvedValue(false);
-    await expect(
-      authorizeUser({ email: "test@example.com", password: "wrongpass" })
-    ).rejects.toThrow("PasswordIncorrect");
+
+    const result = await authorizeUser({ email: "test@example.com", password: "wrongpass" });
+    expect(result).toEqual({
+      success: false,
+      reason: "The email and password you entered are incorrect."
+    });
   });
 
   // ------ Test 6️⃣ ------
   it("returns user object when credentials are valid", async () => {
     mockFindUnique.mockResolvedValue({ id: "u1", email: "test@example.com", password: "hashed" });
     mockBcryptCompare.mockResolvedValue(true);
+
     const result = await authorizeUser({ email: "test@example.com", password: "password123" });
-    expect(result).toEqual({ id: "u1", email: "test@example.com" });
+
+    expect(result).toEqual({
+      success: true,
+      user: {
+        id: "u1",
+        email: "test@example.com",
+        language: undefined,
+        providers: undefined,
+      },
+    });
   });
 });

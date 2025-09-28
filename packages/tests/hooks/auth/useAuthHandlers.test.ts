@@ -183,11 +183,13 @@ describe("useAuthHandlers", () => {
 
   // -------------------- handleSignup --------------------
   describe("handleSignup", () => {
+    let setIsLoading: jest.Mock;
     let setError: jest.Mock;
     let setIsSignup: jest.Mock;
     let refresh: jest.Mock;
 
     beforeEach(() => {
+      setIsLoading = jest.fn();
       setError = jest.fn();
       setIsSignup = jest.fn();
       refresh = jest.fn();
@@ -199,6 +201,7 @@ describe("useAuthHandlers", () => {
         "a@b.com",
         "1234567",
         "1234567",
+        setIsLoading,
         setError,
         setIsSignup,
         refresh
@@ -214,6 +217,7 @@ describe("useAuthHandlers", () => {
         "a@b.com",
         "12345678",
         "87654321",
+        setIsLoading,
         setError,
         setIsSignup,
         refresh
@@ -224,13 +228,14 @@ describe("useAuthHandlers", () => {
     });
 
     it("handles signup API failure", async () => {
-      (signupUser as jest.Mock).mockResolvedValue({ res: { ok: false }, data: { error: "User exists" } });
+      (signupUser as jest.Mock).mockResolvedValue({ res: { ok: false }, data: { message: "User exists" } });
 
       const { result } = renderHook(() => useAuthHandlers());
       const success = await result.current.handleSignup(
         "a@b.com",
         "12345678",
         "12345678",
+        setIsLoading,
         setError,
         setIsSignup,
         refresh
@@ -249,6 +254,7 @@ describe("useAuthHandlers", () => {
         "a@b.com",
         "12345678",
         "12345678",
+        setIsLoading,
         setError,
         setIsSignup,
         refresh
@@ -269,6 +275,7 @@ describe("useAuthHandlers", () => {
           "a@b.com",
           "12345678",
           "12345678",
+          setIsLoading,
           setError,
           setIsSignup,
           refresh
@@ -278,7 +285,8 @@ describe("useAuthHandlers", () => {
       expect(success).toBe(true);
       expect(saveToken).toHaveBeenCalledWith("a", "b");
       expect(setIsSignup).toHaveBeenCalledWith(false);
-      expect(setError).not.toHaveBeenCalled();
+      expect(setError).toHaveBeenCalledTimes(1);
+      expect(setError).toHaveBeenCalledWith("");
       expect(refresh).toHaveBeenCalled();
     });
 
@@ -290,6 +298,7 @@ describe("useAuthHandlers", () => {
         "a@b.com",
         "12345678",
         "12345678",
+        setIsLoading,
         setError,
         setIsSignup,
         refresh

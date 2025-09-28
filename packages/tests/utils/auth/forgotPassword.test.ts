@@ -15,7 +15,7 @@ describe("forgotPasswordRequest", () => {
 
     const result = await forgotPasswordRequest(email);
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/auth/forgot-password", {
+    expect(mockFetch).toHaveBeenCalledWith("/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),

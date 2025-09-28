@@ -16,7 +16,7 @@ describe("signupUser", () => {
 
     const result = await signupUser(email, password);
 
-    expect(mockFetch).toHaveBeenCalledWith("/api/auth/signup", {
+    expect(mockFetch).toHaveBeenCalledWith("/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),

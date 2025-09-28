@@ -100,7 +100,8 @@ describe("<Login />", () => {
       "password",
       expect.any(Function),
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
+      expect.any(Function),
     );
   });
 

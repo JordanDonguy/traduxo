@@ -3,13 +3,16 @@
  */
 import { renderHook, act } from "@testing-library/react";
 import { useDeleteAccount } from "@traduxo/packages/hooks/auth/useDeleteAccount";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 // ---- Mocks ----
 const mockGetToken = jest.fn();
 const mockLogoutUser = jest.fn();
+const mockClearToken = jest.fn();
 
 jest.mock("@traduxo/packages/utils/auth/token", () => ({
   getToken: (...args: any[]) => mockGetToken(...args),
+  clearToken: (...args: any[]) => mockClearToken(...args),
 }));
 
 jest.mock("@traduxo/packages/utils/auth/logout", () => ({
@@ -78,10 +81,10 @@ describe("useDeleteAccount", () => {
       expect(success).toBe(false);
     });
 
-    expect(mockFetcher).toHaveBeenCalledWith("/api/auth/delete-account", expect.any(Object));
+    expect(mockFetcher).toHaveBeenCalledWith(`${API_BASE_URL}/auth/delete-account`, expect.any(Object));
     expect(mockLogoutUser).toHaveBeenCalledWith("t1", "r1");
     expect(onError).toHaveBeenCalledWith(
-      "Account deleted bu failed to logout, please logout manually."
+      "Account deleted but failed to logout, please logout manually."
     );
   });
 
@@ -89,10 +92,11 @@ describe("useDeleteAccount", () => {
   it("calls onSuccess after successful delete + logout", async () => {
     mockGetToken.mockResolvedValue({ token: "t1", refreshToken: "r1" });
     mockFetcher.mockResolvedValue({ ok: true });
+    mockClearToken.mockResolvedValue(undefined);
     mockLogoutUser.mockResolvedValue(true);
 
     const { result } = renderHook(() =>
-      useDeleteAccount({ fetcher: mockFetcher, onSuccess, onError })
+      useDeleteAccount({ fetcher: mockFetcher, logoutFn: mockLogoutUser, onSuccess, onError })
     );
 
     await act(async () => {
@@ -100,7 +104,7 @@ describe("useDeleteAccount", () => {
       expect(success).toBe(true);
     });
 
-    expect(mockFetcher).toHaveBeenCalledWith("/api/auth/delete-account", expect.any(Object));
+    expect(mockFetcher).toHaveBeenCalledWith(`${API_BASE_URL}/auth/delete-account`, expect.any(Object));
     expect(mockLogoutUser).toHaveBeenCalledWith("t1", "r1");
     expect(onSuccess).toHaveBeenCalled();
     expect(onError).not.toHaveBeenCalled();
