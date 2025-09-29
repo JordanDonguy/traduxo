@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Docker image for testing
-        run: docker build -f Dockerfile.test -t traduxo-app:test .
+        run: docker build -f nextjs/Dockerfile.test -t traduxo-app:test .
 
       - name: Run unit tests inside container
         run: |
