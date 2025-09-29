@@ -1,0 +1,35 @@
+# Stage 1: Install dependencies
+FROM node:lts AS builder
+
+WORKDIR /app
+
+# Copy top-level package.json and lock
+COPY package*.json ./
+
+# Copy workspaces
+COPY nextjs/package*.json nextjs/
+COPY packages ./packages
+
+# Copy source
+COPY nextjs/. ./nextjs
+
+# Copy config files
+COPY jest.config.cjs jest.config.cjs
+COPY jest.config.nextjs.cjs jest.config.nextjs.cjs
+COPY tsconfig.json tsconfig.json
+COPY tsconfig.jest.json tsconfig.jest.json
+COPY eslint.config.mjs .eslintrc.mjs
+
+# Install all dependencies
+RUN npm ci
+
+# Stage 2: Run tests
+FROM node:lts
+
+WORKDIR /app
+
+# Copy everything from builder
+COPY --from=builder /app ./
+
+# Run all tests from top-level package.json
+CMD ["npm", "test"]

@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: nextjs/Dockerfile.dev
+    volumes:
+      - ./nextjs:/app/nextjs
+      - ./packages:/app/packages
+      - /app/nextjs/node_modules
+    command: sh -c "npx prisma generate && npm run dev"
+    env_file:
+      - .env    
+      - ./nextjs/.env.development
+    ports:
+      - "3000:3000"

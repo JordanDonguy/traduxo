@@ -1,0 +1,41 @@
+# ---- Build stage ----
+FROM node:lts AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY nextjs/package*.json ./nextjs/
+COPY packages ./packages
+COPY nextjs/. ./nextjs
+
+# Install dependencies
+RUN npm install
+
+# Set working directory to Next.js
+WORKDIR /app/nextjs
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build Next.js for production
+RUN npm run build
+
+# ---- Production stage ----
+FROM node:lts
+
+WORKDIR /app/nextjs
+
+# Copy only necessary files from builder
+COPY --from=builder /app/nextjs/package*.json ./
+COPY --from=builder /app/nextjs/.next ./.next
+COPY --from=builder /app/nextjs/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/nextjs/prisma ./prisma
+
+# expose the port Next.js will run on
+EXPOSE 3000
+
+# Start Next.js in production mode
+CMD ["npm", "start"]

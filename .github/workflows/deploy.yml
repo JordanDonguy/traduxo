@@ -1,5 +1,4 @@
-name: Deploy Web App & Prisma Migrations
-
+name: CI/CD Web App & Prisma Migrations
 
 on:
   push:
@@ -18,26 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Build Docker image for testing
+        run: docker build -f nextjs/Dockerfile.test -t traduxo-app:test .
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run lint
-        run: npm run lint
-
-      - name: Run tests
-        env:
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: npm run test
+      - name: Run unit tests inside container
+        run: |
+          docker run --rm traduxo-app:test
 
   deploy:
-    # Only run deploy when pushing or merging to main (doesn't run on PRs)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
@@ -46,35 +33,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Build production Docker image
+        run: docker build -f nextjs/Dockerfile.prod -t ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest .
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          node-version: '20'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Push production Docker image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest
 
-      - name: Set Prisma DATABASE_URL
-        run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> nextjs/.env
+      - name: SSH deploy to server with backup and safe migration
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /srv/traduxo
 
-      - name: Generate Prisma Client
-        run: npm --prefix nextjs run generate
+            # Backup current container as fallback
+            docker tag traduxo-app:latest traduxo-app:backup
 
-      - name: Clear Next.js build cache
-        run: rm -rf nextjs/.next
+            # Pull new image
+            docker compose pull
 
-      - name: Build project
-        run: npm run build:web
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-
-      - name: Deploy Prisma Migrations
-        run: npm --prefix nextjs run prisma:migrate:deploy
+            # Run migrations in a temporary container first
+            if docker compose run --rm app npx prisma migrate deploy; then
+                # If migrations succeed, bring up new version
+                docker compose up -d
+            else
+                # Rollback if migration fails
+                echo "Migrations failed! Rolling back..."
+                docker stop traduxo-app
+                docker rm traduxo-app || true
+                docker run -d --name traduxo-app traduxo-app:backup
+                exit 1
+            fi
