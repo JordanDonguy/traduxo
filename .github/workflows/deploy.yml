@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -20,14 +20,14 @@ jobs:
       - name: Build Docker image for testing
         run: docker build -f nextjs/Dockerfile.test -t traduxo-app:test .
 
-      - name: Run unit tests inside container
+      - name: Run lint and unit tests inside container
         run: |
           docker run --rm traduxo-app:test
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -39,19 +39,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        
-      - name: Set up QEMU for multi-arch builds
-        uses: docker/setup-qemu-action@v2
-        
       - name: Build and push ARM64 image
         run: |
-          docker buildx build \
-            --platform linux/arm64 \
+          docker build \
+            --build-arg NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }} \
+            --build-arg NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }} \
+            --build-arg NEXT_PUBLIC_PLATFORM=${{ secrets.NEXT_PUBLIC_PLATFORM }} \
             -f nextjs/Dockerfile.prod \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest \
-            --push .
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest
 
       - name: SSH deploy to server with backup and safe migration
         uses: appleboy/ssh-action@v0.1.8
