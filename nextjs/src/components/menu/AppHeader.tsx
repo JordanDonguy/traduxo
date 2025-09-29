@@ -63,6 +63,8 @@ function AppHeader() {
 
       <div className="z-50 fixed w-full max-w-6xl h-14 md:h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
         <button
+          id="suggestion-button-mobile"
+          aria-label="Suggest an expression"
           onClick={() => {
             router.push("/");
             suggestTranslation();
@@ -76,6 +78,8 @@ function AppHeader() {
 
         <div>
           <button
+            id="suggestion-button-desktop"
+            aria-label="Suggest an expression"
             onClick={() => {
               router.push("/");
               suggestTranslation();
@@ -85,6 +89,8 @@ function AppHeader() {
             <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
           </button>
           <button
+            id="user-menu-button"
+            aria-label="User menu"
             onClick={() => {
               if (showMenu) {
                 setShowMenu(false);         // close instantly

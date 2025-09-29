@@ -55,7 +55,7 @@ describe("blurActiveInput", () => {
   it("warns if RN Keyboard module is not provided", () => {
     process.env.PLATFORM = "react-native";
 
-    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => { });
     blurActiveInput();
     expect(warnSpy).toHaveBeenCalledWith(
       "RN Keyboard module not provided. Cannot dismiss keyboard."
@@ -66,6 +66,8 @@ describe("blurActiveInput", () => {
   // ------ Test 5️⃣ ------
   it("does nothing if PLATFORM is not set", () => {
     delete process.env.PLATFORM;
+
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => { }); // silence console warn
 
     const input = document.createElement("input");
     document.body.appendChild(input);
@@ -78,5 +80,6 @@ describe("blurActiveInput", () => {
     expect(blurSpy).not.toHaveBeenCalled();
 
     document.body.removeChild(input);
+    warnSpy.mockRestore(); // restore console warn
   });
 });

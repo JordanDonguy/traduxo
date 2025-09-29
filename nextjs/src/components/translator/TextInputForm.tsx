@@ -20,11 +20,15 @@ export default function TextInputForm({
   return (
     <section className="w-full h-1/2 flex items-center justify-center">
       <form
+        id="text-input-form"
+        aria-label="Text input form"
         data-testid="input-form"
         onSubmit={handleTranslate}
         className="w-[90%] flex bg-[var(--input)] rounded-r-4xl rounded-l-2xl h-12 border border-[var(--input-border)] mt-2"
       >
         <input
+          id="text-input"
+          aria-label="Enter text to translate"
           className="w-full h-full px-6 focus:outline-none"
           placeholder="Enter some text..."
           onChange={(e) => setInputText(e.target.value)}
@@ -33,9 +37,18 @@ export default function TextInputForm({
           maxLength={100}
         />
 
-        <button type="submit" className="sr-only">Translate</button>
+        <button
+          id="submit-translation-button"
+          aria-label="Translate"
+          type="submit"
+          className="sr-only"
+        >
+          Translate
+        </button>
 
         <button
+          id="voice-input-button"
+          aria-label="Voice input"
           data-testid="mic-button"
           type="button"
           className="w-12 hover:cursor-pointer hover:bg-[var(--hover)] rounded-full flex justify-center items-center"

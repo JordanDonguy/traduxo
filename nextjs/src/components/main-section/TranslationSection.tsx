@@ -56,6 +56,8 @@ function TranslationSection({
         <div className="flex gap-4 pr-4 mb-2 font-semibold relative">
           {/* Favorite button */}
           <button
+            id="favorite-button"
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
             onClick={onFavoriteClick}
             disabled={isFavLoading}
             className={`absolute right-4 mt-1 text-[var(--input-placeholder)]
@@ -84,6 +86,8 @@ function TranslationSection({
         <ul className="pl-18 pr-4 pb-4 flex flex-col gap-2">
           {alternatives.map((alt, idx) =>
             <li
+              id={`alternative-translation ${idx + 1}`}
+              aria-label={`Alternative translation ${idx + 1}`}
               key={idx}
               onClick={() => onSwitchTranslations(alt)}
               className={`list-disc w-fit  transition-transform duration-200 fade-in-item

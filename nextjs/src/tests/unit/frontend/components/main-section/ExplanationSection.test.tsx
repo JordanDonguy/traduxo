@@ -74,7 +74,7 @@ describe("ExplanationSection component", () => {
       <ExplanationSection explanation="" translatedText={translatedText} />
     );
 
-    const button = screen.getByText("✨ AI explanations");
+    const button = screen.getByTestId("explanation-button");
     expect(button).toBeInTheDocument();
 
     fireEvent.click(button);
@@ -94,7 +94,7 @@ describe("ExplanationSection component", () => {
       <ExplanationSection explanation="" translatedText={translatedText} />
     );
 
-    const container = screen.getByRole("button", { name: "✨ AI explanations" })
+    const container = screen.getByTestId("explanation-button")
       .parentElement;
 
     expect(container).toHaveClass("scale-x-100", "opacity-100");
@@ -111,7 +111,7 @@ describe("ExplanationSection component", () => {
       <ExplanationSection explanation="" translatedText={translatedText} />
     );
 
-    const container = screen.getByRole("button", { name: "✨ AI explanations" })
+    const container = screen.getByTestId("explanation-button")
       .parentElement;
 
     expect(container).toHaveClass("scale-x-0", "opacity-0");

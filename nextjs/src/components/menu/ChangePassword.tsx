@@ -29,6 +29,8 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
 
   return (
     <form
+      id="change-password-form"
+      aria-label={isCredentials ? "Change password form" : "Create password form"}
       onSubmit={(e) => {
         e.preventDefault();
         handleSubmit({ currentPassword, password, confirmPassword });
@@ -40,7 +42,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
     >
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        < div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
       ) : null}
@@ -63,6 +65,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
               type="password"
               id="current-password"
               name="current-password"
+              aria-label="Current password"
               placeholder="********"
               className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
               value={currentPassword}
@@ -82,6 +85,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
             type="password"
             id="password"
             name="password"
+            aria-label="Password"
             placeholder="********"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
             value={password}
@@ -100,6 +104,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
             type="password"
             id="confirm-password"
             name="confirm-password"
+            aria-label="Confirm password"
             placeholder="********"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
             value={confirmPassword}
@@ -110,6 +115,9 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
 
         {/* -------------- Submit button -------------- */}
         <button
+          id="change-password-button"
+          aria-label={isCredentials ? "Change password" : "Create password"}
+          disabled={isLoading}
           type="submit"
           className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
         >

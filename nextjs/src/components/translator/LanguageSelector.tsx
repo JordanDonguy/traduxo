@@ -35,6 +35,8 @@ export default function LanguageSelector({
 
       {/* Input language */}
       <select
+        id="input-lang-select"
+        aria-label="Select input language"
         data-testid="input-lang-select"
         value={inputLang}
         onChange={(e) => setInputLang(e.target.value)}
@@ -53,6 +55,8 @@ export default function LanguageSelector({
 
       {/* Invert button */}
       <button
+        id="switch-languages-button"
+        aria-label="Switch input and output languages"
         onClick={switchLanguage}
         className="w-12 h-12 flex justify-center items-center hover:cursor-pointer hover:bg-[var(--hover)] rounded-full"
       >
@@ -61,6 +65,8 @@ export default function LanguageSelector({
 
       {/* Output language */}
       <select
+        id="output-lang-select"
+        aria-label="Select output language"
         data-testid="output-lang-select"
         value={outputLang}
         onChange={(e) => setOutputLang(e.target.value)}

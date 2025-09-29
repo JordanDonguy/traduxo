@@ -45,10 +45,10 @@ jobs:
       - name: Set up QEMU for multi-arch builds
         uses: docker/setup-qemu-action@v2
         
-      - name: Build and push multi-arch image
+      - name: Build and push ARM64 image
         run: |
           docker buildx build \
-            --platform linux/arm64,linux/amd64 \
+            --platform linux/arm64 \
             -f nextjs/Dockerfile.prod \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest \
             --push .

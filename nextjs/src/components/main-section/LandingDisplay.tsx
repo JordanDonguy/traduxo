@@ -37,6 +37,8 @@ function LandingDisplay() {
       {/* Suggest expression button */}
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-4 w-full max-w-[85%]">
         <button
+          id="suggestion-button"
+          aria-label="Suggest an expression"
           onClick={suggestTranslation}
           className="flex justify-center items-center rounded-full border w-full py-4 gap-4 border-[var(--border)]
           hover:cursor-pointer hover:bg-[var(--bg-2)] active:scale-85 duration-100"
@@ -47,6 +49,8 @@ function LandingDisplay() {
 
         {/* Translation input focus button */}
         <button
+          id="translation-button"
+          aria-label="Translate something"
           onClick={focusInput}
           className="flex justify-center items-center rounded-full border w-full py-4 gap-4 border-[var(--border)]
           hover:cursor-pointer hover:bg-[var(--bg-2)] active:scale-85 duration-100"

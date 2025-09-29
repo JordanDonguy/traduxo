@@ -282,13 +282,13 @@ describe("<UserMenu />", () => {
 
     // HISTORY BUTTON
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    const historyButton = screen.getByRole("button", { name: /History/i });
+    const historyButton = screen.getByTestId("history-button");
     fireEvent.click(historyButton);
     expect(mockPushLocal).toHaveBeenCalledWith("/?menu=open&submenu=history");
 
     // FAVORITES BUTTON
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    const favButton = screen.getByRole("button", { name: /Favorites/i });
+    const favButton = screen.getByTestId("favorites-button");
     fireEvent.click(favButton);
     expect(mockPushLocal).toHaveBeenCalledWith("/?menu=open&submenu=favorites");
 
@@ -300,18 +300,18 @@ describe("<UserMenu />", () => {
 
     // CHANGE PASSWORD
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    const changePwdButton = screen.getByText(/Change password/i).closest("button")!;
+    const changePwdButton = screen.getByTestId("change-password-button");
     fireEvent.click(changePwdButton);
     expect(mockPushLocal).toHaveBeenCalledWith("/?menu=open&submenu=changePassword");
 
     // LOG OUT
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    fireEvent.click(screen.getByText(/Log Out/i).closest("button")!);
+    fireEvent.click(screen.getByTestId("logout-button"));
     expect(handleLogoutMock).toHaveBeenCalledTimes(1);
 
     // DELETE ACCOUNT
     render(<UserMenu showMenu={true} submenu={null} pathname="/" />);
-    const delButton = screen.getByText(/Delete account/i).closest("button")!;
+    const delButton = screen.getByTestId("delete-account-button");
     fireEvent.click(delButton);
     expect(mockPushLocal).toHaveBeenCalledWith("/?menu=open&submenu=deleteAccount");
 

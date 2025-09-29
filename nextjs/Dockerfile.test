@@ -14,11 +14,12 @@ COPY packages ./packages
 COPY nextjs/. ./nextjs
 
 # Copy config files
-COPY jest.config.cjs jest.config.cjs
-COPY jest.config.nextjs.cjs jest.config.nextjs.cjs
-COPY tsconfig.json tsconfig.json
-COPY tsconfig.jest.json tsconfig.jest.json
-COPY eslint.config.mjs .eslintrc.mjs
+COPY jest.config.cjs ./
+COPY jest.config.nextjs.cjs ./
+COPY tsconfig.json ./
+COPY tsconfig.jest.json ./
+COPY eslint.config.mjs ./
+COPY nextjs/eslint.config.mjs nextjs/
 
 # Install all dependencies
 RUN npm ci
@@ -31,5 +32,5 @@ WORKDIR /app
 # Copy everything from builder
 COPY --from=builder /app ./
 
-# Run all tests from top-level package.json
-CMD ["npm", "test"]
+# Run lint and all tests from top-level package.json
+CMD npm run lint && npm test

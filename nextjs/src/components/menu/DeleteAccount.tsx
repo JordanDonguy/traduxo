@@ -41,6 +41,8 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
 
           {/* -------------- Cancel button -------------- */}
           <button
+            id="cancel-delete-account-button"
+            aria-label="Cancel account deletion"
             type="button"
             onClick={() => router.push("/?menu=open")}
             className="h-16 text-center col-span-1 border rounded-full hover:cursor-pointer hover:bg-[var(--hover-2)]"
@@ -50,6 +52,8 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
 
           {/* -------------- Confirm button -------------- */}
           <button
+            id="confirm-delete-account-button"
+            aria-label="Confirm account deletion"
             type="button"
             onClick={deleteAccount}
             className="h-16 text-center col-span-1 rounded-full bg-red-600 hover:cursor-pointer hover:bg-red-500 text-gray-100"

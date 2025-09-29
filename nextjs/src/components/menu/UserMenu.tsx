@@ -108,6 +108,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
             {/* -------------- Back to Menu button -------------- */}
             {(showLogin || showChangePassword || showDeleteAccount || showHistory || showFavorites || showExplanationLang) ? (
               <button
+                id="back-to-menu-button"
+                aria-label="Back to main menu"
                 onClick={() => router.replace(`${pathname}?menu=open`)}
                 className="hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
               >
@@ -117,6 +119,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
             {/* -------------- Close Menu button -------------- */}
             <button
+              id="close-menu-button"
+              aria-label="Close user menu"
               onClick={() => router.replace(`${pathname}`)}
               className="right-0 hover:cursor-pointer hover:scale-125 active:scale-90 duration-150"
             >
@@ -151,6 +155,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
               <div className="flex flex-col gap-6 items-center w-full max-h-[calc(100dvh-8rem)] pb-8 overflow-y-scroll scrollbar-hide">
                 {/* -------------- Theme toggle -------------- */}
                 <button
+                  id="theme-toggle-button"
+                  aria-label="Toggle theme"
                   onClick={() => setTheme(isDark ? "light" : "dark")}
                   className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
                 >
@@ -160,6 +166,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                 {/* -------------- Explanation language -------------- */}
                 <button
+                  id="explanation-language-button"
+                  aria-label="Change explanation language"
                   onClick={() => {
                     setShowExplanationLang(true);
                     router.push(`${pathname}?menu=open&submenu=explanationLang`)
@@ -173,6 +181,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                 {/* -------------- Login button -------------- */}
                 {status !== "authenticated" && (
                   <button
+                    id="login-button"
+                    aria-label="Login"
                     onClick={() => {
                       setShowLogin(true);
                       router.push(`${pathname}?menu=open&submenu=login`)
@@ -186,6 +196,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                 {/* -------------- History -------------- */}
                 <button
+                  id="history-button"
+                  data-testid="history-button"
+                  aria-label="Translation history"
                   onClick={() => {
                     setShowHistory(true);
                     router.push(`${pathname}?menu=open&submenu=history`)
@@ -198,6 +211,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                 {/* -------------- Favorites -------------- */}
                 <button
+                  id="favorites-button"
+                  data-testid="favorites-button"
+                  aria-label="Favorite translations"
                   onClick={() => {
                     setShowFavorites(true);
                     router.push(`${pathname}?menu=open&submenu=favorites`)
@@ -210,6 +226,8 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                 {/* -------------- Privacy policy -------------- */}
                 <button
+                  id="privacy-policy-button"
+                  aria-label="Privacy policy"
                   onClick={() => {
                     setIsLoading(true);
                     router.push("/privacy")
@@ -225,6 +243,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                   <>
                     {/* -------------- Change password -------------- */}
                     <button
+                      id="change-password-button"
+                      data-testid="change-password-button"
+                      aria-label={isCredentials ? "Change password" : "Create password"}
                       onClick={() => {
                         setShowChangePassword(true);
                         router.push(`${pathname}?menu=open&submenu=changePassword`)
@@ -239,6 +260,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                     {/* -------------- Log Out -------------- */}
                     <button
+                      id="logout-button"
+                      data-testid="logout-button"
+                      aria-label="Log out"
                       onClick={async () => {
                         setIsLoading(true);
                         const success = await handleLogout(refresh, setIsLoading);
@@ -252,6 +276,9 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
                     {/* -------------- Delete account -------------- */}
                     <button
+                      id="delete-account-button"
+                      data-testid="delete-account-button"
+                      aria-label="Delete account"
                       onClick={() => {
                         setShowDeleteAccount(true);
                         router.push(`${pathname}?menu=open&submenu=deleteAccount`)

@@ -26,6 +26,8 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
 
           {getSortedLanguageCodes().map(code => (
             <article
+              id={`explanation-language-option code ${code}`}
+              aria-label={`Select explanation language code ${code}`}
               key={code}
               onClick={() => {
                 changeSystemLang(code);

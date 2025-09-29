@@ -25,6 +25,8 @@ export default function Login({ showMenu }: LoginProps) {
 
   return (
     <form
+      id="login-form"
+      aria-label="Login form"
       data-testid="login-form"
       onSubmit={async (e) => {
         e.preventDefault();
@@ -68,6 +70,7 @@ export default function Login({ showMenu }: LoginProps) {
             type="email"
             id="email"
             name="email"
+            aria-label="Email"
             placeholder="you@example.com"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
             value={email}
@@ -86,6 +89,7 @@ export default function Login({ showMenu }: LoginProps) {
             type="password"
             id="password"
             name="password"
+            aria-label="Password"
             placeholder="********"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
             value={password}
@@ -105,6 +109,7 @@ export default function Login({ showMenu }: LoginProps) {
               type="password"
               id="confirm-password"
               name="confirm-password"
+              aria-label="Confirm password"
               placeholder="********"
               className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
               value={confirmPassword}
@@ -116,6 +121,8 @@ export default function Login({ showMenu }: LoginProps) {
 
         {/* -------------- Submit button -------------- */}
         <button
+          id="submit-login-button"
+          aria-label={isSignup ? "Sign Up" : "Sign In"}
           type="submit"
           className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
         >
@@ -125,6 +132,7 @@ export default function Login({ showMenu }: LoginProps) {
         {/* -------------- Google OAuth button -------------- */}
         <button
           id="google-btn"
+          aria-label="Continue with Google"
           type="button"
           onClick={() => handleGoogleButton()}
           className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--border)] bg-[var(--menu)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
@@ -142,6 +150,8 @@ export default function Login({ showMenu }: LoginProps) {
         {/* -------------- Forgot your password button -------------- */}
         {!isSignup && (
           <button
+            id="forgot-password-button"
+            aria-label="Forgot your password"
             type="button"
             onClick={() => handleForgotPassword(email, setError, setIsLoading)}
             className="text-blue-500 hover:underline hover:cursor-pointer"
@@ -154,6 +164,8 @@ export default function Login({ showMenu }: LoginProps) {
         <p className="text-center">
           {isSignup ? "Already have an account? " : "No account? "}
           <button
+            id="switch-login-signup-button"
+            aria-label="Switch between Login and Sign Up"
             type="button"
             onClick={() => setIsSignup(!isSignup)}
             className="text-blue-500 hover:underline hover:cursor-pointer pb-10"

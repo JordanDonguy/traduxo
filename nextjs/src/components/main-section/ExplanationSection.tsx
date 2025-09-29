@@ -48,6 +48,9 @@ export default function ExplanationSection({
         }`}
     >
       <button
+        id="explanation-button"
+        data-testid="explanation-button"
+        aria-label="Get AI explanations"
         onClick={() => {
           blurActiveInput();
           handleExplanation();

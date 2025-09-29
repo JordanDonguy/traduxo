@@ -12,7 +12,7 @@ interface TranslationHistoryProps {
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
   const router = useRouter();
   const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory({});
-  const { selectTranslation } = useSelectTranslation({router});
+  const { selectTranslation } = useSelectTranslation({ router });
 
   return (
     <div
@@ -35,14 +35,19 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
 
             {translationHistory.map((t, idx) => (
               <article
+                id={`History-translation-item ${idx + 1}`}
+                aria-label={`Select history translation ${idx + 1}`}
                 key={idx}
-                onClick={() => selectTranslation(t, false) }
+                onClick={() => selectTranslation(t, false)}
                 className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4
               border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer
               "
               >
-                <div
+                <button
+                  type="button"
+                  id={`delete-history-translation-item ${idx + 1}`}
+                  aria-label={`Delete history translation ${idx + 1}`}
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent triggering loadTranslation
                     deleteTranslation(t.id);
@@ -50,7 +55,7 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
                   className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--input-placeholder)] hover:scale-115 active:scale-90 duration-100"
                 >
                   <CircleX className="rounded-full bg-[var(--bg-2)]" />
-                </div>
+                </button>
                 <div className="flex items-center gap-4 item-center bg-[var(--menu)] rounded-md">
                   <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.inputLang.toUpperCase()}</span>
                   <p className="h-fit truncate flex-1">{t.inputText}</p>
