@@ -1,0 +1,29 @@
+# Use Node LTS
+FROM node:lts
+
+# Set working directory
+WORKDIR /app
+
+# Copy root package.json and package-lock.json / pnpm-lock.yaml if you use pnpm
+COPY package*.json ./
+
+# Copy Next.js package.json and prisma
+COPY nextjs/package*.json ./nextjs/
+COPY nextjs/prisma ./nextjs/prisma
+COPY packages ./packages
+COPY nextjs/. ./nextjs
+
+# Install dependencies
+RUN npm install
+
+# Set working directory to nextjs
+WORKDIR /app/nextjs
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Expose the dev port
+EXPOSE 3000
+
+# Run dev server
+CMD ["npm", "run", "dev"]
