@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM node:lts AS builder
+FROM --platform=linux/arm64 node:lts AS builder
 
 # Set working directory
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # ---- Production stage ----
-FROM node:lts
+FROM --platform=linux/arm64 node:lts
 
 WORKDIR /app/nextjs
 
