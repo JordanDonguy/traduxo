@@ -64,20 +64,6 @@ describe("<TranslationHistory />", () => {
   });
 
   // ------ Test 2️⃣ ------
-  it("renders loading spinner when isLoading is true", () => {
-    (useTranslationHistory as jest.Mock).mockReturnValue({
-      translationHistory: [],
-      isLoading: true,
-      status: "authenticated",
-      deleteTranslation: mockDeleteTranslation,
-    });
-
-    render(<TranslationHistory showMenu={true} />);
-    // Expect a spinner element to be present
-    expect(screen.getByRole("status")).toBeInTheDocument();
-  });
-
-  // ------ Test 3️⃣ ------
   it("renders translation history items", () => {
     const history = [
       { id: "1", inputLang: "en", inputText: "Hello", outputLang: "fr", translation: "Bonjour" },
@@ -99,7 +85,7 @@ describe("<TranslationHistory />", () => {
     expect(screen.getByText("Hi")).toBeInTheDocument();
   });
 
-  // ------ Test 4️⃣ ------
+  // ------ Test 3️⃣ ------
   it("calls selectTranslation when a history item is clicked", () => {
     const history = [{ id: "1", inputLang: "en", inputText: "Hello", outputLang: "fr", translation: "Bonjour" }];
     (useTranslationHistory as jest.Mock).mockReturnValue({
@@ -117,7 +103,7 @@ describe("<TranslationHistory />", () => {
     expect(mockSelectTranslation).toHaveBeenCalledWith(history[0], false);
   });
 
-  // ------ Test 5️⃣ ------
+  // ------ Test 4️⃣ ------
   it("calls deleteTranslation when delete button is clicked and does not trigger selectTranslation", () => {
     const history = [{ id: "1", inputLang: "en", inputText: "Hello", outputLang: "fr", translation: "Bonjour" }];
     (useTranslationHistory as jest.Mock).mockReturnValue({
@@ -136,7 +122,7 @@ describe("<TranslationHistory />", () => {
     expect(mockSelectTranslation).not.toHaveBeenCalled();
   });
 
-  // ------ Test 6️⃣ ------
+  // ------ Test 5️⃣ ------
   it("displays messages for unauthenticated or empty history", () => {
     // Unauthenticated user
     (useTranslationHistory as jest.Mock).mockReturnValue({

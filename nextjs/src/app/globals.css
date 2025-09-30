@@ -14,7 +14,7 @@
   --border: #a6a6a6;
   --hover: #e0e0e4;
   --hover-2: #dddde4;
-  --btn: #f0f6f7;
+  --btn: #edf1f1;
   --warning: #485a65;
   --example: #ececf0;
   --example-border: #cccccc;
@@ -24,11 +24,11 @@
    Dark Theme (Manual Switch)
 ============================== */
 [data-theme='dark'] {
-  --bg: #121212;
+  --bg: #0c0c0c;
   --text: #ededed;
   --bg-2: #232325;
-  --menu: #121212;
-  --input: #0f0f11;
+  --menu: #0c0c0c;
+  --input: #0c0c0c;
   --input-placeholder: #a3a3a3;
   --input-border: #424242;
   --border: #696969;
@@ -44,11 +44,11 @@
 ============================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #121212;
+    --bg: #0c0c0c;
     --text: #ededed;
     --bg-2: #232325;
-    --menu: #121212;
-    --input: #0f0f11;
+    --menu: #0c0c0c;
+    --input: #0c0c0c;
     --input-placeholder: #a3a3a3;
     --input-border: #424242;
     --border: #696969;

@@ -30,7 +30,10 @@ function ErrorSection({error, setError}: ErrorSectionProps) {
         <button
           id="login-button"
           aria-label="Login"
-          onClick={() => setShowLoginForm(true)} 
+          onClick={() => {
+            setShowLoginForm(true);
+            setError("");
+          }}
           className="hover:bg-[var(--hover-2)] hover:cursor-pointer border border-[var(--border)] rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
         >
           Login

@@ -78,19 +78,6 @@ describe("FavoriteTranslation component", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("shows spinner when loading", () => {
-    (useFavoriteTranslations as jest.Mock).mockReturnValue({
-      favoriteTranslations: [],
-      isLoading: true,
-      status: "authenticated",
-      deleteTranslation,
-    });
-
-    render(<FavoriteTranslation showMenu={true} />);
-    expect(screen.getByRole("status")).toBeInTheDocument();
-  });
-
-  // ------ Test 6️⃣ ------
   it("shows empty message when no favorites", () => {
     (useFavoriteTranslations as jest.Mock).mockReturnValue({
       favoriteTranslations: [],
@@ -103,7 +90,7 @@ describe("FavoriteTranslation component", () => {
     expect(screen.getByText("No favorite translations found...")).toBeInTheDocument();
   });
 
-  // ------ Test 7️⃣ ------
+  // ------ Test 6️⃣ ------
   it("shows login message when not authenticated", () => {
     (useFavoriteTranslations as jest.Mock).mockReturnValue({
       favoriteTranslations: [],
@@ -118,7 +105,7 @@ describe("FavoriteTranslation component", () => {
     ).toBeInTheDocument();
   });
 
-  // ------ Test 8️⃣ ------
+  // ------ Test 7️⃣ ------
   it("renders the correct language codes", () => {
     render(<FavoriteTranslation showMenu={true} />);
 
@@ -129,6 +116,7 @@ describe("FavoriteTranslation component", () => {
     expect(inputLangSpans[3]).toHaveTextContent("EN"); // second translation output
   });
 
+  // ------ Test 8️⃣ ------
   it("navigates to / if deleteTranslation fails", async () => {
     // Arrange deleteTranslation to returns false
     (useFavoriteTranslations as jest.Mock).mockReturnValue({

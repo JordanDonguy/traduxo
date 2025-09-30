@@ -1,22 +1,20 @@
 import { createQuotaChecker, QUOTA, WINDOW } from '@/lib/server/dailyLimiter';
 import type { NextRequest } from 'next/server';
-import type { Redis } from "@upstash/redis";
 
-type MockRedisClient = {
-  get: jest.Mock<Promise<number | null>, [string]>;
-  incr: jest.Mock<Promise<number>, [string]>;
-  expire: jest.Mock<Promise<boolean>, [string, number]>;
-  decr: jest.Mock<Promise<number>, [string]>;
+// ------ Mock Redis client ------
+const mockRedisClient = {
+  get: jest.fn<Promise<number | null>, [string]>(),
+  incr: jest.fn<Promise<number>, [string]>(),
+  expire: jest.fn<Promise<boolean>, [string, number]>(),
+  decr: jest.fn<Promise<number>, [string]>(),
 };
 
-// ------ Mock config ------
-const mockRedisClient: MockRedisClient = {
-  get: jest.fn(),
-  incr: jest.fn(),
-  expire: jest.fn(),
-  decr: jest.fn(),
-};
-const quotaChecker = createQuotaChecker(mockRedisClient as unknown as Redis);
+// Mock Redis.fromEnv to return our mock client
+jest.mock('@upstash/redis', () => ({
+  Redis: {
+    fromEnv: () => mockRedisClient,
+  },
+}));
 
 // Helper to create a mock NextRequest with given IP in header key
 function createRequest(ip: string, headerKey = 'cf-connecting-ip'): NextRequest {
@@ -27,8 +25,14 @@ function createRequest(ip: string, headerKey = 'cf-connecting-ip'): NextRequest 
   } as unknown as NextRequest;
 }
 
+const quotaChecker = createQuotaChecker();
+
 // ------ Tests ------
 describe('createQuotaChecker', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // ------ Test 1️⃣ ------
   it('allows requests under quota and increments count', async () => {
     const req = createRequest('1.2.3.4');
@@ -45,7 +49,7 @@ describe('createQuotaChecker', () => {
   // ------ Test 2️⃣ ------
   it('sets expire when first use (used === 0)', async () => {
     const req = createRequest('5.6.7.8');
-    mockRedisClient.get.mockResolvedValue(null); // no previous use
+    mockRedisClient.get.mockResolvedValue(null);
 
     const result = await quotaChecker.checkQuota(req);
 
@@ -91,7 +95,6 @@ describe('createQuotaChecker', () => {
 
     const result = await quotaChecker.checkQuota(req);
 
-    // Should pick only the first IP before the comma
     expect(mockRedisClient.get).toHaveBeenCalledWith('rl:55.66.77.88');
     expect(result.allowed).toBe(true);
   });

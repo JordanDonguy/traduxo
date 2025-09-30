@@ -14,10 +14,20 @@ function getIdentifier(req: Request): string {
   ).trim();
 }
 
-export function createQuotaChecker(redisClient: Redis) {
+// Lazy Redis initialization
+let redis: Redis | null = null;
+function getRedis() {
+  if (!redis) {
+    redis = Redis.fromEnv(); // now reads env vars at runtime
+  }
+  return redis;
+}
+
+export function createQuotaChecker() {
   return {
     // Check quota to allow or not request, and then increment user's used requests by one
     async checkQuota(req: Request) {
+      const redisClient = getRedis();
       const id = getIdentifier(req);
 
       // Get number of user's request for the last 24 hours
@@ -34,14 +44,14 @@ export function createQuotaChecker(redisClient: Redis) {
 
       return { allowed: true, remaining: QUOTA - used - 1 };           // Returns remaning quota
     },
-    
+
     // Function to decrement user's requests count
-     async  giveBack(req: NextRequest) {
+    async giveBack(req: NextRequest) {
+      const redisClient = getRedis();
       const id = getIdentifier(req);
       await redisClient.decr(`rl:${id}`);
     }
   }
 }
 
-const redis = Redis.fromEnv();
-export const { checkQuota, giveBack } = createQuotaChecker(redis);
+export const { checkQuota, giveBack } = createQuotaChecker();

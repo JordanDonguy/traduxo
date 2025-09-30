@@ -3,6 +3,7 @@ import { useApp } from "./AppContext";
 import { fetchHistory } from "@traduxo/packages/utils/history/fetchHistory";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { Translation, TranslationItem } from "@traduxo/packages/types/translation";
+import { API_BASE_URL } from "../utils/config/apiBase";
 
 export type TranslationState = {
   inputText: string;
@@ -56,11 +57,11 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
       const saveTranslation = async () => {
         try {
-          const res = await fetch("/api/history", {
+          const res = await fetch(`${API_BASE_URL}/history`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}), // only add if token exists
+              "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
               translations: translatedText,
@@ -118,6 +119,8 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
         })
       };
       loadHistory();
+    } else if (status === "unauthenticated") {
+      setTranslationHistory([]);
     }
   }, [status, token])
 

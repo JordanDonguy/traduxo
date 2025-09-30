@@ -48,6 +48,8 @@ const Providers = ({ children }: React.PropsWithChildren) => (
 
 const mockUseApp = (mockSetError = jest.fn()) => {
   jest.spyOn(AppContextModule, "useApp").mockReturnValue({
+    showMenu: false,
+    setShowMenu: jest.fn(),
     showLoginForm: false,
     setShowLoginForm: jest.fn(),
     error: "",
@@ -134,7 +136,7 @@ describe("TranslationContext", () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        "/api/history",
+        "/history",
         expect.objectContaining({
           method: "POST",
           headers: expect.objectContaining({

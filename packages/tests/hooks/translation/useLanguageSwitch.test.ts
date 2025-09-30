@@ -137,4 +137,40 @@ describe("useLanguageSwitch", () => {
 
     clearTimeoutSpy.mockRestore();
   });
+
+  // ------ Test 6️⃣ ------
+  it("falls back to 'en' when detectedLang equals outputLang and outputLang is not 'en'", () => {
+    const { result } = renderHook(() =>
+      useLanguageSwitch({
+        inputLang: "auto",
+        outputLang: "fr",
+        setInputLang: mockSetInputLang,
+        setOutputLang: mockSetOutputLang,
+        detectedLang: "fr", // same as outputLang
+      })
+    );
+
+    act(() => result.current.switchLanguage());
+
+    expect(mockSetOutputLang).toHaveBeenCalledWith("en");
+    expect(mockSetInputLang).toHaveBeenCalledWith("fr");
+  });
+
+  // ------ Test 7️⃣ ------
+  it("falls back to 'fr' when detectedLang equals outputLang and outputLang is 'en'", () => {
+    const { result } = renderHook(() =>
+      useLanguageSwitch({
+        inputLang: "auto",
+        outputLang: "en",
+        setInputLang: mockSetInputLang,
+        setOutputLang: mockSetOutputLang,
+        detectedLang: "en", // same as outputLang
+      })
+    );
+
+    act(() => result.current.switchLanguage());
+
+    expect(mockSetOutputLang).toHaveBeenCalledWith("fr");
+    expect(mockSetInputLang).toHaveBeenCalledWith("en");
+  });
 });

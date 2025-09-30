@@ -24,16 +24,9 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
 
         <h1 className="text-2xl text-center font-medium">History</h1>
 
-        {/* -------------- Loading spinner -------------- */}
-        {isLoading ? (
-          <div className="flex-1 flex min-h-[70vh] items-center justify-center">
-            <div role="status" className="spinner" />
-          </div>
-        ) : (
-
           <div className="flex flex-col gap-4 md:gap-6 overflow-y-auto max-h-[calc(100dvh-8rem)] pb-8 scrollbar-hide">
 
-            {translationHistory.map((t, idx) => (
+            {status === "authenticated" && translationHistory.map((t, idx) => (
               <article
                 id={`History-translation-item ${idx + 1}`}
                 aria-label={`Select history translation ${idx + 1}`}
@@ -70,12 +63,11 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
 
             {/* Display a message if user is not logged in or if favoriteTranslations is empty */}
             {(status !== "authenticated" && !isLoading) ? (
-              <p className="text-xl pt-10 text-center">You need to log in to have access to your translation history</p>
+              <p className="text-xl pt-10 text-center fade-in-item">You need to log in to have access to your translation history</p>
             ) : !translationHistory.length && !isLoading ? (
-              <p className="text-xl pt-10 text-center">No translations found in history...</p>
+              <p className="text-xl pt-10 text-center fade-in-item">No translations found in history...</p>
             ) : null}
           </div>
-        )}
       </div>
     </div>
   )

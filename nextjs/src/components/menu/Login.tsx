@@ -47,7 +47,7 @@ export default function Login({ showMenu }: LoginProps) {
     >
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        < div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center fade-in-item">
           <div className="spinner" />
         </div>
       ) : null}
@@ -71,6 +71,7 @@ export default function Login({ showMenu }: LoginProps) {
             id="email"
             name="email"
             aria-label="Email"
+            autoComplete="email"
             placeholder="you@example.com"
             className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
             value={email}

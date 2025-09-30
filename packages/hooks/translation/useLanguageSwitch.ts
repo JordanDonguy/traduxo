@@ -30,8 +30,14 @@ export function useLanguageSwitch({
     // Swap input/output languages
     const temp = outputLang;
     if (inputLang === "auto") {
-      // If inputLang is "auto", use detected language as output
+      // If inputLang is "auto", use detected language or fallback as output
+      if (detectedLang !== outputLang) {
       setOutputLang(detectedLang);
+      } else if (outputLang !== "en") {
+        setOutputLang("en"); // Fallback to English
+      } else {
+        setOutputLang("fr"); // If output was English, fallback to French
+      };
     } else {
       setOutputLang(inputLang);
     }

@@ -92,7 +92,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
         inset-0 max-h-screen duration-400 origin-top
         ${showMenu ? "scale-y-100 bg-[var(--menu)]" : "scale-y-0 bg-[var(--bg)]"}`}
     >
-      {(status === "loading" || isLoading) ? (
+      {(isLoading) ? (
         <div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
@@ -158,7 +158,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                   id="theme-toggle-button"
                   aria-label="Toggle theme"
                   onClick={() => setTheme(isDark ? "light" : "dark")}
-                  className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
+                  className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0 "
                 >
                   {isDark ? <Moon /> : <Sun />}
                   <span className="pl-6 text-xl">Theme ({theme})</span>
@@ -239,7 +239,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
                 </button>
 
                 {/* Authenticated actions */}
-                {status === "authenticated" && (
+                {(status === "authenticated") && (
                   <>
                     {/* -------------- Change password -------------- */}
                     <button
