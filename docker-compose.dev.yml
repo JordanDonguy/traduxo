@@ -4,7 +4,7 @@ services:
     container_name: traduxo-db-dev
     restart: unless-stopped
     env_file:
-      - .env
+      - ./nextjs/.env.development
     ports:
       - "5432:5432"
     volumes:
@@ -16,14 +16,15 @@ services:
       dockerfile: nextjs/Dockerfile.dev
     command: sh -c "npx prisma generate && npx prisma migrate dev && npm run dev"
     env_file:
-      - .env    
       - ./nextjs/.env.development
-    environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}"
     ports:
       - "3000:3000"
     depends_on:
       - db
+    volumes:
+      - ./nextjs:/app/nextjs           # mount local code
+      - /app/nextjs/node_modules      # keep container's node_modules
+      - ./packages:/app/packages      # mount monorepo packages
 
 volumes:
   traduxo-db-data-dev:

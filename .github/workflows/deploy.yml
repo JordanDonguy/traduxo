@@ -22,7 +22,11 @@ jobs:
 
       - name: Run lint and unit tests inside container
         run: |
+          # Run tests
           docker run --rm traduxo-app:test
+
+          # Remove test image
+          docker rmi -f traduxo-app:test || true
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -68,6 +72,8 @@ jobs:
             if docker compose run --rm app npx prisma migrate deploy; then
                 # If migrations succeed, bring up new version
                 docker compose up -d
+                # Remove dangling images
+                docker image prune -f
             else
                 # Rollback if migration fails
                 echo "Migrations failed! Rolling back..."

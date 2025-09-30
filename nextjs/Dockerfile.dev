@@ -10,8 +10,6 @@ COPY package*.json ./
 # Copy Next.js package.json and prisma
 COPY nextjs/package*.json ./nextjs/
 COPY nextjs/prisma ./nextjs/prisma
-COPY packages ./packages
-COPY nextjs/. ./nextjs
 
 # Install dependencies
 RUN npm install

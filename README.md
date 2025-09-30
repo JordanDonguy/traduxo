@@ -5,11 +5,13 @@ It provides **native-like translations, idiomatic expressions, cultural explanat
 
 With features like **voice input, auto language detection, and personal history**, Traduxo is designed for anyone who wants to **learn, practice, and master expressions across languages**.
 
+
 ---
 
 ## 🚀 Live Demo
 
 👉 [https://traduxo.app](https://traduxo.app)
+
 
 ---
 
@@ -20,11 +22,12 @@ With features like **voice input, auto language detection, and personal history*
 - 📖 ```Explanations Mode``` — Learn the **origin, meaning, nuance, and tone** of an expression with **3 real-world examples**.  
 - 🗣️ ```Voice Input``` — Speak directly to request translations.  
 - 🕵️ ```Auto Language Detection``` — Automatically detects source language.  
-- 🔐 ```User Accounts``` — Login with **Google OAuth** (via NextAuth).  
+- 🔐 ```User Accounts``` — Login with **Google OAuth** and persistent session with **JWT**.
 - 🗄️ ```History & Favorite``` — Store translations and suggestions in history or favorites.  
 - 🌐 ```Choose Explanation Language``` — Control the language used for expression explanations.  
 - 📱 ```Responsive UI``` — Works seamlessly on desktop and mobile.  
 - 🌙 ```Light/Dark themes``` - Light and dark themes available for user's visual comfort
+
 
 ---
 
@@ -43,41 +46,147 @@ With features like **voice input, auto language detection, and personal history*
 - ```Next.js``` — React framework for SSR, routing, API routes and performance  
 - ```TypeScript``` — Strict typing for maintainable development  
 - ```Gemini API``` — AI engine powering translations, suggestions, and explanations (currently using Gemini 2.5 Flash-Lite model)
-- ```NextAuth.js``` — Authentication with Google OAuth and Credentials methods
+- ```PostgreSQL``` — Relational database for persistent storage
 - ```Prisma``` — ORM for database access and type-safe queries 
-- ```Neon``` — PostgreSQL database hosting
+- ```JWT + Google OAuth``` — Authentication using JSON Web Tokens and Google OAuth for secure login
 - ```Zod``` — Type-safe schema validation for inputs  
 - ```sanitize-html``` — Secures user input against XSS  
-- ```Upstash Redis``` — In-memory database used for IP-based daily user request limits
 - ```Tailwind CSS``` — Utility-first CSS framework for styling  
 - ```CSS``` — CSS transformations and optimizations  
 - ```next-themes``` — Handles light and dark theme switching for user interface
 - ```React-toastify``` — Displays toast notifications for user feedback and alerts
 - ```Jest``` — Unit and integration testing framework
-- ```Vercel``` — Hosting and deployment platform  
+- ```Docker``` — Containerized deployment for reproducible environments
+- ```Hetzner VPS``` — Self-hosted server infrastructure
+- ```Nginx``` — Reverse proxy for routing, SSL termination, and caching
 - ```Cloudflare``` — Provides CDN, SSL, caching, and security protection for the app
+- ```Upstash Redis``` — In-memory database used for IP-based daily user request limits
+
 
 ---
 
-## 📁 Project Structure
+## 🖥️ Deployment
+
+- Self-hosted on a `Hetzner VPS` using `Docker` for containerized deployment  
+- `Nginx` as a reverse proxy, routing traffic to the app containers  
+- `Certbot` is used to issue and automatically renew SSL certificates for HTTPS  
+- `Cloudflare` for CDN, caching, and additional security protection  
+- Monorepo structure: most front-end logic lives in `/packages` to prepare for an upcoming `React Native` version  
+- Deployment is fully containerized and scalable, allowing easy updates and maintenance
+
+
+---
+
+## ⚡ CI/CD Pipeline
+
+Traduxo uses a **self-hosted GitHub Actions runner** on the server (managed via `systemd`) to handle continuous integration and deployment.  
+
+The pipeline is triggered on:
+
+- Pushes to `main` branch  
+- Pull requests targeting `main` (only the test branch would be triggered on pull requests)  
+- Manual triggers (`workflow_dispatch`)
+
+---
+
+### 1️⃣ Test Job
+- Runs on the self-hosted runner  
+- Steps:
+  1. Checkout code  
+  2. Build the Docker test image (`nextjs/Dockerfile.test`)  
+  3. Run linting and Jest unit tests inside the container  
+  4. Remove the test image after completion  
+
+This ensures that only code passing tests proceeds to deployment.
+
+---
+
+### 2️⃣ Deploy Job
+- Runs **only on pushes to `main`** and depends on the `test` job  
+- Steps:
+  1. Checkout code  
+  2. Log in to Docker Hub using secrets  
+  3. Build the production Docker image (`nextjs/Dockerfile.prod`) with required build arguments  
+  4. Push the Docker image to Docker Hub  
+  5. SSH into the Hetzner server and perform deployment:
+     - Backup the current container (`docker tag traduxo-app:latest traduxo-app:backup`)  
+     - Pull the new image via `docker compose pull`  
+     - Run Prisma migrations in a temporary container  
+     - If migrations succeed, bring up the new version (`docker compose up -d`)  
+     - Remove dangling images (`docker image prune -f`)  
+     - If migrations fail, rollback to the backup image  
+
+---
+
+### 🔑 Notes
+- All operations run inside Docker, ensuring consistent environments  
+- The pipeline uses **secrets** for sensitive data like Docker Hub credentials, server SSH keys, and API base URLs
+- Using self-hosted runner because server architecture is **ARM64**, avoiding slow build times with buildx or QEMU on GitHub Actions cloud runners
+
+
+---
+
+## 🏗️ Local Developer Guide
+
+Follow these steps to set up and run Traduxo locally for development.
+
+### 1️⃣ Clone the Repository
+```bash
+    git clone https://github.com/JordanDonguy/traduxo.git
+    cd traduxo
 ```
-traduxo/nextjs/
-├── app/                     # Next.js App Router pages & layouts
-│   ├── api/                 # API routes (Supabase, Gemini)
-├── components/              # Reusable UI components
-├── lib/
-│   ├── client/              # Frontend client logic
-│   │   ├── hooks/           # Custom hooks for client
-│   │   └── utils/           # Utility functions
-│   ├── server/              # Backend logic
-│   │   ├── auth/            # Authentication helpers
-│   │   ├── handlers/        # API route handlers
-│   │   └── middlewares/     # Express/Next middlewares
-│   └── shared/              # Shared code: Gemini prompts & Zod schemas
-├── types/                   # TypeScript type definitions
-├── context/                 # React context for global state
-└── tests/                   # Jest unit tests
+
+### 2️⃣ Set Up Environment Variables
+```bash
+    cp nextjs/.env.example nextjs/.env.development
 ```
+
+Then edit the files to set your environment variables
+
+### 3️⃣ Start Development Containers
+```bash
+    docker compose -f docker-compose.dev.yml up -d
+```
+
+This will start:
+
+- PostgreSQL  
+- Traduxo app container  
+
+### 4️⃣ View Application Logs
+```bash
+    docker logs -f traduxo-app-1
+```
+
+### 5️⃣ Run Tests & Lint
+
+Inside /nextjs, there is a Dockerfile.test configured to run tests and linting:
+```bash
+    # Build and run the test container
+    docker build -f nextjs/Dockerfile.test -t traduxo-test .
+    docker run --rm traduxo-test
+```
+
+- `--rm` ensures the container is removed after running  
+- This will execute Jest tests and linting in an isolated environment  
+
+If you want to remove the test image after:
+```bash
+    docker rmi -f traduxo-test
+```
+
+### 6️⃣ Access the App
+
+Once containers are running, the app should be available at:
+```bash
+    http://localhost:3000
+```
+
+### ✅ Notes
+
+- Make sure Docker and Docker Compose are installed and running  
+- Any changes to .env files require restarting the containers
+
 
 
 ---
@@ -88,6 +197,7 @@ This project is proprietary software.
 All rights reserved.  
 
 See [LICENSE](./LICENSE) for full details.
+
 
 ---
 
