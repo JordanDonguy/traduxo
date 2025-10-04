@@ -49,6 +49,7 @@ jobs:
             --build-arg NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }} \
             --build-arg NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }} \
             --build-arg NEXT_PUBLIC_PLATFORM=${{ secrets.NEXT_PUBLIC_PLATFORM }} \
+            --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} \
             -f nextjs/Dockerfile.prod \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest
@@ -63,7 +64,7 @@ jobs:
             cd /srv/traduxo
 
             # Backup current container as fallback
-            docker tag traduxo-app:latest traduxo-app:backup
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:latest ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:backup
 
             # Pull new image
             docker compose pull
@@ -79,6 +80,6 @@ jobs:
                 echo "Migrations failed! Rolling back..."
                 docker stop traduxo-app
                 docker rm traduxo-app || true
-                docker run -d --name traduxo-app traduxo-app:backup
+                docker run -d --name traduxo-app ${{ secrets.DOCKERHUB_USERNAME }}/traduxo-app:backup
                 exit 1
             fi

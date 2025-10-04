@@ -53,7 +53,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
   // Save a translation once saveToHistory is triggered
   useEffect(() => {
-    if (status === "authenticated" && saveToHistory) {
+    if (status === "authenticated" && saveToHistory && translatedText.length) {
 
       const saveTranslation = async () => {
         try {
