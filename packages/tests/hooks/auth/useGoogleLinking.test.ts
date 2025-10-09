@@ -13,12 +13,12 @@ describe("useGoogleLinking", () => {
     mockFetch = jest.fn();
     mockNavigate = jest.fn();
 
-    // Reset spy on saveToken before each test
+    // Spy on saveToken
     jest.spyOn(authUtils, "saveToken").mockImplementation(jest.fn());
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // restore original implementation
+    jest.clearAllMocks();
   });
 
   // ------ Test 1️⃣ ------
@@ -48,8 +48,7 @@ describe("useGoogleLinking", () => {
   });
 
   // ------ Test 3️⃣ ------
-  it("sets fallback error if backend fails without tokens or error message", async () => {
-    // Backend returns no tokens and no error
+  it("sets fallback error if backend fails without token or error message", async () => {
     mockFetch.mockResolvedValue({
       ok: false,
       json: jest.fn().mockResolvedValue({}),
@@ -74,7 +73,7 @@ describe("useGoogleLinking", () => {
   });
 
   // ------ Test 4️⃣ ------
-  it("sets error if backend fails or tokens missing", async () => {
+  it("sets error if backend fails with an error message", async () => {
     mockFetch.mockResolvedValue({
       ok: false,
       json: jest.fn().mockResolvedValue({ error: "Invalid credentials" }),
@@ -93,14 +92,14 @@ describe("useGoogleLinking", () => {
       expect(result.current.isLoading).toBe(false);
       expect(authUtils.saveToken).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
-    })
+    });
   });
 
   // ------ Test 5️⃣ ------
   it("saves token and redirects on successful login", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({ accessToken: "at", refreshToken: "rt" }),
+      json: jest.fn().mockResolvedValue({ token: "at", refreshToken: "rt" }),
     });
 
     const { result } = renderHook(() =>
@@ -109,8 +108,9 @@ describe("useGoogleLinking", () => {
 
     await act(async () => {
       await result.current.handleSubmit("email@example.com", "password");
+    });
 
-      // Check state inside the same act block
+    await waitFor(() => {
       expect(authUtils.saveToken).toHaveBeenCalledWith("at", "rt");
       expect(mockNavigate).toHaveBeenCalledWith("/?login=true");
       expect(result.current.error).toBe("");
@@ -130,7 +130,9 @@ describe("useGoogleLinking", () => {
       await result.current.handleSubmit("email@example.com", "password");
     });
 
-    expect(result.current.error).toBe("Something went wrong... Please try again later");
+    expect(result.current.error).toBe(
+      "Something went wrong... Please try again later"
+    );
     expect(result.current.isLoading).toBe(false);
     expect(authUtils.saveToken).not.toHaveBeenCalled();
     expect(mockNavigate).not.toHaveBeenCalled();

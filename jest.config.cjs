@@ -19,7 +19,7 @@ module.exports = {
     "^@traduxo/packages/(.*)$": "<rootDir>/packages/$1",
 
     // React Native mocks
-    "^@react-native-async-storage/async-storage$": "<rootDir>/packages/tests/mocks/asyncStorageMock.ts",
+    "^expo-secure-store$": "<rootDir>packages/tests/mocks/expoSecureStore.ts",
     "^react-native-localize$": "<rootDir>/packages/tests/mocks/reactNativeLocalizeMock.ts",
     "^react-native-toast-message$": "<rootDir>/packages/tests/mocks/reactNativeToastMock.ts"
   },

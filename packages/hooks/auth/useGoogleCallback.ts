@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { saveToken } from "@traduxo/packages/utils/auth/token";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 interface GoogleCallbackOptions {
   fetchFn?: typeof fetch;
@@ -16,9 +17,13 @@ export function useGoogleCallback({ fetchFn = fetch }: GoogleCallbackOptions) {
 
     (async () => {
       try {
-        const res = await fetchFn("/api/auth/google-login", {
+        const isNative = process.env.PLATFORM === "native";
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (isNative) headers["x-client"] = "native";
+
+        const res = await fetchFn(`${API_BASE_URL}/auth/google-login`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({ code }),
         });
 
@@ -29,8 +34,8 @@ export function useGoogleCallback({ fetchFn = fetch }: GoogleCallbackOptions) {
           return;
         }
 
-        if (data.accessToken && data.refreshToken) {
-          saveToken(data.accessToken, data.refreshToken);
+        if (data.token) {
+          saveToken(data.token, data.refreshToken ?? undefined);
           router.replace("/?login=true");
         } else {
           router.push("/?error=google-auth");

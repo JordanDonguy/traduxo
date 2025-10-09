@@ -28,7 +28,6 @@ describe("useDeleteAccount", () => {
     mockFetcher = jest.fn();
     onSuccess = jest.fn();
     onError = jest.fn();
-    jest.clearAllMocks();
   });
 
   // ------ Test 1️⃣ ------
@@ -44,7 +43,7 @@ describe("useDeleteAccount", () => {
       expect(success).toBe(false);
     });
 
-    expect(onError).toHaveBeenCalledWith("Missing authentication tokens");
+    expect(onError).toHaveBeenCalledWith("Missing authentication token");
     expect(mockFetcher).not.toHaveBeenCalled();
   });
 
