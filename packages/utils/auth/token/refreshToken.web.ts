@@ -19,11 +19,11 @@ export async function refreshToken(oldAccessToken?: string): Promise<string | nu
     }
 
     const data = await res.json();
-    const { accessToken } = data;
+    const { token } = data;
 
-    if (!accessToken) return null;
+    if (!token) return null;
 
-    return accessToken;
+    return token;
   } catch (err) {
     console.error("refreshToken error:", err);
     return null;

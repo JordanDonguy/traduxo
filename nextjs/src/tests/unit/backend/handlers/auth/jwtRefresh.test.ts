@@ -75,9 +75,11 @@ describe("refreshTokenHandler", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("creates new tokens successfully (native)", async () => {
-    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
+  it("creates new tokens successfully (native, old token >1 day)", async () => {
+    const oldTokenCreatedAt = new Date(Date.now() - 1000 * 60 * 60 * 25); // 25 hours ago
+    const tokenRecord = { id: "1", token: "hashed", userId: "user1", createdAt: oldTokenCreatedAt };
     const user = { id: "user1", email: "a@b.com", systemLang: "en", providers: ["google"] };
+
     mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
     mockPrisma.user.findUnique.mockResolvedValue(user);
     (bcrypt.compareSync as jest.Mock).mockReturnValue(true);
@@ -103,18 +105,16 @@ describe("refreshTokenHandler", () => {
   });
 
   // ------ Test 6️⃣ ------
-  it("creates new tokens and sets cookie for web clients", async () => {
-    const tokenRecord = { id: "1", token: "hashed", userId: "user1" };
+  it("does not rotate refresh token if recent (<1 day) for web", async () => {
+    const recentTokenCreatedAt = new Date(Date.now() - 1000 * 60 * 60 * 12); // 12 hours ago
+    const tokenRecord = { id: "1", token: "hashed", userId: "user1", createdAt: recentTokenCreatedAt };
     const user = { id: "user1", email: "a@b.com", systemLang: "fr", providers: [] };
+
     mockPrisma.refreshToken.findMany.mockResolvedValue([tokenRecord]);
     mockPrisma.user.findUnique.mockResolvedValue(user);
     (bcrypt.compareSync as jest.Mock).mockReturnValue(true);
 
-    jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
-      accessToken: "jwt-access",
-      refreshToken: "cookie-refresh",
-      expiresIn: 3600,
-    });
+    jest.spyOn(tokenModule, "generateToken");
 
     const req = {
       headers: new Map(),
@@ -126,9 +126,22 @@ describe("refreshTokenHandler", () => {
     const json = await res.json();
 
     expect(res.status).toBe(200);
-    expect(json.token).toBe("jwt-access");
+
+    // Access token is newly minted JWT
+    expect(json.token).toMatch(/^ey/); // JWT format
+
+    // Web clients do NOT return refresh token in JSON
+    expect(json.refreshToken).toBeUndefined();
+
     expect(json.language).toBe("fr");
     expect(json.providers).toEqual([]);
+
+    // No new refresh token was generated
+    expect(tokenModule.generateToken).not.toHaveBeenCalled();
+
+    // Check that cookie was set to the existing refresh token
+    const cookie = res.cookies.get("refreshToken");
+    expect(cookie?.value).toBe("refresh-token");
   });
 
   // ------ Test 7️⃣ ------

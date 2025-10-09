@@ -15,7 +15,7 @@ describe("refreshToken.web", () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ accessToken: newAccess }),
+      json: async () => ({ token: newAccess }),
     });
 
     const token = await refreshToken();
@@ -62,7 +62,7 @@ describe("refreshToken.web", () => {
 
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ accessToken: newAccess }),
+      json: async () => ({ token: newAccess }),
     });
 
     // Trigger two calls concurrently
