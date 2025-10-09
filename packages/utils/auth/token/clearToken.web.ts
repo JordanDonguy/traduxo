@@ -1,4 +1,6 @@
+import { clearAccessToken } from "./tokenStore";
+
 export async function clearToken() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+  // Clear only the in-memory token
+  clearAccessToken();
 }

@@ -1,27 +1,33 @@
 import { clearToken } from "@traduxo/packages/utils/auth/token/clearToken.native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { clearAccessToken } from "@traduxo/packages/utils/auth/token/tokenStore";
 
-jest.mock("@react-native-async-storage/async-storage", () => ({
+jest.mock("expo-secure-store", () => ({
   __esModule: true,
-  default: {
-    removeItem: jest.fn(),
-  },
+  deleteItemAsync: jest.fn(),
 }));
 
-const mockRemoveItem = AsyncStorage.removeItem as jest.Mock;
+jest.mock("@traduxo/packages/utils/auth/token/tokenStore", () => ({
+  clearAccessToken: jest.fn(),
+}));
+
+const mockDeleteItemAsync = SecureStore.deleteItemAsync as jest.Mock;
+const mockClearAccessToken = clearAccessToken as jest.Mock;
 
 describe("clearToken.native", () => {
   // ------ Test 1️⃣ ------
   it("removes both access and refresh tokens", async () => {
     await clearToken();
 
-    expect(mockRemoveItem).toHaveBeenCalledWith("accessToken");
-    expect(mockRemoveItem).toHaveBeenCalledWith("refreshToken");
+    expect(mockClearAccessToken).toHaveBeenCalled();
+    expect(mockDeleteItemAsync).toHaveBeenCalledWith("accessToken");
+    expect(mockDeleteItemAsync).toHaveBeenCalledWith("refreshToken");
+    expect(mockDeleteItemAsync).toHaveBeenCalledTimes(2);
   });
 
   // ------ Test 2️⃣ ------
-  it("throws if AsyncStorage.removeItem fails", async () => {
-    mockRemoveItem.mockRejectedValueOnce(new Error("storage error"));
+  it("throws if SecureStore.deleteItemAsync fails", async () => {
+    mockDeleteItemAsync.mockRejectedValueOnce(new Error("storage error"));
 
     await expect(clearToken()).rejects.toThrow("storage error");
   });

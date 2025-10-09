@@ -1,78 +1,67 @@
 import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "@traduxo/packages/utils/auth/token/refreshToken.native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { refreshToken } from "./refreshToken.native";
+import * as SecureStore from "expo-secure-store";
 import { TokenResult } from "@traduxo/packages/types/token";
 import { JwtPayload } from "@traduxo/packages/types/jwt";
+import { getAccessToken, setAccessToken } from "./tokenStore";
 
-/**
- * Retrieves the access token from AsyncStorage.
- * Automatically refreshes if expired and refresh token is available.
- *
- * @param returnRefreshToken - Whether to include the refresh token in the result
- * @returns TokenResult or null if unavailable/invalid
- */
-export async function getToken(returnRefreshToken = false): Promise<TokenResult | null> {
+export async function getToken(): Promise<TokenResult | null> {
   const now = Math.floor(Date.now() / 1000);
 
-  // Get stored access token and optionally the refresh token
-  let token = await AsyncStorage.getItem("accessToken");
-  const refreshTokenFromStorage = returnRefreshToken
-    ? await AsyncStorage.getItem("refreshToken")
-    : undefined;
+  // 1. Try in-memory token first
+  let token = getAccessToken();
 
-  if (!token) return null;
+  // 2. Fallback to SecureStore
+  if (!token) {
+    token = await SecureStore.getItemAsync("accessToken");
+    if (token) setAccessToken(token);
+  }
+
+  // 3. Get refresh token from SecureStore
+  const storedRefreshToken = await SecureStore.getItemAsync("refreshToken");
+
+  // If no token and no refresh token, user is unauthenticated
+  if (!token && !storedRefreshToken) return null;
 
   let payload: JwtPayload | null = null;
 
-  // Try decoding the current token
-  try {
-    payload = jwtDecode<JwtPayload>(token);
-  } catch {
-    // Token malformed, attempt refresh if refresh token exists
-    if (refreshTokenFromStorage) {
-      const newToken = await refreshToken(refreshTokenFromStorage, token);
-      if (!newToken) return null;
-
-      token = newToken;
-      await AsyncStorage.setItem("accessToken", newToken);
-
-      try {
-        payload = jwtDecode<JwtPayload>(newToken);
-      } catch {
-        return null;
-      }
-    } else {
-      return null; // no refresh token available
+  // 4. Decode token if available
+  if (token) {
+    try {
+      payload = jwtDecode<JwtPayload>(token);
+    } catch {
+      token = null;
+      payload = null;
     }
   }
 
-  // If token is expired, refresh it
-  if (payload.exp && payload.exp < now) {
-    if (!refreshTokenFromStorage) return null;
+  // 5. Refresh if missing or expired
+  if (!token || (payload?.exp && payload.exp < now)) {
+    if (!storedRefreshToken) return null;
 
-    const newToken = await refreshToken(refreshTokenFromStorage, token);
+    const newToken = await refreshToken(storedRefreshToken);
     if (!newToken) return null;
 
     token = newToken;
-    await AsyncStorage.setItem("accessToken", newToken);
+    setAccessToken(token);
+    await SecureStore.setItemAsync("accessToken", token);
 
     try {
-      payload = jwtDecode<JwtPayload>(newToken);
+      payload = jwtDecode<JwtPayload>(token);
     } catch {
       return null;
     }
   }
 
-  // Return token result
+  if (!token || !payload) return null;
+
+  // 6. Return token result
   const result: TokenResult = {
     token,
+    refreshToken: storedRefreshToken,
     language: payload.language,
     providers: payload.providers,
   };
-
-  if (returnRefreshToken && refreshTokenFromStorage) {
-    result.refreshToken = refreshTokenFromStorage;
-  }
 
   return result;
 }

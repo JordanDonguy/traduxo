@@ -1,16 +1,17 @@
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
+import * as SecureStore from "expo-secure-store";
 
-let refreshing: boolean = false;
+let refreshing = false;
 
-export async function refreshToken(oldRefreshToken: string, oldAccessToken: string): Promise<string | null> {
-  if (refreshing) return null; // prevent double call
+export async function refreshToken(oldRefreshToken: string): Promise<string | null> {
+  if (refreshing) return null;
   refreshing = true;
 
   try {
     const res = await fetch(`${API_BASE_URL}/auth/jwt-refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: oldRefreshToken, accessToken: oldAccessToken }),
+      headers: { "Content-Type": "application/json", "x-client": "native" },
+      body: JSON.stringify({ refreshToken: oldRefreshToken }),
     });
 
     if (!res.ok) return null;
@@ -20,12 +21,12 @@ export async function refreshToken(oldRefreshToken: string, oldAccessToken: stri
 
     if (!accessToken || !newRefreshToken) return null;
 
-    const { default: AsyncStorage } = await import("@react-native-async-storage/async-storage");
-    await AsyncStorage.setItem("refreshToken", newRefreshToken);
+    // Save new refresh token in SecureStore
+    await SecureStore.setItemAsync("refreshToken", newRefreshToken);
 
     return accessToken;
   } catch (err) {
-    console.error("refreshToken error: ", err)
+    console.error("refreshToken error:", err);
     return null;
   } finally {
     refreshing = false;
