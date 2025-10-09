@@ -1,6 +1,11 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { clearAccessToken } from "./tokenStore";
 
 export async function clearToken() {
-  await AsyncStorage.removeItem("accessToken");
-  await AsyncStorage.removeItem("refreshToken");
+  // Clear in-memory token
+  clearAccessToken();
+
+  // Clear tokens from secure storage
+  await SecureStore.deleteItemAsync("accessToken");
+  await SecureStore.deleteItemAsync("refreshToken");
 }

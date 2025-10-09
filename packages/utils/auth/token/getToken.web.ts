@@ -1,71 +1,46 @@
 import { jwtDecode } from "jwt-decode";
-import { refreshToken } from "./refreshToken.web";
 import { TokenResult } from "@traduxo/packages/types/token";
 import { JwtPayload } from "@traduxo/packages/types/jwt";
+import { getAccessToken, setAccessToken } from "./tokenStore";
+import { refreshToken } from "./refreshToken.web";
 
-export async function getToken(returnRefreshToken = false): Promise<TokenResult | null> {
+export async function getToken(): Promise<TokenResult | null> {
   const now = Math.floor(Date.now() / 1000);
 
-  // Load tokens from storage
-  let token = localStorage.getItem("accessToken");
-  const refreshTokenFromStorage = localStorage.getItem("refreshToken");
-
-  // If we don't even have an access token, user is unauthenticated
-  if (!token) return null;
-
+  // First, check shared in-memory token
+  let token = getAccessToken();
   let payload: JwtPayload | null = null;
 
-  try {
-    // Try to decode the access token
-    payload = jwtDecode<JwtPayload>(token);
-  } catch {
-    // If decoding fails, try refreshing with the refresh token
-    if (refreshTokenFromStorage) {
-      const newToken = await refreshToken(refreshTokenFromStorage, token);
-      if (!newToken) return null; // refresh failed → unauthenticated
-
-      // Store and decode the new access token
-      token = newToken;
-      localStorage.setItem("accessToken", newToken);
-
-      try {
-        payload = jwtDecode<JwtPayload>(newToken);
-      } catch {
-        return null; // even refreshed token is invalid
-      }
-    } else {
-      return null; // no refresh token available → unauthenticated
+  // Try decoding current token if it exists
+  if (token) {
+    try {
+      payload = jwtDecode<JwtPayload>(token);
+    } catch {
+      token = null;
     }
   }
 
-  // If the token is expired, try refreshing
-  if (payload.exp && payload.exp < now) {
-    if (!refreshTokenFromStorage) return null;
+  // If no token or expired, attempt refresh
+  if (!token || (payload?.exp && payload.exp < now)) {
+    const refreshed = await refreshToken(token ?? undefined);
+    if (!refreshed) return null;
 
-    const newToken = await refreshToken(refreshTokenFromStorage, token);
-    if (!newToken) return null;
-
-    token = newToken;
-    localStorage.setItem("accessToken", newToken);
+    token = refreshed;
+    setAccessToken(token);
 
     try {
-      payload = jwtDecode<JwtPayload>(newToken);
+      payload = jwtDecode<JwtPayload>(token);
     } catch {
-      return null; // refreshed token couldn't be decoded → unauthenticated
+      console.error("Could not decode refreshed token");
+      return null;
     }
   }
 
-  // Build the final result object with data from the token payload
-  const result: TokenResult = {
+  if (!token || !payload) return null;
+
+  return {
     token,
     language: payload.language,
     providers: payload.providers,
   };
-
-  // Optionally include the refresh token if requested
-  if (returnRefreshToken && refreshTokenFromStorage) {
-    result.refreshToken = refreshTokenFromStorage;
-  }
-
-  return result;
 }

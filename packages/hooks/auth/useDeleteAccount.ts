@@ -26,10 +26,10 @@ export function useDeleteAccount({
 
     try {
       // Step 1: Get tokens
-      const tokens = await getToken(true);
+      const tokens = await getToken();
 
-      if (!tokens?.token || !tokens?.refreshToken) {
-        onError?.("Missing authentication tokens");
+      if (!tokens?.token) {
+        onError?.("Missing authentication token");
         return false
       }
 
@@ -48,7 +48,7 @@ export function useDeleteAccount({
       }
 
       // Step 3: Logout
-      const success = await logoutFn(tokens.token, tokens.refreshToken);
+      const success = await logoutFn(tokens.token, tokens.refreshToken ?? undefined);
       if (!success) {
         onError?.("Account deleted but failed to logout, please logout manually.");
         return false

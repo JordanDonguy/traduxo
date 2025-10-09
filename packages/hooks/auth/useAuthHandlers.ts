@@ -50,10 +50,10 @@ export function useAuthHandlers() {
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
     try {
-      const tokenData = await getToken(true);
-      if (!tokenData?.token || !tokenData.refreshToken) return false;
+      const tokenData = await getToken();
+      if (!tokenData?.token) return false;
 
-      const success = await logoutUser(tokenData.token, tokenData.refreshToken);
+      const success = await logoutUser(tokenData.token, tokenData.refreshToken ?? undefined);
       if (!success) return false;
 
       clearToken();

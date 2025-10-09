@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { linkGoogle } from "@/lib/server/handlers/auth/linkGoogle";
 import { mockPrisma } from "@/tests/jest.setup";
 import bcrypt from "bcrypt";
@@ -6,16 +7,15 @@ import * as tokenModule from "@/lib/server/auth/generateToken";
 jest.mock("bcrypt");
 
 describe("linkGoogle handler", () => {
-  const mockReq = (body: unknown) => ({
+  const mockReq = (body: unknown, headers?: HeadersInit) => ({
     json: async () => body,
-  } as unknown as Request);
+    headers: new Headers(headers),
+  } as unknown as NextRequest);
 
   // ------ Test 1️⃣ ------
   it("returns 400 if input fails Zod validation", async () => {
     const req = mockReq({ email: "bad-email", password: "" });
-
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
-
     expect(response.status).toBe(400);
     const json = await response.json();
     expect(json.error).toBe("Invalid email or password.");
@@ -25,9 +25,7 @@ describe("linkGoogle handler", () => {
   it("returns 404 if user not found", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null);
     const req = mockReq({ email: "user@example.com", password: "ValidPass123!" });
-
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
-
     expect(response.status).toBe(404);
     const json = await response.json();
     expect(json.error).toBe("User not found.");
@@ -44,7 +42,6 @@ describe("linkGoogle handler", () => {
 
     const req = mockReq({ email: "user@example.com", password: "wrongpass" });
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
-
     expect(response.status).toBe(401);
     const json = await response.json();
     expect(json.error).toBe("Incorrect password.");
@@ -62,14 +59,13 @@ describe("linkGoogle handler", () => {
 
     const req = mockReq({ email: "user@example.com", password: "correctpass" });
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
-
     expect(response.status).toBe(400);
     const json = await response.json();
-    expect(json.error).toBe("For security, Google linking requests expire after 10 minutes. Please sign in with Google again to restart the process.");
+    expect(json.error).toMatch(/requests expire after 10 minutes/);
   });
 
   // ------ Test 5️⃣ ------
-  it("adds Google provider and returns 200 with tokens", async () => {
+  it("adds Google provider and returns tokens for native client", async () => {
     const recentDate = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     mockPrisma.user.findUnique.mockResolvedValue({
       id: "user1",
@@ -77,6 +73,46 @@ describe("linkGoogle handler", () => {
       password: "hashed-password",
       google_linking: recentDate,
       providers: [],
+      systemLang: "en",
+    });
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+    mockPrisma.user.update.mockResolvedValue({
+      id: "user1",
+      email: "user@example.com",
+      providers: ["Google"],
+      systemLang: "en",
+    });
+
+    jest.spyOn(tokenModule, "generateToken").mockResolvedValue({
+      accessToken: "jwt-access",
+      refreshToken: "new-refresh",
+      expiresIn: 3600, // generateToken still returns this internally
+    });
+
+    const req = mockReq({ email: "user@example.com", password: "correctpass" }, { "x-client": "native" });
+    const response = await linkGoogle(req, { prismaClient: mockPrisma });
+    const json = await response.json();
+
+    expect(mockPrisma.user.update).toHaveBeenCalledWith({
+      where: { email: "user@example.com" },
+      data: { providers: { push: "Google" }, google_linking: null },
+    });
+
+    expect(response.status).toBe(200);
+    expect(json.token).toBe("jwt-access");
+    expect(json.refreshToken).toBe("new-refresh");
+  });
+
+  // ------ Test 6️⃣ ------
+  it("sets refresh token cookie for web clients", async () => {
+    const recentDate = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: "user1",
+      email: "user@example.com",
+      password: "hashed-password",
+      google_linking: recentDate,
+      providers: [],
+      systemLang: "en",
     });
     (bcrypt.compare as jest.Mock).mockResolvedValue(true);
     mockPrisma.user.update.mockResolvedValue({
@@ -96,25 +132,15 @@ describe("linkGoogle handler", () => {
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
     const json = await response.json();
 
-    expect(mockPrisma.user.update).toHaveBeenCalledWith({
-      where: { email: "user@example.com" },
-      data: {
-        providers: { push: "Google" },
-        google_linking: null,
-      },
-    });
-
-    expect(response.status).toBe(200);
-    expect(json.accessToken).toBe("jwt-access");
-    expect(json.refreshToken).toBe("new-refresh");
-    expect(json.expiresIn).toBe(3600);
+    expect(json.token).toBe("jwt-access");
+    const cookie = response.cookies.get("refreshToken");
+    expect(cookie?.value).toBe("new-refresh");
   });
 
-
-  // ------ Test 6️⃣ ------
+  // ------ Test 7️⃣ ------
   it("returns 500 if unexpected error occurs", async () => {
     mockPrisma.user.findUnique.mockRejectedValue(new Error("DB error"));
-    const req = mockReq({ email: "user@example.com", password: "ValidPass123!" }); // valid password
+    const req = mockReq({ email: "user@example.com", password: "ValidPass123!" });
 
     const response = await linkGoogle(req, { prismaClient: mockPrisma });
     expect(response.status).toBe(500);

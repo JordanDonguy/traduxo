@@ -1,4 +1,6 @@
-export async function saveToken(accessToken: string, refreshToken: string) {
-  localStorage.setItem("accessToken", accessToken);
-  localStorage.setItem("refreshToken", refreshToken);
+import { setAccessToken } from "./tokenStore";
+
+export async function saveToken(accessToken?: string, _refreshToken?: string) {
+  if (accessToken) setAccessToken(accessToken);
+  // refresh token is ignored on web
 }

@@ -25,14 +25,31 @@ export async function jwtLogoutHandler(
   { prismaClient = prisma, bcryptFn = bcrypt, jwtFn = jwt }: LogoutDeps
 ) {
   try {
-    const body: LogoutBody = await req.json();
-    const { refreshToken, accessToken } = body;
+    // 1. Determine platform: RN sends "x-client: native" header
+    const isNative = req.headers.get("x-client") === "native";
 
-    if (!refreshToken || !accessToken) {
-      return NextResponse.json({ error: "Missing refreshToken or accessToken" }, { status: 400 });
+    // 2. Pick refresh token
+    let refreshToken: string | undefined;
+    let accessToken: string | undefined;
+
+    if (isNative) {
+      const body: Partial<LogoutBody> = await req.json();
+      refreshToken = body.refreshToken;
+      accessToken = body.accessToken;
+    } else {
+      refreshToken = req.cookies.get("refreshToken")?.value;
+      const body: Partial<LogoutBody> = await req.json();
+      accessToken = body.accessToken; // web still sends accessToken
     }
 
-    // Decode access token to get userId
+    if (!refreshToken || !accessToken) {
+      return NextResponse.json(
+        { error: "Missing refreshToken or accessToken" },
+        { status: 400 }
+      );
+    }
+
+    // 3. Decode access token to get userId
     let userId: string | null = null;
     try {
       const decoded = jwtFn.verify(accessToken, process.env.JWT_SECRET!, { ignoreExpiration: true }) as jwt.JwtPayload;
@@ -42,19 +59,17 @@ export async function jwtLogoutHandler(
       userId = decoded?.sub ?? null;
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: "Invalid access token" }, { status: 401 });
-    }
+    if (!userId) return NextResponse.json({ error: "Invalid access token" }, { status: 401 });
 
-    // Find all active refresh tokens for this user
+    // 4. Find active refresh tokens for this user
     const tokens = await prismaClient.refreshToken.findMany({
       where: { userId, expiresAt: { gt: new Date() } },
       select: { id: true, token: true },
     });
 
-    // Find matching token
+    // 5. Revoke the matching token
     const tokenToRevoke = tokens.find((t: RefreshTokenRecord) =>
-      bcryptFn.compareSync(refreshToken, t.token)
+      bcryptFn.compareSync(refreshToken!, t.token)
     );
 
     if (tokenToRevoke) {
@@ -64,7 +79,19 @@ export async function jwtLogoutHandler(
       });
     }
 
-    return NextResponse.json({ success: true, message: "Logged out" });
+    // 6. Clear the cookie in response (web)
+    const response = NextResponse.json({ success: true, message: "Logged out" });
+    if (!isNative) {
+      response.cookies.set("refreshToken", "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0, // immediately expire
+      });
+    }
+
+    return response;
   } catch (err) {
     console.error("JWT logout error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -18,10 +18,8 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock saveToken
 jest.spyOn(authUtils, "saveToken").mockImplementation(jest.fn());
 
-// ---- Tests ----
 describe("useGoogleCallback", () => {
   // ------ Test 1️⃣ ------
   it("does nothing if code param is missing", () => {
@@ -30,6 +28,7 @@ describe("useGoogleCallback", () => {
     });
     mockGet.mockReturnValue(null);
     renderHook(() => useGoogleCallback({ fetchFn: mockFetch }));
+
     expect(mockReplace).not.toHaveBeenCalled();
     expect(mockPush).not.toHaveBeenCalled();
   });
@@ -52,7 +51,7 @@ describe("useGoogleCallback", () => {
   it("saves token and redirects on successful login", async () => {
     mockGet.mockReturnValue("some-code");
     const mockFetch = jest.fn().mockResolvedValue({
-      json: jest.fn().mockResolvedValue({ accessToken: "at", refreshToken: "rt" }),
+      json: jest.fn().mockResolvedValue({ token: "at", refreshToken: "rt" }),
     });
 
     renderHook(() => useGoogleCallback({ fetchFn: mockFetch }));
@@ -83,8 +82,9 @@ describe("useGoogleCallback", () => {
     const mockFetch = jest.fn().mockRejectedValue(new Error("fail"));
 
     renderHook(() => useGoogleCallback({ fetchFn: mockFetch }));
-    await Promise.resolve();
 
-    expect(mockPush).toHaveBeenCalledWith("/?error=server");
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/?error=server");
+    });
   });
 });

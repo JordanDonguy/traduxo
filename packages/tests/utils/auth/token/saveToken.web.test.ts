@@ -2,30 +2,27 @@
  * @jest-environment jsdom
  */
 
-import { saveToken } from "@traduxo/packages/utils/auth/token";
+import { saveToken } from "@traduxo/packages/utils/auth/token/saveToken.web";
+import { setAccessToken } from "@traduxo/packages/utils/auth/token/tokenStore";
 
-beforeAll(() => {
-  let store: Record<string, string> = {};
-  Object.defineProperty(global, "localStorage", {
-    value: {
-      getItem: jest.fn((key) => store[key] || null),
-      setItem: jest.fn((key, value) => { store[key] = value; }),
-      removeItem: jest.fn((key) => { delete store[key]; }),
-      clear: jest.fn(() => { store = {}; }),
-    },
-    writable: true,
-  });
-});
+jest.mock("@traduxo/packages/utils/auth/token/tokenStore", () => ({
+  setAccessToken: jest.fn(),
+}));
 
-beforeEach(() => {
-  localStorage.clear();
-});
+const mockSetAccessToken = setAccessToken as jest.Mock;
 
 describe("saveToken.web", () => {
-  it("saves accessToken and refreshToken to localStorage", async () => {
+  // ------ Test 1️⃣ ------
+  it("calls setAccessToken with accessToken", async () => {
     await saveToken("access123", "refresh456");
 
-    expect(localStorage.getItem("accessToken")).toBe("access123");
-    expect(localStorage.getItem("refreshToken")).toBe("refresh456");
+    expect(mockSetAccessToken).toHaveBeenCalledWith("access123");
+  });
+
+  // ------ Test 2️⃣ ------
+  it("does not call setAccessToken if accessToken is undefined", async () => {
+    await saveToken(undefined, "refresh456");
+
+    expect(mockSetAccessToken).not.toHaveBeenCalled();
   });
 });

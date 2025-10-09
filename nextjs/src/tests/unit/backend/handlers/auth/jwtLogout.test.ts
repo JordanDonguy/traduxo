@@ -14,14 +14,18 @@ const mockDeps: LogoutDeps = {
   jwtFn: jwt,
 };
 
-// Create a fake access token that decodes to userId "user1"
+// Fake access token that decodes to userId "user1"
 const fakeAccessToken = jwt.sign({ sub: "user1" }, "test-secret");
 
 // ---- Tests ----
 describe("jwtLogoutHandler", () => {
   // ------ Test 1️⃣ ------
   it("fails if missing refreshToken or accessToken", async () => {
-    const req = { json: async () => ({}) } as unknown as NextRequest;
+    const req = {
+      headers: new Map([["x-client", "native"]]),
+      json: async () => ({}),
+    } as unknown as NextRequest;
+
     const res = await jwtLogoutHandler(req, mockDeps);
     const json = await res.json();
 
@@ -30,13 +34,14 @@ describe("jwtLogoutHandler", () => {
   });
 
   // ------ Test 2️⃣ ------
-  it("does nothing if token does not match any hashed token", async () => {
+  it("does nothing if token does not match any hashed token (native)", async () => {
     mockDeps.prismaClient!.refreshToken.findMany.mockResolvedValue([
       { id: "1", token: "hashed1" },
     ]);
     (mockDeps.bcryptFn!.compareSync as jest.Mock).mockReturnValue(false);
 
     const req = {
+      headers: new Map([["x-client", "native"]]),
       json: async () => ({ refreshToken: "invalid-token", accessToken: fakeAccessToken }),
     } as unknown as NextRequest;
 
@@ -48,7 +53,7 @@ describe("jwtLogoutHandler", () => {
   });
 
   // ------ Test 3️⃣ ------
-  it("revokes token if it matches hashed token", async () => {
+  it("revokes token if it matches hashed token (native)", async () => {
     const tokens = [{ id: "1", token: "hashed1" }];
     mockDeps.prismaClient!.refreshToken.findMany.mockResolvedValue(tokens);
     (mockDeps.bcryptFn!.compareSync as jest.Mock).mockImplementation(
@@ -56,6 +61,7 @@ describe("jwtLogoutHandler", () => {
     );
 
     const req = {
+      headers: new Map([["x-client", "native"]]),
       json: async () => ({ refreshToken: "refresh-token", accessToken: fakeAccessToken }),
     } as unknown as NextRequest;
 
@@ -73,7 +79,11 @@ describe("jwtLogoutHandler", () => {
   it("handles errors gracefully", async () => {
     mockDeps.prismaClient!.refreshToken.findMany.mockRejectedValue(new Error("DB error"));
 
-    const req = { json: async () => ({ refreshToken: "any", accessToken: fakeAccessToken }) } as unknown as NextRequest;
+    const req = {
+      headers: new Map([["x-client", "native"]]),
+      json: async () => ({ refreshToken: "any", accessToken: fakeAccessToken }),
+    } as unknown as NextRequest;
+
     const res = await jwtLogoutHandler(req, mockDeps);
     const json = await res.json();
 
@@ -82,8 +92,14 @@ describe("jwtLogoutHandler", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("uses default prisma and bcrypt when deps are not provided", async () => {
-    const req = { json: async () => ({ refreshToken: "any-token", accessToken: fakeAccessToken }) } as unknown as NextRequest;
+  it("uses default prisma and bcrypt when deps are not provided (web)", async () => {
+    const req = {
+      headers: new Map(), // no x-client header (web)
+      cookies: {
+        get: () => ({ value: "refresh-token" }), // simulate cookie
+      },
+      json: async () => ({ accessToken: fakeAccessToken }),
+    } as unknown as NextRequest;
 
     const findManySpy = jest
       .spyOn(prismaModule.prisma.refreshToken, "findMany")
@@ -116,11 +132,14 @@ describe("jwtLogoutHandler", () => {
     // Override jwt.verify to throw (simulate invalid signature/expired token)
     const mockJwt = {
       ...jwt,
-      verify: jest.fn(() => { throw new Error("invalid token"); }),
+      verify: jest.fn(() => {
+        throw new Error("invalid token");
+      }),
       decode: jest.fn(() => ({ foo: "bar" })), // no sub property
     } as unknown as typeof jwt;
 
     const req = {
+      headers: new Map([["x-client", "native"]]),
       json: async () => ({ refreshToken: "any", accessToken: badAccessToken }),
     } as unknown as NextRequest;
 
@@ -133,5 +152,30 @@ describe("jwtLogoutHandler", () => {
 
     expect(res.status).toBe(401);
     expect(json.error).toBe("Invalid access token");
+  });
+
+  // ------ Test 7️⃣ ------
+  it("works for web clients using cookies", async () => {
+    mockDeps.prismaClient!.refreshToken.findMany.mockResolvedValue([
+      { id: "1", token: "hashed1" },
+    ]);
+    (mockDeps.bcryptFn!.compareSync as jest.Mock).mockReturnValue(true);
+
+    const req = {
+      headers: new Map(), // no x-client header → web
+      cookies: {
+        get: () => ({ value: "refresh-token" }),
+      },
+      json: async () => ({ accessToken: fakeAccessToken }),
+    } as unknown as NextRequest;
+
+    const res = await jwtLogoutHandler(req, mockDeps);
+    const json = await res.json();
+
+    expect(mockDeps.prismaClient!.refreshToken.update).toHaveBeenCalledWith({
+      where: { id: "1" },
+      data: { revoked: true },
+    });
+    expect(json).toEqual({ success: true, message: "Logged out" });
   });
 });

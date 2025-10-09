@@ -1,6 +1,7 @@
 // hooks/useGoogleLinking.ts
 import { useState } from "react";
 import { saveToken } from "@traduxo/packages/utils/auth/token";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 interface UseGoogleLinkingResult {
   isLoading: boolean;
@@ -33,22 +34,27 @@ export function useGoogleLinking({
     }
 
     try {
-      const res = await fetchFn("/api/auth/google-linking", {
+      const isNative = process.env.PLATFORM === "native";
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (isNative) headers["x-client"] = "native";
+
+      const res = await fetchFn(`${API_BASE_URL}/auth/google-linking`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
 
-      if (!res.ok || !data.accessToken || !data.refreshToken) {
+      if (!res.ok || !data.token) {
         setError(data.error || "Something went wrong... Please try again later");
         setIsLoading(false);
         return;
       }
 
-      saveToken(data.accessToken, data.refreshToken);
+      saveToken(data.token, data.refreshToken ?? undefined);
       navigateFn("/?login=true");
+      setIsLoading(false);
     } catch (err) {
       console.error(err);
       setError("Something went wrong... Please try again later");

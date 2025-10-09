@@ -1,14 +1,19 @@
+// tests/utils/auth/signup.test.ts
 import { signupUser } from "@traduxo/packages/utils/auth/signup";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 describe("signupUser", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete process.env.PLATFORM;
   });
 
+  // ------ Test 1️⃣ ------
   it("calls fetch with correct URL and payload", async () => {
+    const mockJson = jest.fn().mockResolvedValue({ id: "123", email: "test@test.com" });
     const mockFetch = jest.spyOn(global, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => ({ id: "123", email: "test@test.com" }),
+      json: mockJson,
     } as any);
 
     const email = "test@test.com";
@@ -16,7 +21,7 @@ describe("signupUser", () => {
 
     const result = await signupUser(email, password);
 
-    expect(mockFetch).toHaveBeenCalledWith("/auth/signup", {
+    expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -24,15 +29,12 @@ describe("signupUser", () => {
 
     expect(result.res.ok).toBe(true);
     expect(result.data).toEqual({ id: "123", email: "test@test.com" });
-
-    mockFetch.mockRestore();
   });
 
-  it("returns response and data even when response not ok", async () => {
-    jest.spyOn(global, "fetch").mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: "Email already exists" }),
-    } as any);
+  // ------ Test 2️⃣ ------
+  it("handles API error responses", async () => {
+    const mockJson = jest.fn().mockResolvedValue({ error: "Email already exists" });
+    jest.spyOn(global, "fetch").mockResolvedValue({ ok: false, json: mockJson } as any);
 
     const result = await signupUser("test@test.com", "password123");
 
@@ -40,6 +42,26 @@ describe("signupUser", () => {
     expect(result.data).toEqual({ error: "Email already exists" });
   });
 
+  // ------ Test 3️⃣ ------
+  it("adds native header if PLATFORM is 'native'", async () => {
+    process.env.PLATFORM = "native";
+
+    const mockJson = jest.fn().mockResolvedValue({ id: "123", email: "native@test.com" });
+    const mockFetch = jest.spyOn(global, "fetch").mockResolvedValue({
+      ok: true,
+      json: mockJson,
+    } as any);
+
+    await signupUser("native@test.com", "pass");
+
+    expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-client": "native" },
+      body: JSON.stringify({ email: "native@test.com", password: "pass" }),
+    });
+  });
+
+  // ------ Test 4️⃣ ------
   it("throws if fetch rejects", async () => {
     jest.spyOn(global, "fetch").mockRejectedValue(new Error("Network down"));
 

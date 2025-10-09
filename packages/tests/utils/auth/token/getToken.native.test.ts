@@ -1,14 +1,13 @@
 import { getToken } from "@traduxo/packages/utils/auth/token/getToken.native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import { refreshToken } from "@traduxo/packages/utils/auth/token/refreshToken.native";
 import { jwtDecode } from "jwt-decode";
+import { getAccessToken, setAccessToken } from "@traduxo/packages/utils/auth/token/tokenStore";
 
-jest.mock("@react-native-async-storage/async-storage", () => ({
+jest.mock("expo-secure-store", () => ({
   __esModule: true,
-  default: {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-  },
+  getItemAsync: jest.fn(),
+  setItemAsync: jest.fn(),
 }));
 
 jest.mock("@traduxo/packages/utils/auth/token/refreshToken.native", () => ({
@@ -20,9 +19,17 @@ jest.mock("jwt-decode", () => ({
   jwtDecode: jest.fn(),
 }));
 
-const mockGetItem = AsyncStorage.getItem as jest.Mock;
-const mockSetItem = AsyncStorage.setItem as jest.Mock;
+jest.mock("@traduxo/packages/utils/auth/token/tokenStore", () => ({
+  getAccessToken: jest.fn(),
+  setAccessToken: jest.fn(),
+}));
+
+const mockGetItemAsync = SecureStore.getItemAsync as jest.Mock;
+const mockSetItemAsync = SecureStore.setItemAsync as jest.Mock;
 const mockJwtDecode = jwtDecode as jest.Mock;
+const mockRefreshToken = refreshToken as jest.Mock;
+const mockGetAccessToken = getAccessToken as jest.Mock;
+const mockSetAccessToken = setAccessToken as jest.Mock;
 
 describe("getToken.native", () => {
   beforeEach(() => {
@@ -31,37 +38,58 @@ describe("getToken.native", () => {
 
   // ------ Test 1️⃣ ------
   it("returns null if no accessToken", async () => {
-    mockGetItem.mockResolvedValueOnce(null);
-    expect(await getToken()).toBeNull();
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => Promise.resolve(null));
+
+    const result = await getToken();
+    expect(result).toBeNull();
   });
 
   // ------ Test 2️⃣ ------
   it("returns null if token is malformed", async () => {
     const token = "bad.token";
-    mockGetItem.mockResolvedValueOnce(token);
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(token);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockImplementation(() => { throw new Error("invalid"); });
 
-    expect(await getToken()).toBeNull();
+    const result = await getToken();
+    expect(result).toBeNull();
   });
 
   // ------ Test 3️⃣ ------
   it("returns null if expired and no refresh token", async () => {
     const oldToken = "expired.token";
-    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(null); // no refresh token
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(oldToken);
+      if (key === "refreshToken") return Promise.resolve(null);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10 });
 
-    expect(await getToken()).toBeNull();
+    const result = await getToken();
+    expect(result).toBeNull();
   });
 
   // ------ Test 4️⃣ ------
   it("returns null if refresh fails", async () => {
     const oldToken = "expired.token";
     const refresh = "refresh.token";
-    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(refresh);
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(oldToken);
+      if (key === "refreshToken") return Promise.resolve(refresh);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10 });
-    (refreshToken as jest.Mock).mockResolvedValueOnce(null);
+    mockRefreshToken.mockResolvedValueOnce(null);
 
-    expect(await getToken()).toBeNull();
+    const result = await getToken();
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh);
+    expect(result).toBeNull();
   });
 
   // ------ Test 5️⃣ ------
@@ -70,12 +98,19 @@ describe("getToken.native", () => {
     const refresh = "refresh.token";
     const newToken = "new.token";
 
-    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(refresh);
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(oldToken);
+      if (key === "refreshToken") return Promise.resolve(refresh);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10 }); // old token expired
-    (refreshToken as jest.Mock).mockResolvedValueOnce(newToken);
+    mockRefreshToken.mockResolvedValueOnce(newToken);
     mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid new token"); });
 
-    expect(await getToken()).toBeNull();
+    const result = await getToken();
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh);
+    expect(result).toBeNull();
   });
 
   // ------ Test 6️⃣ ------
@@ -83,11 +118,21 @@ describe("getToken.native", () => {
     const token = "valid.token";
     const payload = { exp: Math.floor(Date.now() / 1000) + 60, language: "en" };
 
-    mockGetItem.mockResolvedValueOnce(token);
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(token);
+      if (key === "refreshToken") return Promise.resolve(undefined);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockReturnValueOnce(payload);
 
     const result = await getToken();
-    expect(result).toEqual({ token, language: "en", providers: undefined });
+    expect(result).toEqual({
+      token,
+      refreshToken: undefined,
+      language: "en",
+      providers: undefined,
+    });
   });
 
   // ------ Test 7️⃣ ------
@@ -96,16 +141,24 @@ describe("getToken.native", () => {
     const refresh = "refresh.token";
     const newToken = "new.token";
 
-    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(refresh);
+    const expiredPayload = { exp: Math.floor(Date.now() / 1000) - 10, language: "fr", providers: ["github"] };
+    const newPayload = { exp: Math.floor(Date.now() / 1000) + 60, language: "fr", providers: ["github"] };
+
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(oldToken);
+      if (key === "refreshToken") return Promise.resolve(refresh);
+      return Promise.resolve(null);
+    });
     mockJwtDecode
-      .mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) - 10, language: "fr", providers: ["github"] })
-      .mockReturnValueOnce({ exp: Math.floor(Date.now() / 1000) + 60, language: "fr", providers: ["github"] });
-    (refreshToken as jest.Mock).mockResolvedValueOnce(newToken);
+      .mockReturnValueOnce(expiredPayload)
+      .mockReturnValueOnce(newPayload);
+    mockRefreshToken.mockResolvedValueOnce(newToken);
 
-    const result = await getToken(true);
+    const result = await getToken();
 
-    expect(refreshToken).toHaveBeenCalledWith(refresh, oldToken);
-    expect(mockSetItem).toHaveBeenCalledWith("accessToken", newToken);
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh);
+    expect(mockSetItemAsync).toHaveBeenCalledWith("accessToken", newToken);
     expect(result).toEqual({
       token: newToken,
       refreshToken: refresh,
@@ -120,14 +173,19 @@ describe("getToken.native", () => {
     const refresh = "refresh.token";
     const newToken = "new.token";
 
-    mockGetItem.mockResolvedValueOnce(oldToken).mockResolvedValueOnce(refresh);
+    mockGetAccessToken.mockReturnValue(null);
+    mockGetItemAsync.mockImplementation((key: string) => {
+      if (key === "accessToken") return Promise.resolve(oldToken);
+      if (key === "refreshToken") return Promise.resolve(refresh);
+      return Promise.resolve(null);
+    });
     mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid old token"); });
-    (refreshToken as jest.Mock).mockResolvedValueOnce(newToken);
+    mockRefreshToken.mockResolvedValueOnce(newToken);
     mockJwtDecode.mockImplementationOnce(() => { throw new Error("invalid new token"); });
 
-    const result = await getToken(true);
+    const result = await getToken();
 
-    expect(refreshToken).toHaveBeenCalledWith(refresh, oldToken);
+    expect(mockRefreshToken).toHaveBeenCalledWith(refresh);
     expect(result).toBeNull();
   });
 });

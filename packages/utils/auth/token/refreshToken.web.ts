@@ -1,32 +1,31 @@
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
-let refreshing: boolean = false;
+let refreshing = false;
 
-export async function refreshToken(oldRefreshToken: string, oldAccessToken: string): Promise<string | null> {
-  if (refreshing) return null; // prevent double call
+export async function refreshToken(oldAccessToken?: string): Promise<string | null> {
+  if (refreshing) return null; // prevent concurrent calls
   refreshing = true;
 
   try {
     const res = await fetch(`${API_BASE_URL}/auth/jwt-refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken: oldRefreshToken, accessToken: oldAccessToken }),
+      credentials: "include",
     });
 
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const { accessToken, refreshToken: newRefreshToken } = data;
-
-    if (!accessToken || !newRefreshToken) return null;
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("refreshToken", newRefreshToken);
+    if (!res.ok) {
+      console.warn("Refresh request failed:", res.status);
+      return null;
     }
 
-    return accessToken;
+    const data = await res.json();
+    const { token } = data;
+
+    if (!token) return null;
+
+    return token;
   } catch (err) {
-    console.error("refreshToken error: ", err)
+    console.error("refreshToken error:", err);
     return null;
   } finally {
     refreshing = false;
