@@ -1,12 +1,19 @@
-import { AppProviderBase } from "@traduxo/packages/contexts/AppContext";
 import { API_BASE_URL } from "../config/apiBase";
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (
+  email: string,
+  password: string,
+) => {
+  const isNative = process.env.PLATFORM === "native";
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (isNative) headers["x-client"] = "native";
+
   const res = await fetch(`${API_BASE_URL}/auth/jwt-login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify({ email, password }),
   });
+
   const data = await res.json();
   return { res, data };
 };
