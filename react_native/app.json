@@ -17,11 +17,15 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.svg"
+      "favicon": "./assets/images/favicon.svg",
+      "bundler": "metro"
     },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

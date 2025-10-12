@@ -1,4 +1,5 @@
 const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 const path = require("path");
 
 const projectRoot = __dirname;
@@ -12,4 +13,10 @@ config.watchFolders = [path.resolve(workspaceRoot, "packages")];
 // Allow symlinks (monorepo / PNPM / Yarn workspaces)
 config.resolver.unstable_enableSymlinks = true;
 
-module.exports = config;
+// Force Metro to resolve modules from app node_modules
+config.resolver.extraNodeModules = new Proxy({}, {
+  get: (_, name) => path.join(projectRoot, "node_modules", name),
+});
+
+
+module.exports = withNativeWind(config, { input: './app/global.css' })
