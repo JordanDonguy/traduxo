@@ -4,7 +4,7 @@
     "slug": "react_native",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/favicon.svg",
+    "icon": "./assets/images/favicon.png",
     "scheme": "reactnative",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -17,7 +17,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.svg",
+      "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },
     "experiments": {
