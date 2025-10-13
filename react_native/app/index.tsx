@@ -1,15 +1,21 @@
-import { Text, View } from "react-native";
+import React from "react";
+import { TouchableWithoutFeedback, Keyboard } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import LandingDisplay from "./components/main-section/LandingDisplay";
+import TranslatorInput from "./components/translator/TranslatorInput";
 
-export default function Index() {
+export default function IndexScreen() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text className="text-2xl text-blue-400">Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView className="flex-1">
+
+        {/* Main Display*/}
+        <LandingDisplay />
+
+        {/* Fixed Translator Input at bottom */}
+        <TranslatorInput />
+
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
