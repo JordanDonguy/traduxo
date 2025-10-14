@@ -9,8 +9,6 @@ import { useTranslationContext } from "@traduxo/packages/contexts/TranslationCon
 import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
 import { translationHelper } from "@traduxo/packages/utils/translation/translate";
-import { getTranslationPrompt } from "@traduxo/packages/utils/geminiPrompts";
-import { createReader } from "@traduxo/packages/utils/translation/createReader";
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TranslatorInput() {
@@ -70,8 +68,6 @@ export default function TranslatorInput() {
 
   const handleTranslate = async () => {
     setIsLoading(true);
-    const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
-    const reader = await createReader(prompt, "translation");
 
     await translationHelper({
       inputText,
@@ -87,7 +83,6 @@ export default function TranslatorInput() {
       setIsFavorite,
       setTranslationId,
       setError,
-      reader
     });
   };
 

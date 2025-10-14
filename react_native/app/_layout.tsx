@@ -2,12 +2,12 @@ import React from "react";
 import { View } from "react-native";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import AppProvider from "./contexts/AppProvider";
+import AppProvider from "@/contexts/AppProvider";
 import { AppProviderBase } from "@traduxo/packages/contexts/AppContext";
 import "./global.css";
-import AppHeader from "./components/AppHeader";
+import AppHeader from "@/components/AppHeader";
 import { useFonts } from "expo-font";
-import LoadingAnimation from "./components/main-section/LoadingAnimation";
+import LoadingAnimation from "@/components/main-section/LoadingAnimation";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

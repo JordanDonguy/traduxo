@@ -39,9 +39,6 @@ export default function MainDisplay() {
       />
       <ExplanationSection
         explanation={explanation}
-        translatedText={translatedText}
-        inputTextLang={inputTextLang}
-        translatedTextLang={translatedTextLang}
       />
     </ScrollView>
 

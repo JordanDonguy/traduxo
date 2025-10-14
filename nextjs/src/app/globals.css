@@ -159,10 +159,6 @@ h3::before {
   background-color: transparent;
 }
 
-.explanation ul li:nth-child(3)::before {
-  content: "💡 ";
-}
-
 /* Dark Mode Overrides */
 [data-theme="dark"] .explanation strong {
   font-weight: 800;

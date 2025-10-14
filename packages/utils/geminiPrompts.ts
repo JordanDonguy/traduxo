@@ -105,7 +105,7 @@ For each example, use this structure:
 ### 💬 Example 1:
 - **${inputTextLang.toUpperCase()}:** Full sentence in ${inputTextLang} containing **${original}**
 - **${translatedTextLang.toUpperCase()}:** Full sentence in ${translatedTextLang} containing **${mainTranslation}**
-- Short explanation in ${systemLang}
+- 💡 Short explanation in ${systemLang}
 
 USER  
 Original*** (${inputTextLang}): "${original}"

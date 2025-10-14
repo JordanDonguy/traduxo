@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, Animated, Easing } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
@@ -14,15 +14,23 @@ export default function AppHeader() {
   const { colors } = useTheme();
   const router = useRouter();
   const searchParams = useLocalSearchParams();
-  const submenu = searchParams.submenu as string | undefined; // e.g. ?submenu=login
+  const submenu = searchParams.submenu as string | undefined;
 
   const { showMenu, setShowMenu } = useApp();
   const { refresh } = useAuth();
-  const { suggestTranslation, isRolling } = useSuggestion({});
+  const { suggestTranslation } = useSuggestion({});
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  const rotation = useRef(new Animated.Value(0)).current;
+  
+  // Interpolate rotation value to degrees
+  const rotateInterpolate = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "1440deg"], // 4 full spins
+  });
+  
+    useEffect(() => {
+      refresh();
+    }, [refresh]);
 
   return (
     <SafeAreaView edges={["top"]} className="bg-white dark:bg-black">
@@ -45,12 +53,21 @@ export default function AppHeader() {
           {/* Suggest expression button */}
           <TouchableOpacity
             onPress={() => {
-              router.push("/"); // go to home
+              rotation.setValue(0);
+              Animated.timing(rotation, {
+                toValue: 1,
+                duration: 900,
+                easing: Easing.out(Easing.ease),
+                useNativeDriver: true,
+              }).start();
+
               suggestTranslation();
             }}
             className="p-2 rounded-full active:opacity-70"
           >
-            <Dices size={32} color={colors.text} />
+            <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
+              <Dices size={32} color={colors.text} />
+            </Animated.View>
           </TouchableOpacity>
         </View>
 

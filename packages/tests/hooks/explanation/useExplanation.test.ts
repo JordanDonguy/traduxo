@@ -158,26 +158,6 @@ describe("useExplanation (non-streaming behavior)", () => {
     expect(mockFetcher).toHaveBeenCalledTimes(1);
     expect(getReaderSpy).toHaveBeenCalled();
   });
-
-  // ------ Test 6️⃣ ------
-  it("skips calling fetcher when an injected reader is provided", async () => {
-    // injected reader that reports done immediately
-    const injectedReader = { read: jest.fn().mockResolvedValue({ done: true }) };
-
-    const { result } = renderHook(() =>
-      useExplanation({ fetcher: mockFetcher, reader: injectedReader })
-    );
-
-    let success: boolean | undefined;
-    await act(async () => {
-      success = await result.current.handleExplanation();
-    });
-
-    expect(success).toBe(true);
-
-    // fetcher must not be called at all when reader is injected
-    expect(mockFetcher).not.toHaveBeenCalled();
-  });
-});
+})
 
 // Low functions test coverage because streamed response isn't tested

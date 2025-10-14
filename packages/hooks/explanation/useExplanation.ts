@@ -4,6 +4,7 @@ import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { getExplanationPrompt as defaultGetExplanationPrompt } from "@traduxo/packages/utils/geminiPrompts";
 import { decodeTextStream } from "@traduxo/packages/utils/formatting/decodeTextStream";
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
+import { createReader } from "@traduxo/packages/utils/config/createReader";
 
 // Injected dependencies for testing
 type UseExplanationArgs = {
@@ -30,7 +31,7 @@ export function useExplanation({
   const { systemLang } = useLanguageContext();
 
   // ---- Step 3: Explanation handler ----
-  async function handleExplanation(reader?: { read: () => Promise<{ done: boolean; value?: Uint8Array }> }) {
+  async function handleExplanation() {
     // ---- Step 3a: Start loading & reset errors ----
     setIsExpLoading(true);
     setExplanationError("");
@@ -46,22 +47,26 @@ export function useExplanation({
       });
 
       // ---- Step 3c: Fetch streaming response if reader's not provided ----
-      let usedReader = reader;
-      if (!usedReader) {
-        const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt, mode: "explanation" }),
-        });
+      let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
-        if (res.status === 429) {
-          const data = await res.json();
-          setExplanationError(data.error);
-          return false;
-        }
-        if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
+      const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, mode: "explanation" }),
+      });
 
-        usedReader = res.body.getReader();
+      if (res.status === 429) {
+        const data = await res.json();
+        setExplanationError(data.error);
+        return false;
+      }
+      if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+
+      // ---- Step 3d: Get streaming reader ----
+      if (res.body) {
+        usedReader = res.body.getReader(); // real streaming (browser)
+      } else {
+        usedReader = await createReader(res); // React Native fake reader fallback
       }
 
       // ---- Step 4: decode streamed response ----

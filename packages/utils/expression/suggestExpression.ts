@@ -4,6 +4,7 @@ import { blurActiveInput } from "../ui/blurActiveInput";
 import { decodeStream } from "../formatting/decodeStream";
 import { SetState } from "@traduxo/packages/types/reactSetState";
 import { API_BASE_URL } from "../config/apiBase";
+import { createReader } from "../config/createReader";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
@@ -61,32 +62,34 @@ export async function suggestExpressionHelper({
 
   try {
     // ---- Step 3: Determine data source (injected reader vs fetch) ----
-    let usedReader = reader;
+    let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
-    if (!usedReader) {
-      // ---- Step 3a: Fetch from API ----
-      const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}), // only include if token provided
-        },
-        body: JSON.stringify({ prompt, mode: "suggestion" }),
-      });
+    // ---- Step 3a: Fetch from API ----
+    const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}), // only include if token provided
+      },
+      body: JSON.stringify({ prompt, mode: "suggestion" }),
+    });
 
-      // ---- Step 3b: Handle rate-limit errors ----
-      if (res.status === 429) {
-        const { error } = await res.json();
-        setError(error);
-        setIsLoading(false);
-        return { success: false, error };
-      }
+    // ---- Step 3b: Handle rate-limit errors ----
+    if (res.status === 429) {
+      const { error } = await res.json();
+      setError(error);
+      setIsLoading(false);
+      return { success: false, error };
+    }
 
-      // ---- Step 3c: Handle non-ok responses ----
-      if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
+    // ---- Step 3c: Handle non-ok responses ----
+    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
 
-      // ---- Step 3d: Get streaming reader (browser/Next.js) ----
-      usedReader = res.body.getReader();
+    // ---- Step 3d: Get streaming reader (browser/Next.js) ----
+    if (res.body) {
+      usedReader = res.body.getReader(); // real streaming (browser)
+    } else {
+      usedReader = await createReader(res); // React Native fake reader fallback
     }
 
     // ---- Step 4: Stream decode response ----

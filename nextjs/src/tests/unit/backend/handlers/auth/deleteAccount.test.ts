@@ -1,9 +1,9 @@
+jest.mock('@/lib/server/middlewares/checkAuth');
 import { deleteAccount } from "@/lib/server/handlers/auth/deleteAccount";
 import { mockPrisma } from "@/tests/jest.setup";
 import { createMockRequest } from "../../mocks/requestMocks";
 import { checkAuth } from "@/lib/server/middlewares/checkAuth";
 
-jest.mock('@/lib/server/middlewares/checkAuth');
 
 describe("deleteAccount", () => {
   beforeEach(() => {
