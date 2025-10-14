@@ -38,13 +38,20 @@ export default function LanguageSelector({
   const { height: screenHeight } = Dimensions.get("window");
   const modalMaxHeight = screenHeight * 0.75;
 
-  const languages = [
+  // Input languages include "auto"
+  const inputLanguages = [
     { key: "auto", label: "✨ Auto" },
     ...ISO6391.getAllCodes().map((code) => ({
       key: code,
       label: ISO6391.getName(code),
     })),
   ];
+
+  // Output languages exclude "auto"
+  const outputLanguages = ISO6391.getAllCodes().map((code) => ({
+    key: code,
+    label: ISO6391.getName(code),
+  }));
 
   // Animated values for smooth transition
   const inputTranslate = useRef(new Animated.Value(0)).current;
@@ -72,24 +79,24 @@ export default function LanguageSelector({
       onPress={() => onSelect(item.key)}
       className="py-3 px-4 border-b border-gray-600"
     >
-      <Text className="text-txt-light dark:text-txt-dark text-lg">{item.label}</Text>
+      <Text className="font-sans text-black dark:text-white text-lg">{item.label}</Text>
     </TouchableOpacity>
   );
 
   const renderModal = (
     visible: boolean,
     setVisible: (val: boolean) => void,
-    onSelect: (key: string) => void
+    onSelect: (key: string) => void,
+    languages: { key: string; label: string }[]
   ) => (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={() => setVisible(false)} >
       <TouchableWithoutFeedback onPress={() => setVisible(false)}>
-        <View className="flex-1 bg-bg1-light/50 dark:bg-bg1-dark/50 justify-center">
+        <View className="flex-1 bg-white/50 dark:bg-black/50 justify-center">
           <TouchableWithoutFeedback>
             <View
-              className="bg-bg2-light dark:bg-bg2-dark mx-4 rounded-xl"
+              className="bg-zinc-300 dark:bg-zinc-800 mx-4 rounded-xl"
               style={{ maxHeight: modalMaxHeight }}
             >
-              {/* Close Button */}
               <TouchableOpacity
                 onPress={() => setVisible(false)}
                 className="self-end p-3"
@@ -121,11 +128,11 @@ export default function LanguageSelector({
         style={{ flex: 1, transform: [{ translateX: inputTranslate }] }}
       >
         <TouchableOpacity
-          className="bg-bg2-light dark:bg-bg2-dark rounded-2xl py-4 px-4 mx-1"
+          className="bg-zinc-300 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenInput(true)}
         >
-          <Text className="text-center text-lg text-txt-light dark:text-txt-dark">
-            {languages.find((l) => l.key === inputLang)?.label}
+          <Text className="font-sans text-center text-lg text-black dark:text-white">
+            {inputLanguages.find((l) => l.key === inputLang)?.label}
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -134,7 +141,7 @@ export default function LanguageSelector({
       <TouchableOpacity
         onPress={switchLanguage}
         disabled={isAnimating} // disable while animating
-        className="w-16 h-16 mx-2 rounded-full flex items-center justify-center bg-bg2-light dark:bg-bg2-dark"
+        className="w-16 h-16 mx-2 rounded-full flex items-center justify-center bg-zinc-300 dark:bg-zinc-800"
       >
         <ArrowRightLeft color={colors.text} />
       </TouchableOpacity>
@@ -144,18 +151,18 @@ export default function LanguageSelector({
         style={{ flex: 1, transform: [{ translateX: outputTranslate }] }}
       >
         <TouchableOpacity
-          className="bg-bg2-light dark:bg-bg2-dark rounded-2xl py-4 px-4 mx-1"
+          className="bg-zinc-300 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenOutput(true)}
         >
-          <Text className="text-center text-lg text-txt-light dark:text-txt-dark">
-            {languages.find((l) => l.key === outputLang)?.label}
+          <Text className="font-sans text-center text-lg text-black dark:text-white">
+            {outputLanguages.find((l) => l.key === outputLang)?.label}
           </Text>
         </TouchableOpacity>
       </Animated.View>
 
       {/* Modals */}
-      {renderModal(openInput, setOpenInput, setInputLang)}
-      {renderModal(openOutput, setOpenOutput, setOutputLang)}
+      {renderModal(openInput, setOpenInput, setInputLang, inputLanguages)}
+      {renderModal(openOutput, setOpenOutput, setOutputLang, outputLanguages)}
     </View>
   );
 }

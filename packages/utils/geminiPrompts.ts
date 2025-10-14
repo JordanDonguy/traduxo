@@ -96,7 +96,7 @@ Format:
 
 ## 💡 Explanation
 
-Write 3 very short paragraphs with level-3 headings (###) including emojis.
+Write 3 very short paragraphs with level-3 headings (###) including emojis. Add an emojis before each headings.
 
 ## 📘 Examples
 

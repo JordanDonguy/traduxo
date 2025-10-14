@@ -4,12 +4,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LanguageSelector from "./LanguageSelector";
 import TextInputForm from "./TextInputForm";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTheme } from "@react-navigation/native";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
 import { translationHelper } from "@traduxo/packages/utils/translation/translate";
+import { getTranslationPrompt } from "@traduxo/packages/utils/geminiPrompts";
+import { createReader } from "@traduxo/packages/utils/translation/createReader";
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TranslatorInput() {
+  const { colors } = useTheme();
   const { setIsLoading, setError } = useApp();
   const {
     inputText,
@@ -64,6 +69,10 @@ export default function TranslatorInput() {
   }, [insets.bottom, translateY]);
 
   const handleTranslate = async () => {
+    setIsLoading(true);
+    const prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
+    const reader = await createReader(prompt, "translation");
+
     await translationHelper({
       inputText,
       inputLang,
@@ -78,6 +87,7 @@ export default function TranslatorInput() {
       setIsFavorite,
       setTranslationId,
       setError,
+      reader
     });
   };
 
@@ -87,11 +97,25 @@ export default function TranslatorInput() {
         styles.wrapper,
         {
           transform: [{ translateY }],
-          paddingBottom: insets.bottom + (keyboardVisible ? 62 : 16), // 👈 conditional padding
+          paddingBottom: insets.bottom,
         },
       ]}
     >
-      <View className="w-full flex flex-col gap-4 px-2 pt-2 border-t border-zinc-500 bg-bg1-light dark:bg-bg1-dark">
+      {/* Gradient fade on top */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.5)']}
+        pointerEvents="none"
+        style={{
+          height: 30,
+          zIndex: 40,
+        }}
+      />
+
+      {/* Content */}
+      <View
+        className={`w-full flex flex-col gap-4 px-2 pt-2 bg-white dark:bg-black
+          border-t border-zinc-400 ${keyboardVisible ? "pb-20" : "pb-4"}`}
+      >
         <LanguageSelector
           inputLang={inputLang}
           outputLang={outputLang}
