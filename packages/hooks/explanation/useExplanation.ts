@@ -9,13 +9,11 @@ import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 type UseExplanationArgs = {
   fetcher?: typeof fetch;
   getExplanationPrompt?: typeof defaultGetExplanationPrompt;
-  reader?: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 };
 
 export function useExplanation({
   fetcher = fetch,
   getExplanationPrompt = defaultGetExplanationPrompt,
-  reader,   // Reader has to be provided if in react-native
 }: UseExplanationArgs) {
   // ---- Step 1: Local loading + error states ----
   const [isExpLoading, setIsExpLoading] = useState(false);
@@ -32,7 +30,7 @@ export function useExplanation({
   const { systemLang } = useLanguageContext();
 
   // ---- Step 3: Explanation handler ----
-  async function handleExplanation() {
+  async function handleExplanation(reader?: { read: () => Promise<{ done: boolean; value?: Uint8Array }> }) {
     // ---- Step 3a: Start loading & reset errors ----
     setIsExpLoading(true);
     setExplanationError("");
@@ -84,5 +82,5 @@ export function useExplanation({
   }
 
   // ---- Step 4: Return handler + states ----
-  return { handleExplanation, isExpLoading, explanationError, setExplanationError };
+  return { handleExplanation, isExpLoading, setIsExpLoading, explanationError, setExplanationError };
 }

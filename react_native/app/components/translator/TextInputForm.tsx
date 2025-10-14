@@ -23,9 +23,9 @@ export default function TextInputForm({
   return (
     <View className="w-full flex items-center justify-center relative">
       {/* Form container */}
-      <View className="w-full flex-row items-center rounded-2xl h-16 border border-input-light dark:border-input-dark mt-2">
+      <View className="w-full flex-row items-center rounded-2xl h-16 border border-zinc-200 dark:border-zinc-600 mt-2">
         <TextInput
-          className="flex-1 h-full px-6 text-lg text-txt-light dark:text-txt-dark"
+          className="font-sans flex-1 h-full px-6 text-lg text-black dark:text-white"
           placeholder="Enter some text..."
           placeholderTextColor="#9ca3af"
           value={inputText}
@@ -51,7 +51,7 @@ export default function TextInputForm({
 
       {/* Character limit warning */}
       {inputText.length >= 100 && (
-        <Text className="absolute bottom-1 left-[6%] text-xs text-neutral-400 italic">
+        <Text className="font-sans absolute bottom-1 left-[6%] text-xs text-neutral-400 italic">
           100 characters max allowed
         </Text>
       )}
