@@ -1,56 +1,64 @@
 import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, TouchableOpacity, Animated, Easing } from "react-native";
+import { View, TouchableOpacity, Animated, Easing, BackHandler, Pressable } from "react-native";
 import { useTheme } from "@react-navigation/native";
-import { useRouter, useLocalSearchParams } from "expo-router";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { Dices, User } from "lucide-react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import Logo from "./Logo";
+import Logo from "../Logo";
 
 export default function AppHeader() {
-  const { colors } = useTheme();
-  const router = useRouter();
-  const searchParams = useLocalSearchParams();
-  const submenu = searchParams.submenu as string | undefined;
-
-  const { showMenu, setShowMenu } = useApp();
+  const { colors, dark } = useTheme();
+  const { showMenu, setShowMenu, currentSubmenu, setCurrentSubmenu } = useApp();
   const { refresh } = useAuth();
   const { suggestTranslation } = useSuggestion({});
 
   const rotation = useRef(new Animated.Value(0)).current;
-  
-  // Interpolate rotation value to degrees
+
+  // Animate dice rotation
   const rotateInterpolate = rotation.interpolate({
     inputRange: [0, 1],
-    outputRange: ["0deg", "1440deg"], // 4 full spins
+    outputRange: ["0deg", "1440deg"],
   });
-  
-    useEffect(() => {
-      refresh();
-    }, [refresh]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // Handle hardware back button
+  useEffect(() => {
+    const backAction = () => {
+      if (currentSubmenu) {
+        setCurrentSubmenu(null);
+        return true; // consumed
+      }
+      if (showMenu) {
+        setShowMenu(false);
+        return true;
+      }
+      return false; // let OS handle
+    };
+
+    const subscription = BackHandler.addEventListener("hardwareBackPress", backAction);
+    return () => subscription.remove();
+  }, [currentSubmenu, showMenu, setShowMenu]);
 
   return (
     <SafeAreaView edges={["top"]} className="bg-white dark:bg-black">
       <View className="relative w-full">
         {/* Header */}
-        <View className="border-b border-zinc-200 dark:border-zinc-400 z-50 w-full h-16 flex flex-row items-center justify-between px-4">
-          {/* User menu toggle */}
-          <TouchableOpacity
-            onPress={() => {
-              setShowMenu(!showMenu);
-              router.push(!showMenu ? "/?menu=open" : "/");
-            }}
+        <View className="border-b border-zinc-400 z-50 w-full h-16 flex flex-row items-center justify-between px-4">
+          <Pressable
+            onPress={() => setShowMenu(!showMenu)}
             className="p-2 rounded-full active:opacity-70"
           >
             <User size={32} color={colors.text} />
-          </TouchableOpacity>
+          </Pressable>
 
           <Logo />
 
-          {/* Suggest expression button */}
           <TouchableOpacity
             onPress={() => {
               rotation.setValue(0);
@@ -60,7 +68,6 @@ export default function AppHeader() {
                 easing: Easing.out(Easing.ease),
                 useNativeDriver: true,
               }).start();
-
               suggestTranslation();
             }}
             className="p-2 rounded-full active:opacity-70"
@@ -71,18 +78,12 @@ export default function AppHeader() {
           </TouchableOpacity>
         </View>
 
-        {/* Gradient fade at bottom of header */}
+        {/* Gradient fade */}
         <LinearGradient
-          colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0)']}
-          style={{
-            position: 'absolute',
-            top: 54,
-            left: 0,
-            right: 0,
-            height: 30,
-            zIndex: 40,
-          }}
+          colors={dark ? ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0)'] : ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0)']}
+          style={{ position: 'absolute', top: 54, left: 0, right: 0, height: 30, zIndex: 40 }}
         />
+
       </View>
     </SafeAreaView>
   );

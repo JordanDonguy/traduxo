@@ -6,6 +6,8 @@ import { AuthProvider } from "./AuthContext";
 export type AppContextType = {
   showMenu: boolean;
   setShowMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  currentSubmenu: string | null;
+  setCurrentSubmenu: React.Dispatch<React.SetStateAction<string | null>>;
   showLoginForm: boolean;
   setShowLoginForm: React.Dispatch<React.SetStateAction<boolean>>;
   error: string;
@@ -24,6 +26,7 @@ export const useApp = () => {
 
 export function AppProviderBase({ children }: { children: ReactNode }) {
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [currentSubmenu, setCurrentSubmenu] = useState<string | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +36,8 @@ export function AppProviderBase({ children }: { children: ReactNode }) {
       value={{
         showMenu,
         setShowMenu,
+        currentSubmenu,
+        setCurrentSubmenu,
         showLoginForm,
         setShowLoginForm,
         error,

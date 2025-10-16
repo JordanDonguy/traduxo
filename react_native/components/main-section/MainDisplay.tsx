@@ -14,7 +14,7 @@ export default function MainDisplay() {
 
   if (error.length) return null; // todo: render ErrorSection later
   if (isLoading) return (
-    <View className="flex-1 mb-60 flex justify-center">
+    <View className="bg-white dark:bg-zinc-950 flex-1 mb-60 flex justify-center">
       <LoadingAnimation />
     </View>
   );
@@ -23,7 +23,7 @@ export default function MainDisplay() {
   return (
 
     <ScrollView
-      className="bg-white dark:bg-black mb-60"
+      className="bg-white dark:bg-zinc-950 mb-60"
       keyboardShouldPersistTaps="handled"
       nestedScrollEnabled
     >

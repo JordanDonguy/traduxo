@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, Animated } from "react-native";
 import Markdown from "react-native-markdown-display";
 import LoadingAnimation from "./LoadingAnimation";
+import { MotiView } from "moti";
+import { useTheme } from "@react-navigation/native";
 import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 
@@ -10,6 +12,7 @@ type ExplanationSectionProps = {
 };
 
 export default function ExplanationSection({ explanation }: ExplanationSectionProps) {
+  const { colors, dark } = useTheme();
   const { handleExplanation, isExpLoading, setIsExpLoading, explanationError } = useExplanation({});
 
   const fadeAnim = useRef(new Animated.Value(0.5)).current; // opacity
@@ -47,30 +50,29 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
 
   if (explanation.length) {
     return (
-      <Animated.View
-        className="mb-8 px-4"
-        style={{
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-        }}
+      <MotiView
+        from={{ translateY: 100, opacity: 0 }}
+        animate={{ translateY: 0, opacity: 1 }}
+        transition={{ type: "spring", damping: 40, stiffness: 400 }}
+        className="px-4 mb-8"
       >
         <Markdown
           style={{
             body: {
-              color: 'white',
+              color: colors.text,
               fontSize: 18,
               fontFamily: "OpenSans-Regular",
             },
             paragraph: { marginVertical: 8 },
-            list_item: { backgroundColor: '#2a2a2a', borderRadius: 8, padding: 8, marginVertical: 12 },
+            list_item: { backgroundColor: dark ? '#2a2a2a' : '#e4e4e7', borderRadius: 8, padding: 8, marginVertical: 12 },
             heading2: { fontSize: 30, fontWeight: '600', marginTop: 24, paddingTop: 24, borderTopWidth: 1, borderTopColor: "#71717a", marginBottom: 16 },
             heading3: { fontSize: 26, fontWeight: '600', paddingVertical: 16 },
-            strong: { fontWeight: '800', color: 'white', textShadowColor: 'rgba(255,255,255,0.5)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 1 },
+            strong: { fontWeight: '800', color: colors.text, textShadowColor: 'rgba(255,255,255,0.5)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 1 },
           }}
         >
           {explanation}
         </Markdown>
-      </Animated.View>
+      </MotiView>
     );
   }
 
@@ -83,14 +85,21 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
   }
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        blurActiveInput();
-        fetchExplanation();
-      }}
-      className="w-full max-w-xl py-4 rounded-full bg-zinc-200 dark:bg-zinc-800 self-center mt-8"
+    <MotiView
+      from={{ translateY: 300, opacity: 0 }}
+      animate={{ translateY: 0, opacity: 1 }}
+      delay={300}
+      transition={{ type: "spring", damping: 50, stiffness: 400 }}
     >
-      <Text className="font-sans text-center text-lg text-black dark:text-white">✨ AI explanations</Text>
-    </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          blurActiveInput();
+          fetchExplanation();
+        }}
+        className="w-full max-w-xl py-4 rounded-full bg-zinc-200 dark:bg-zinc-800 self-center mt-8"
+      >
+        <Text className="font-sans text-center text-lg text-black dark:text-white">✨ AI explanations</Text>
+      </TouchableOpacity>
+    </MotiView>
   );
 }

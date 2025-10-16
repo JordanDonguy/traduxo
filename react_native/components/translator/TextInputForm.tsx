@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
 import { Mic, CircleStop } from "lucide-react-native";
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTheme } from "@react-navigation/native";
 
 type Props = {
@@ -18,12 +19,16 @@ export default function TextInputForm({
   isListening = false,
   handleVoice,
 }: Props) {
+  const { showMenu } = useApp();
   const { colors } = useTheme();
 
   return (
-    <View className="w-full flex items-center justify-center relative">
+    <View
+      pointerEvents={showMenu ? "none" : "auto"}
+      className="w-full flex items-center justify-center relative"
+    >
       {/* Form container */}
-      <View className="w-full flex-row items-center rounded-2xl h-16 border border-zinc-200 dark:border-zinc-600 mt-2">
+      <View className="w-full flex-row items-center rounded-2xl h-16 border border-zinc-400 dark:border-zinc-600 mt-2">
         <TextInput
           className="font-sans flex-1 h-full px-6 text-lg text-black dark:text-white"
           placeholder="Enter some text..."

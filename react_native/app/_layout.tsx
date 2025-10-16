@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import AppProvider from "@/contexts/AppProvider";
 import { AppProviderBase } from "@traduxo/packages/contexts/AppContext";
 import "./global.css";
-import AppHeader from "@/components/AppHeader";
+import AppHeader from "@/components/menu/AppHeader";
 import { useFonts } from "expo-font";
 import LoadingAnimation from "@/components/main-section/LoadingAnimation";
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   Modal,
   Dimensions,
   TouchableWithoutFeedback,
-  Animated,
 } from "react-native";
+import { MotiView } from "moti";
 import { useTheme } from "@react-navigation/native";
 import ISO6391 from "iso-639-1";
 import { ArrowRightLeft, X } from "lucide-react-native";
@@ -53,25 +53,6 @@ export default function LanguageSelector({
     label: ISO6391.getName(code),
   }));
 
-  // Animated values for smooth transition
-  const inputTranslate = useRef(new Animated.Value(0)).current;
-  const outputTranslate = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const width = 100;
-    setIsAnimating(true); // animation starts
-    Animated.timing(inputTranslate, {
-      toValue: isSwitching ? width : 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start(() => setIsAnimating(false)); // animation ends
-
-    Animated.timing(outputTranslate, {
-      toValue: isSwitching ? -width : 0,
-      duration: 100,
-      useNativeDriver: true,
-    }).start();
-  }, [isSwitching]);
 
   const renderItem = (item: { key: string; label: string }, onSelect: (key: string) => void) => (
     <TouchableOpacity
@@ -89,76 +70,110 @@ export default function LanguageSelector({
     onSelect: (key: string) => void,
     languages: { key: string; label: string }[]
   ) => (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={() => setVisible(false)} >
+    <Modal visible={visible} transparent onRequestClose={() => setVisible(false)}>
       <TouchableWithoutFeedback onPress={() => setVisible(false)}>
-        <View className="flex-1 bg-white/50 dark:bg-black/50 justify-center">
-          <TouchableWithoutFeedback>
-            <View
-              className="bg-zinc-300 dark:bg-zinc-800 mx-4 rounded-xl"
-              style={{ maxHeight: modalMaxHeight }}
+        <View className="flex-1 justify-center items-center bg-white/50 dark:bg-black/50 px-4">
+          <MotiView
+            from={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{
+              scale: { type: "spring", damping: 35, stiffness: 500, },
+              opacity: { type: "timing", duration: 250 },
+            }}
+            style={{ maxHeight: modalMaxHeight }}
+            className="w-full bg-zinc-200 dark:bg-zinc-800 rounded-xl border border-zinc-950 dark:border-zinc-500"
+          >
+            {/* Close Button */}
+            <TouchableOpacity
+              onPress={() => setVisible(false)}
+              style={{ alignSelf: "flex-end", padding: 12 }}
             >
-              <TouchableOpacity
-                onPress={() => setVisible(false)}
-                className="self-end p-3"
-              >
-                <X color={colors.text} size={24} />
-              </TouchableOpacity>
+              <X color={colors.text} size={24} />
+            </TouchableOpacity>
 
-              <FlatList
-                data={languages}
-                keyExtractor={(item) => item.key}
-                renderItem={({ item }) =>
-                  renderItem(item, (key) => {
-                    onSelect(key);
+            {/* Language List */}
+            <FlatList
+              data={languages}
+              keyExtractor={(item) => item.key}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    onSelect(item.key);
                     setVisible(false);
-                  })
-                }
-              />
-            </View>
-          </TouchableWithoutFeedback>
+                  }}
+                  className="py-3 px-4 border-b border-gray-600"
+                >
+                  <Text className="text-black dark:text-white text-lg">
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </MotiView>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
   );
 
+
   return (
     <View className="flex-row items-center justify-between w-full mt-4">
       {/* Input Language */}
-      <Animated.View
-        style={{ flex: 1, transform: [{ translateX: inputTranslate }] }}
+      <MotiView
+        animate={{
+          translateX: isSwitching ? 100 : 0,
+        }}
+        transition={{
+          type: "spring",
+          damping: 40,
+          mass: 0.8,
+        }}
+        onDidAnimate={(key, finished) => {
+          if (key === "translateX" && finished) setIsAnimating(false);
+        }}
+        style={{ flex: 1 }}
       >
         <TouchableOpacity
-          className="bg-zinc-300 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
+          className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenInput(true)}
         >
           <Text className="font-sans text-center text-lg text-black dark:text-white">
             {inputLanguages.find((l) => l.key === inputLang)?.label}
           </Text>
         </TouchableOpacity>
-      </Animated.View>
+      </MotiView>
 
       {/* Switch Button */}
       <TouchableOpacity
         onPress={switchLanguage}
         disabled={isAnimating} // disable while animating
-        className="w-16 h-16 mx-2 rounded-full flex items-center justify-center bg-zinc-300 dark:bg-zinc-800"
+        className="w-16 h-16 mx-2 rounded-full flex items-center justify-center bg-zinc-200 dark:bg-zinc-800"
       >
         <ArrowRightLeft color={colors.text} />
       </TouchableOpacity>
 
       {/* Output Language */}
-      <Animated.View
-        style={{ flex: 1, transform: [{ translateX: outputTranslate }] }}
+      <MotiView
+        animate={{
+          translateX: isSwitching ? -100 : 0,
+        }}
+        transition={{
+          type: "spring",
+          damping: 40,
+          mass: 0.8,
+        }}
+        style={{ flex: 1 }}
       >
         <TouchableOpacity
-          className="bg-zinc-300 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
+          className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenOutput(true)}
         >
           <Text className="font-sans text-center text-lg text-black dark:text-white">
             {outputLanguages.find((l) => l.key === outputLang)?.label}
           </Text>
         </TouchableOpacity>
-      </Animated.View>
+      </MotiView>
 
       {/* Modals */}
       {renderModal(openInput, setOpenInput, setInputLang, inputLanguages)}
