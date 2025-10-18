@@ -32,8 +32,11 @@ export default function Login({ showMenu }: LoginProps) {
         e.preventDefault();
         setError("");
         if (isSignup) {
-          const success = await handleSignup(email, password, confirmPassword, setIsLoading, setError, setIsSignup, refresh);
-          if (success) router.push("/?login=true");
+          const success = await handleSignup(email, password, confirmPassword, setIsLoading, setError, refresh);
+          if (success) {
+            setIsSignup(false);
+            router.push("/?login=true");
+          }
         }
         else {
           const success = await handleLogin(email, password, setError, setIsLoading, refresh);

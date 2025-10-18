@@ -27,7 +27,7 @@ export function useSelectTranslation({
   const effectiveRouter = router ?? { push: () => {} }; // fallback fake router in case hook called without router argument
 
   // ---- Step 2: Shared handler ----
-  function selectTranslation(t: Translation, isFavorite: boolean) {
+  function selectTranslation(t: Translation, isFavorite: boolean): void {
     loadTranslationFromMenu(t, isFavorite);
     setInputLang(t.inputLang);
     setOutputLang(t.outputLang);

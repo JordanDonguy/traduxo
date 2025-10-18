@@ -12,8 +12,8 @@ import { translationHelper } from "@traduxo/packages/utils/translation/translate
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TranslatorInput() {
-  const { colors } = useTheme();
-  const { setIsLoading, setError } = useApp();
+  const { dark } = useTheme();
+  const { setIsLoading, setError, showMenu } = useApp();
   const {
     inputText,
     setInputText,
@@ -88,17 +88,17 @@ export default function TranslatorInput() {
 
   return (
     <Animated.View
+      pointerEvents={showMenu ? "none" : "auto"}
       style={[
         styles.wrapper,
         {
           transform: [{ translateY }],
-          paddingBottom: insets.bottom,
         },
       ]}
     >
       {/* Gradient fade on top */}
       <LinearGradient
-        colors={['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.5)']}
+        colors={dark ? ['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.5)'] : ['rgba(255,255,255,0.0)', 'rgba(255,255,255,0.5)']}
         pointerEvents="none"
         style={{
           height: 30,
@@ -136,7 +136,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 50,
-    elevation: 50,
+    elevation: 40,
   },
 });
