@@ -86,10 +86,10 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
 
   return (
     <MotiView
-      from={{ translateY: 300, opacity: 0 }}
-      animate={{ translateY: 0, opacity: 1 }}
+      from={{ translateX: -300, opacity: 0 }}
+      animate={{ translateX: 0, opacity: 1 }}
       delay={300}
-      transition={{ type: "spring", damping: 50, stiffness: 400 }}
+      transition={{ type: "spring", damping: 26, stiffness: 200, mass: 1.5 }}
     >
       <TouchableOpacity
         onPress={() => {

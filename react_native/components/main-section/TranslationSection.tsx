@@ -50,9 +50,9 @@ export default function TranslationSection({
 
   return (
     <MotiView
-      from={{ scale: 0.7 }}
-      animate={{ scale: 1 }}
-      transition={{ type: "spring", damping: 40, stiffness: 500 }}
+      from={{ translateX: -200, opacity: 0 }}
+      animate={{ translateX: 0, opacity: 1 }}
+      transition={{ type: "spring", damping: 22, stiffness: 200, mass: 1.5 }}
       className="w-full flex flex-col justify-center px-4 mt-8"
     >
       {/* Input language + expression */}
@@ -60,7 +60,7 @@ export default function TranslationSection({
         <Text className="z-10 py-2 w-14 font-sans text-xl text-center text-black dark:text-white border-r border-zinc-500">
           {inputTextLang.length <= 2 ? inputTextLang.toUpperCase() : ""}
         </Text>
-        <Text className="pt-2 pl-4 font-sans text-xl flex-1 text-black dark:text-white bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
+        <Text className="pt-2 pl-4 pr-2 font-sans text-xl flex-1 text-black dark:text-white bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
           {capitalizeFirstLetter(expression)}
         </Text>
       </View>

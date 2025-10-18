@@ -8,8 +8,11 @@ import "./global.css";
 import AppHeader from "@/components/menu/AppHeader";
 import { useFonts } from "expo-font";
 import LoadingAnimation from "@/components/main-section/LoadingAnimation";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function RootLayout() {
+  const insets = useSafeAreaInsets();
+  
   const [fontsLoaded] = useFonts({
     "OpenSans-Regular": require("../assets/fonts/OpenSans-Regular.ttf"),
   });
@@ -20,10 +23,12 @@ export default function RootLayout() {
     </View>
   )
 
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppProviderBase>
         <AppProvider>
+
           <Stack
             screenOptions={{
               header: () => (
@@ -34,6 +39,9 @@ export default function RootLayout() {
               },
             }}
           />
+
+          <View className="dark:bg-zinc-950" style={{ height: insets.bottom }} />
+
         </AppProvider>
       </AppProviderBase>
     </GestureHandlerRootView>

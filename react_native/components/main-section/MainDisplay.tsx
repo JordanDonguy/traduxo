@@ -23,7 +23,7 @@ export default function MainDisplay() {
   return (
 
     <ScrollView
-      className="bg-white dark:bg-zinc-950 mb-60"
+      className="bg-white dark:bg-zinc-950 mb-48"
       keyboardShouldPersistTaps="handled"
       nestedScrollEnabled
     >

@@ -1,24 +1,22 @@
 import React, { ReactNode } from "react";
 import { AppProviderBase } from "@traduxo/packages/contexts/AppContext";
-import {
-  ThemeProvider,
-  DefaultTheme,
-  DarkTheme,
-  Theme,
-} from "@react-navigation/native";
-import { useColorScheme } from "react-native";
+import { ThemeProvider } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import { AppThemeProvider, useAppTheme } from "./ThemeContext";
 
 export default function AppProvider({ children }: { children: ReactNode }) {
-  const colorScheme = useColorScheme();
-  const theme: Theme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
-
   return (
     <AppProviderBase>
-      <ThemeProvider value={theme}>
-        {children}
-        <Toast />
-      </ThemeProvider>
+      <AppThemeProvider>
+        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+      </AppThemeProvider>
+      <Toast />
     </AppProviderBase>
   );
+}
+
+// Wrapper to connect navigation ThemeProvider with our custom theme
+function ThemeProviderWrapper({ children }: { children: ReactNode }) {
+  const { theme } = useAppTheme();
+  return <ThemeProvider value={theme}>{children}</ThemeProvider>;
 }

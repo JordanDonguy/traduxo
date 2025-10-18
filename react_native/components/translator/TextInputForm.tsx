@@ -34,7 +34,7 @@ export default function TextInputForm({
           placeholder="Enter some text..."
           placeholderTextColor="#9ca3af"
           value={inputText}
-          onChangeText={setInputText}
+          onChangeText={setInputText} 
           maxLength={100}
           onSubmitEditing={handleTranslate}
           returnKeyType="send"

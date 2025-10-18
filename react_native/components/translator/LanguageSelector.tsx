@@ -74,11 +74,11 @@ export default function LanguageSelector({
       <TouchableWithoutFeedback onPress={() => setVisible(false)}>
         <View className="flex-1 justify-center items-center bg-white/50 dark:bg-black/50 px-4">
           <MotiView
-            from={{ scale: 0.8, opacity: 0 }}
+            from={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
+            exit={{ scale: 0.5, opacity: 0 }}
             transition={{
-              scale: { type: "spring", damping: 35, stiffness: 500, },
+              scale: { type: "spring", damping: 40, stiffness: 500, },
               opacity: { type: "timing", duration: 250 },
             }}
             style={{ maxHeight: modalMaxHeight }}
