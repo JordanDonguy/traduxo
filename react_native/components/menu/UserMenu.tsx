@@ -10,10 +10,13 @@ import { useTheme } from "@react-navigation/native";
 import { useAppTheme } from "@/contexts/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useScrollGradient } from "@/hooks/useScrollGradient";
+import Toast from "react-native-toast-message";
 import TopGradient from "./TopGradient";
 import LoadingSpinner from "./LoadingSpinner";
 import Login from "./Login";
 import TranslationHistory from "./TranslationHistory";
+import Favorites from "./Favorites";
+import ExplanationLanguage from "./ExplanationLanguage";
 
 import {
   Moon,
@@ -113,6 +116,10 @@ export default function UserMenu() {
             <Login currentSubmenu={currentSubmenu} setCurrentSubmenu={setCurrentSubmenu} />
           ) : currentSubmenu === "History" ? (
             <TranslationHistory />
+          ) : currentSubmenu === "Favorites" ? (
+            <Favorites />
+          ) : currentSubmenu === "Explanation Language" ? (
+            <ExplanationLanguage />
           ) : (
             <ScrollView
               keyboardShouldPersistTaps="handled"
@@ -195,7 +202,10 @@ export default function UserMenu() {
                     onPress={async () => {
                       setIsLoading(true);
                       const success = await handleLogout(refresh, setIsLoading);
-                      if (success) setShowMenu(false);
+                      if (success) {
+                        Toast.show({ text1: "Successfully logged out! See you soon 😉", text1Style: ({ fontSize: 14 }) });
+                        setShowMenu(false)
+                      };
                     }}
                   >
                     <LogOut size={28} color={colors.text} />

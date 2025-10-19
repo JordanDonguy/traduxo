@@ -5,6 +5,7 @@ import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTheme } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface LoginProps {
@@ -28,11 +29,15 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
     setError("");
     if (currentSubmenu === "Signup") {
       const success = await handleSignup(email, password, confirmPassword, setIsLoading, setError, refresh);
-      if (success) setCurrentSubmenu("Login"); // Switch to login on success
+      if (success) {
+        Toast.show({ type: "success", text1: "Successfully signed up! You can now login 🙂", text1Style:({ fontSize: 14 }) })
+        setCurrentSubmenu("Login");
+      }
     } else {
       const success = await handleLogin(email, password, setError, setIsLoading, refresh);
       if (success) {
         setShowMenu(false);
+        Toast.show({ type: "success", text1: "Successfully logged in! Welcome back 🙂", text1Style:({ fontSize: 14 }) })
         refresh() // Refresh auth context
       };
     }

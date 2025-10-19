@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
-import { toast } from "react-toastify";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { Translation } from "@traduxo/packages/types/translation";
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
@@ -8,12 +7,10 @@ import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 // Injected dependencies for testing
 type UseFavoriteTranslationsArgs = {
   fetcher?: typeof fetch;
-  toaster?: typeof toast;
 };
 
 export function useFavoriteTranslations({
   fetcher = fetch,
-  toaster = toast,
 }: UseFavoriteTranslationsArgs) {
   // ---- Step 1: Get dependencies ----
   const { translationId, setTranslationId, setIsFavorite } = useTranslationContext();
@@ -32,8 +29,9 @@ export function useFavoriteTranslations({
     }
 
     try {
-      if (!token) return false;
-      const res = await fetcher("/api/favorite", {
+      if (!token) throw new Error("You need to be logged in to add a translation to favorites");
+
+      const res = await fetcher(`${API_BASE_URL}/favorite`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -49,11 +47,10 @@ export function useFavoriteTranslations({
 
       // Update local state to remove deleted translation
       setFavoriteTranslations((prev) => prev.filter((t) => t.id !== id));
-      return true
+      return { success: true }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "An error occurred";
-      toaster.error(message);
-      return false;
+      return { success: false, message: message};
     }
   }
 

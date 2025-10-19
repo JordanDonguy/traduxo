@@ -5,6 +5,7 @@ import { useTranslationContext } from "@traduxo/packages/contexts/TranslationCon
 import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
+import Toast from "react-native-toast-message";
 import { useScrollGradient } from "@/hooks/useScrollGradient";
 import TopGradient from "./TopGradient";
 import LoadingSpinner from "./LoadingSpinner";
@@ -19,6 +20,22 @@ export default function TranslationHistory() {
   const { deleteTranslation, isLoading } = useTranslationHistory({});
   const { selectTranslation } = useSelectTranslation({});
 
+  // Delete a translation from history
+  const handleDelete = async (id: string) => {
+    const res = await deleteTranslation(id);
+    if (!res.success) {
+      Toast.show({
+        type: "error",
+        text1: res.message,
+        text1Style: ({ fontSize: 14 })
+      })
+    };
+    Toast.show({
+      text1: "Translation deleted from history 👍",
+      text1Style: ({ fontSize: 14 })
+    })
+  };
+
   return (
     <>
       <View className="relative flex-1">
@@ -27,10 +44,12 @@ export default function TranslationHistory() {
           <Text className="text-xl pt-10 text-center dark:text-white">
             You need to log in to have access to your translation history
           </Text>
+
         ) : !translationHistory.length ? (
           <Text className="text-xl pt-10 text-center dark:text-white">
             No translations found in history...
           </Text>
+
         ) : (isLoading) ? <LoadingSpinner /> : (
           <View className="flex flex-col gap-6 pb-24">
             {status === "authenticated" && translationHistory.length > 0 && (
@@ -44,16 +63,20 @@ export default function TranslationHistory() {
                     t={item}
                     setShowMenu={setShowMenu}
                     selectTranslation={selectTranslation}
-                    deleteTranslation={deleteTranslation}
-
+                    deleteTranslation={handleDelete}
+                    isFavorite={false}
                   />
                 )}
+                initialNumToRender={10}
+                maxToRenderPerBatch={10}
+                windowSize={5}
                 contentContainerStyle={{ paddingBottom: 32, gap: 12 }}
               />
             )}
           </View>
         )}
       </View>
+
       <TopGradient show={showTopGradient} />
     </>
   );

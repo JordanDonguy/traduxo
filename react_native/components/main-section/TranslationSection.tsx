@@ -84,7 +84,7 @@ export default function TranslationSection({
             >
               <Star
                 size={28}
-                fill={isFavorite ? "currentColor" : "transparent"}
+                fill={isFavorite ? colors.text : "transparent"}
                 color={colors.text}
               />
             </TouchableOpacity>

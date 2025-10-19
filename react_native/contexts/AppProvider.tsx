@@ -10,7 +10,7 @@ export default function AppProvider({ children }: { children: ReactNode }) {
       <AppThemeProvider>
         <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
       </AppThemeProvider>
-      <Toast />
+      <Toast topOffset={100} />
     </AppProviderBase>
   );
 }
