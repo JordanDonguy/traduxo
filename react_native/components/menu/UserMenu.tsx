@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
 import { MotiView } from 'moti';
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
@@ -17,6 +16,7 @@ import Login from "./Login";
 import TranslationHistory from "./TranslationHistory";
 import Favorites from "./Favorites";
 import ExplanationLanguage from "./ExplanationLanguage";
+import PrivacyPolicy from "./PrivacyPolicy";
 
 import {
   Moon,
@@ -51,11 +51,9 @@ export default function UserMenu() {
   const { handleLogout } = useAuthHandlers();
   const isCredentials = providers?.includes("Credentials");
 
-  const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const { showTopGradient, onScroll } = useScrollGradient();
+  const { showTopGradient, setShowTopGradient, onScroll } = useScrollGradient();
 
   // Reset submenu if menu is closed
   useEffect(() => {
@@ -78,6 +76,11 @@ export default function UserMenu() {
       setShowLoginForm(false);
     }
   }, [showLoginForm, setShowLoginForm]);
+
+  // Remove Top Gradient when going into a submenu
+  useEffect(() => {
+    if (currentSubmenu) setShowTopGradient(false);
+  }, [currentSubmenu, setShowTopGradient])
 
   return (
     <MotiView
@@ -120,6 +123,8 @@ export default function UserMenu() {
             <Favorites />
           ) : currentSubmenu === "Explanation Language" ? (
             <ExplanationLanguage />
+          ) : currentSubmenu === "Privacy Policy" ? (
+            <PrivacyPolicy />
           ) : (
             <ScrollView
               keyboardShouldPersistTaps="handled"
@@ -178,7 +183,7 @@ export default function UserMenu() {
               {/* Privacy policy */}
               <TouchableOpacity
                 className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-              /* onPress={() => router.push("/privacy")} */
+                onPress={() => setCurrentSubmenu("Privacy Policy")}
               >
                 <Shield size={28} color={colors.text} />
                 <Text className="ml-3 text-lg text-black dark:text-white">Privacy policy</Text>
@@ -214,7 +219,7 @@ export default function UserMenu() {
 
                   {/* Delete account */}
                   <TouchableOpacity
-                    className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
+                    className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-8"
                     onPress={() => setCurrentSubmenu("Delete Account")}
                   >
                     <BadgeMinus size={28} color={colors.text} />
