@@ -3,6 +3,7 @@ import { View, ScrollView } from "react-native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useFavoriteToggle } from "@traduxo/packages/hooks/favorites/useFavoriteToggle";
+import { useSwitchTranslations } from "@traduxo/packages/hooks/translation/useSwitchTranslations"
 import Toast from "react-native-toast-message";
 import TranslationSection from "./TranslationSection";
 import LandingDisplay from "./LandingDisplay";
@@ -11,10 +12,21 @@ import ExplanationSection from "./ExplanationSection";
 
 export default function MainDisplay() {
   const { isLoading, error } = useApp();
-  const { translatedText, inputTextLang, translatedTextLang, explanation, isFavorite } =
-    useTranslationContext();
+  const {
+    translatedText,
+    setTranslatedText,
+    inputTextLang,
+    translatedTextLang,
+    explanation,
+    isFavorite
+  } = useTranslationContext();
 
   const { handleFavorite } = useFavoriteToggle();
+  const { switchTranslations, fading } = useSwitchTranslations({
+    translatedText,
+    setTranslatedText,
+    timeoutFn: setTimeout
+  });
 
   // Add or remove from favorites, display toast error if not successful
   const onFavoriteClick = async () => {
@@ -46,11 +58,11 @@ export default function MainDisplay() {
         translatedText={translatedText}
         inputTextLang={inputTextLang}
         translatedTextLang={translatedTextLang}
-        fading={[]} // to implement fading later
+        fading={fading}
         isFavorite={isFavorite}
         isFavLoading={false}
         onFavoriteClick={onFavoriteClick}
-        onSwitchTranslations={() => { }}
+        onSwitchTranslations={switchTranslations}
       />
       <ExplanationSection
         explanation={explanation}
