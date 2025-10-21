@@ -69,6 +69,7 @@ export default function AppHeader() {
                 useNativeDriver: true,
               }).start();
               suggestTranslation();
+              setShowMenu(false)
             }}
             className="p-2 rounded-full active:opacity-70"
           >

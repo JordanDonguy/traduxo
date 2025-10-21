@@ -12,5 +12,5 @@ export function useScrollGradient(threshold = 10) {
     [threshold]
   );
 
-  return { showTopGradient, onScroll };
+  return { showTopGradient, setShowTopGradient, onScroll };
 }

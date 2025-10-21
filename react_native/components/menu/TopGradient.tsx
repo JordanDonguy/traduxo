@@ -12,6 +12,7 @@ export default function TopGradient({ show }: { show: boolean }) {
       from={{ opacity: 0 }}
       animate={{ opacity: show ? 1 : 0 }}
       transition={{ type: "timing", duration: 400 }}
+      pointerEvents="none"
       style={{
         position: "absolute",
         top: 70,

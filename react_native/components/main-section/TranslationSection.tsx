@@ -72,10 +72,19 @@ export default function TranslationSection({
             {translatedTextLang.length <= 2 ? translatedTextLang.toUpperCase() : ""}
           </Text>
 
-          <View className="flex-row flex-1 items-center bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
-            <Text className="py-2 pl-4 font-sans text-xl flex-1 text-black dark:text-white">
-              {capitalizeFirstLetter(mainTranslation)}
-            </Text>
+          <View className="flex-row flex-1 items-center justify-between bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
+            <MotiView
+              animate={{
+                scale: fading.includes(mainTranslation) ? 0 : 1,
+                opacity: fading.includes(mainTranslation) ? 0 : 1,
+              }}
+              transition={{ type: "timing", duration: 200 }}
+                style={{ flexShrink: 1 }}
+            >
+              <Text className="py-2 pl-4 font-sans text-xl flex-1 text-black dark:text-white">
+                {capitalizeFirstLetter(mainTranslation)}
+              </Text>
+            </MotiView>
 
             <TouchableOpacity
               onPress={onFavoriteClick}
@@ -93,9 +102,17 @@ export default function TranslationSection({
 
         {alternatives.map((alt, idx) => (
           <TouchableOpacity key={idx} onPress={() => onSwitchTranslations(alt)}>
-            <Text className="pl-4 mb-2 font-sans text-lg text-black dark:text-white">
-              ● {capitalizeFirstLetter(alt)}
-            </Text>
+            <MotiView
+              animate={{
+                translateX: fading.includes(alt) ? -500 : 0,
+                opacity: fading.includes(alt) ? 0 : 1,
+              }}
+              transition={{ type: "timing", duration: 200 }}
+            >
+              <Text className="pl-4 mb-2 font-sans text-lg text-black dark:text-white">
+                ● {capitalizeFirstLetter(alt)}
+              </Text>
+            </MotiView>
           </TouchableOpacity>
         ))}
       </View>

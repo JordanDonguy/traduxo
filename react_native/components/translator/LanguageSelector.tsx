@@ -78,7 +78,7 @@ export default function LanguageSelector({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.5, opacity: 0 }}
             transition={{
-              scale: { type: "spring", damping: 40, stiffness: 500, },
+              scale: { type: "spring", damping: 40, stiffness: 500, mass: 2.5 },
               opacity: { type: "timing", duration: 250 },
             }}
             style={{ maxHeight: modalMaxHeight }}

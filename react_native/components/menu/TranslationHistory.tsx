@@ -50,7 +50,10 @@ export default function TranslationHistory() {
             No translations found in history...
           </Text>
 
-        ) : (isLoading) ? <LoadingSpinner /> : (
+        ) : (isLoading) ? (
+          <LoadingSpinner />
+
+        ) : (
           <View className="flex flex-col gap-6 pb-24">
             {status === "authenticated" && translationHistory.length > 0 && (
               <FlatList

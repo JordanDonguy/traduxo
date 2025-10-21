@@ -35,8 +35,6 @@ export default function Favorites() {
     })
   };
 
-  if (isLoading) return <LoadingSpinner />;
-
   return (
     <>
       <View className="relative flex-1">
@@ -48,10 +46,13 @@ export default function Favorites() {
               You need to log in to have access to your favorite translations
             </Text>
 
-          ) : !favoriteTranslations.length ? (
+          ) : (!favoriteTranslations.length && !isLoading) ? (
             <Text className="text-xl pt-10 text-center dark:text-white">
               No favorite translations found...
             </Text>
+
+          ) : (isLoading) ? (
+            <LoadingSpinner />
 
           ) : (
             <FlatList
