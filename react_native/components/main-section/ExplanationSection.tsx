@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, TouchableOpacity, Animated } from "react-native";
+import { View, TouchableOpacity, Animated } from "react-native";
+import AppText from "../AppText";
 import Markdown from "react-native-markdown-display";
 import LoadingAnimation from "./LoadingAnimation";
 import { MotiView } from "moti";
@@ -43,7 +44,7 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
   if (explanationError.length) {
     return (
       <View>
-        <Text className="font-sans text-black dark:text-white mt-8 text-lg">{explanationError}</Text>
+        <AppText className="font-sans mt-8 text-lg">{explanationError}</AppText>
       </View>
     );
   }
@@ -98,7 +99,7 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
         }}
         className="w-full max-w-xl py-4 rounded-full bg-zinc-200 dark:bg-zinc-800 self-center mt-8"
       >
-        <Text className="font-sans text-center text-lg text-black dark:text-white">✨ AI explanations</Text>
+        <AppText className="font-sans text-center text-lg">✨ AI explanations</AppText>
       </TouchableOpacity>
     </MotiView>
   );

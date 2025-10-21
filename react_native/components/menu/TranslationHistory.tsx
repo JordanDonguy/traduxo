@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, FlatList } from "react-native";
+import AppText from "../AppText";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
@@ -41,14 +42,14 @@ export default function TranslationHistory() {
       <View className="relative flex-1">
 
         {status !== "authenticated" ? (
-          <Text className="text-xl pt-10 text-center dark:text-white">
+          <AppText className="text-xl pt-10 text-center">
             You need to log in to have access to your translation history
-          </Text>
+          </AppText>
 
         ) : !translationHistory.length ? (
-          <Text className="text-xl pt-10 text-center dark:text-white">
+          <AppText className="text-xl pt-10 text-center">
             No translations found in history...
-          </Text>
+          </AppText>
 
         ) : (isLoading) ? (
           <LoadingSpinner />

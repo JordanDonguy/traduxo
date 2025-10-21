@@ -1,5 +1,4 @@
 import { LinearGradient } from "expo-linear-gradient"
-import { useScrollGradient } from "@/hooks/useScrollGradient"
 import { useTheme } from "@react-navigation/native";
 import { MotiView } from "moti"
 

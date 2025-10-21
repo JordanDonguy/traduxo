@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   FlatList,
   Modal,
   Dimensions,
   TouchableWithoutFeedback,
 } from "react-native";
+import AppText from "../AppText";
 import { MotiView } from "moti";
 import { useTheme } from "@react-navigation/native";
 import ISO6391 from "iso-639-1";
@@ -60,7 +60,7 @@ export default function LanguageSelector({
       onPress={() => onSelect(item.key)}
       className="py-3 px-4 border-b border-gray-600"
     >
-      <Text className="font-sans text-black dark:text-white text-lg">{item.label}</Text>
+      <AppText className="font-sans text-lg">{item.label}</AppText>
     </TouchableOpacity>
   );
 
@@ -104,9 +104,9 @@ export default function LanguageSelector({
                   }}
                   className="py-3 px-4 border-b border-gray-600"
                 >
-                  <Text className="text-black dark:text-white text-lg">
+                  <AppText className="text-lg">
                     {item.label}
-                  </Text>
+                  </AppText>
                 </TouchableOpacity>
               )}
             />
@@ -138,9 +138,9 @@ export default function LanguageSelector({
           className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenInput(true)}
         >
-          <Text className="font-sans text-center text-lg text-black dark:text-white">
+          <AppText className="font-sans text-center text-lg">
             {inputLanguages.find((l) => l.key === inputLang)?.label}
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </MotiView>
 
@@ -169,9 +169,9 @@ export default function LanguageSelector({
           className="bg-zinc-200 dark:bg-zinc-800 rounded-2xl py-4 px-4 mx-1"
           onPress={() => setOpenOutput(true)}
         >
-          <Text className="font-sans text-center text-lg text-black dark:text-white">
+          <AppText className="font-sans text-center text-lg">
             {outputLanguages.find((l) => l.key === outputLang)?.label}
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </MotiView>
 

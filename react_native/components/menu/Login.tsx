@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import AppText from "../AppText";
 import { Lock, Mail } from "lucide-react-native";
 import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
@@ -43,7 +44,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
     }
   };
 
-  if (isLoading) return <LoadingSpinner />
+  if (isLoading) return <LoadingSpinner paddingBottom="20" />
 
   return (
     <View className={`${showMenu ? "opacity-100" : "opacity-0"} flex-1`}>
@@ -54,7 +55,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
       <View className="py-2 rounded-xl mb-6">
         <View className="flex-row items-center mb-2">
           <Mail size={28} color={colors.text} />
-          <Text className="ml-2 text-xl text-black dark:text-white">Email</Text>
+          <AppText className="ml-2 text-xl">Email</AppText>
         </View>
         <TextInput
           value={email}
@@ -71,7 +72,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
       <View className="py-2 rounded-xl mb-6">
         <View className="flex-row items-center mb-2">
           <Lock size={28} color={colors.text} />
-          <Text className="ml-2 text-xl text-black dark:text-white">Password</Text>
+          <AppText className="ml-2 text-xl">Password</AppText>
         </View>
         <TextInput
           value={password}
@@ -88,7 +89,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
         <View className="py-2 rounded-xl mb-6">
           <View className="flex-row items-center mb-2">
             <Lock size={28} color={colors.text} />
-            <Text className="ml-2 text-xl text-black dark:text-white">Confirm Password</Text>
+            <AppText className="ml-2 text-xl">Confirm Password</AppText>
           </View>
           <TextInput
             value={confirmPassword}
@@ -103,14 +104,14 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
 
       {/* Submit Button */}
       <TouchableOpacity className="bg-gray-300 dark:bg-zinc-800 rounded-full h-16 flex items-center justify-center mt-4 mb-6" onPress={onSubmit}>
-        <Text className="text-black dark:text-white text-lg">{(currentSubmenu === "Signup") ? "Sign Up" : "Sign In"}</Text>
+        <AppText className="text-lg">{(currentSubmenu === "Signup") ? "Sign Up" : "Sign In"}</AppText>
       </TouchableOpacity>
 
       {/* Google OAuth Button */}
       {/* /!\ TO BE IMPLEMENTED -> google login */}
       <TouchableOpacity className="flex-row items-center justify-center bg-gray-300 dark:bg-zinc-800 h-16 rounded-full mb-6">
         <Image source={require("@/assets/images/google-logo.webp")} className="w-10 h-10 mr-4" />
-        <Text className="text-black dark:text-white text-lg">Continue with Google</Text>
+        <AppText className="text-lg">Continue with Google</AppText>
       </TouchableOpacity>
 
       {/* Forgot Password */}
@@ -121,7 +122,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
       )}
 
       {/* Switch Login/Signup */}
-      <Text className="text-center text-black dark:text-white text-lg">
+      <AppText className="text-center text-lg">
         {(currentSubmenu === "Signup") ? "Already have an account? " : "No account? "}
         <Text
           className="text-blue-500 underline"
@@ -132,7 +133,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
           {currentSubmenu === "Login" ? "Sign Up" : "Login"}
         </Text>
 
-      </Text>
+      </AppText>
     </View>
   );
 }

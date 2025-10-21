@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { View, TouchableOpacity, FlatList } from "react-native";
+import AppText from "../AppText";
 import { Check } from "lucide-react-native";
 import ISO6391 from "iso-639-1";
 import { useExplanationLanguage } from "@traduxo/packages/hooks/explanation/useExplanationLanguage";
@@ -28,9 +29,9 @@ export default function ExplanationLanguage() {
           }`}
         activeOpacity={0.7}
       >
-        <Text className="text-lg dark:text-white text-center">
+        <AppText className="text-lg text-center">
           {ISO6391.getName(code) || code} ({code.toUpperCase()})
-        </Text>
+        </AppText>
 
         {isSelected && (
           <View className="absolute right-6">

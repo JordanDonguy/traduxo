@@ -1,6 +1,7 @@
 import { MotiView } from "moti";
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
+import AppText from "../AppText";
 import type { Translation } from "@traduxo/packages/types/translation";
 
 interface TranslationItemProps {
@@ -34,30 +35,30 @@ const _TranslationItem: React.FC<TranslationItemProps> = ({
 
         {/* Input language & text */}
         <View className="flex flex-row items-center rounded-lg border border-zinc-600">
-          <Text className="text-black dark:text-white text-lg p-2 w-14 border-r border-zinc-600 flex text-center">
+          <AppText className="text-lg p-2 w-14 border-r border-zinc-600 flex text-center">
             {t.inputLang.toUpperCase()}
-          </Text>
-          <Text
-            className="flex-1 text-lg text-black dark:text-white bg-zinc-200 dark:bg-zinc-800 pl-4 pr-6 h-full align-middle rounded-r-lg"
+          </AppText>
+          <AppText
+            className="flex-1 text-lg bg-zinc-200 dark:bg-zinc-800 pl-4 pr-6 h-full align-middle rounded-r-lg"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {t.inputText}
-          </Text>
+          </AppText>
         </View>
 
         {/* Output language & text */}
         <View className="flex flex-row items-center rounded-lg border border-zinc-600">
-          <Text className="text-black dark:text-white text-lg p-2 w-14 border-r border-zinc-600 text-center">
+          <AppText className="text-lg p-2 w-14 border-r border-zinc-600 text-center">
             {t.outputLang.toUpperCase()}
-          </Text>
-          <Text
-            className="flex-1 text-lg text-black dark:text-white bg-zinc-200 dark:bg-zinc-800 pl-4 pr-2 h-full align-middle rounded-r-lg"
+          </AppText>
+          <AppText
+            className="flex-1 text-lg bg-zinc-200 dark:bg-zinc-800 pl-4 pr-2 h-full align-middle rounded-r-lg"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {t.translation}
-          </Text>
+          </AppText>
         </View>
 
         {/* Delete button */}

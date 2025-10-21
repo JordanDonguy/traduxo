@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
+import AppText from "../AppText";
 import { Star } from "lucide-react-native";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { useTheme } from "@react-navigation/native";
@@ -57,20 +58,20 @@ export default function TranslationSection({
     >
       {/* Input language + expression */}
       <View className="flex-row mb-8 border border-zinc-500 rounded-md">
-        <Text className="z-10 py-2 w-14 font-sans text-xl text-center text-black dark:text-white border-r border-zinc-500">
+        <AppText className="z-10 py-2 w-14 font-sans text-xl text-center border-r border-zinc-500">
           {inputTextLang.length <= 2 ? inputTextLang.toUpperCase() : ""}
-        </Text>
-        <Text className="pt-2 pl-4 pr-2 font-sans text-xl flex-1 text-black dark:text-white bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
+        </AppText>
+        <AppText className="pt-2 pl-4 pr-2 font-sans text-xl flex-1 bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
           {capitalizeFirstLetter(expression)}
-        </Text>
+        </AppText>
       </View>
 
       {/* Output language + main translation + alternatives */}
       <View className="border-t border-zinc-500 pt-8">
         <View className="flex-row mb-6 border border-zinc-500 rounded-md">
-          <Text className="z-10 py-2 w-14 font-sans text-xl text-center border-r border-zinc-500 text-black dark:text-white">
+          <AppText className="z-10 py-2 w-14 font-sans text-xl text-center border-r border-zinc-500">
             {translatedTextLang.length <= 2 ? translatedTextLang.toUpperCase() : ""}
-          </Text>
+          </AppText>
 
           <View className="flex-row flex-1 items-center justify-between bg-zinc-200 dark:bg-zinc-800 rounded-r-md">
             <MotiView
@@ -81,9 +82,9 @@ export default function TranslationSection({
               transition={{ type: "timing", duration: 200 }}
                 style={{ flexShrink: 1 }}
             >
-              <Text className="py-2 pl-4 font-sans text-xl flex-1 text-black dark:text-white">
+              <AppText className="py-2 pl-4 font-sans text-xl flex-1">
                 {capitalizeFirstLetter(mainTranslation)}
-              </Text>
+              </AppText>
             </MotiView>
 
             <TouchableOpacity
@@ -109,9 +110,9 @@ export default function TranslationSection({
               }}
               transition={{ type: "timing", duration: 200 }}
             >
-              <Text className="pl-4 mb-2 font-sans text-lg text-black dark:text-white">
+              <AppText className="pl-4 mb-2 font-sans text-lg">
                 ● {capitalizeFirstLetter(alt)}
-              </Text>
+              </AppText>
             </MotiView>
           </TouchableOpacity>
         ))}

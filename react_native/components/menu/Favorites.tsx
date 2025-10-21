@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, FlatList } from "react-native";
+import AppText from "../AppText";
 import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFavoriteTranslations";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
@@ -42,14 +43,14 @@ export default function Favorites() {
         <View className="flex flex-col gap-6 pb-24">
 
           {status !== "authenticated" ? (
-            <Text className="text-xl pt-10 text-center dark:text-white">
+            <AppText className="text-xl pt-10 text-center">
               You need to log in to have access to your favorite translations
-            </Text>
+            </AppText>
 
           ) : (!favoriteTranslations.length && !isLoading) ? (
-            <Text className="text-xl pt-10 text-center dark:text-white">
+            <AppText className="text-xl pt-10 text-center">
               No favorite translations found...
-            </Text>
+            </AppText>
 
           ) : (isLoading) ? (
             <LoadingSpinner />
