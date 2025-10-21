@@ -1,9 +1,13 @@
 import { View } from "react-native";
 import { MotiView } from "moti";
 
-export default function LoadingSpinner() {
+type Props = {
+  paddingBottom?: string
+}
+
+export default function LoadingSpinner({paddingBottom = "48"}: Props) {
   return (
-    <View className="absolute h-screen-safe pb-48 inset-0 bg-white dark:bg-zinc-950 z-50 flex items-center justify-center">
+    <View className={`absolute h-screen-safe inset-0 bg-white dark:bg-zinc-950 z-50 flex items-center justify-center pb-${paddingBottom}`}>
       <MotiView
         from={{ rotate: "0deg" }}
         animate={{ rotate: "360deg" }}

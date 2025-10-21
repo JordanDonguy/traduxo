@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import AppText from "../AppText";
 import { MotiView } from 'moti';
 import { LinearGradient } from "expo-linear-gradient";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
@@ -10,6 +11,7 @@ import { useAppTheme } from "@/contexts/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useScrollGradient } from "@/hooks/useScrollGradient";
 import Toast from "react-native-toast-message";
+import MenuButton from "./MenuButton";
 import TopGradient from "./TopGradient";
 import LoadingSpinner from "./LoadingSpinner";
 import Login from "./Login";
@@ -105,16 +107,16 @@ export default function UserMenu() {
               <CircleArrowLeft size={28} color={colors.text} />
             </TouchableOpacity>
           )}
-          <Text className="text-xl text-black dark:text-white font-semibold">
+          <AppText className="text-xl font-semibold">
             {currentSubmenu ? currentSubmenu : "User Settings"}
-          </Text>
+          </AppText>
           <TouchableOpacity onPress={() => setShowMenu(false)} className="z-50">
             <CircleX size={28} color={colors.text} />
           </TouchableOpacity>
         </View>
 
 
-        {isLoading ? <LoadingSpinner /> :
+        {isLoading ? <LoadingSpinner paddingBottom="20" /> :
           (currentSubmenu === "Login" || currentSubmenu === "Signup") ? (
             <Login currentSubmenu={currentSubmenu} setCurrentSubmenu={setCurrentSubmenu} />
           ) : currentSubmenu === "History" ? (
@@ -139,67 +141,31 @@ export default function UserMenu() {
                 onPress={() => toggleTheme()}
               >
                 {theme.dark ? <Moon size={28} color={colors.text} /> : <Sun size={28} color={colors.text} />}
-                <Text className="ml-3 text-lg text-black dark:text-white">Theme ({theme.dark ? "Dark" : "Light"})</Text>
+                <AppText className="ml-3 text-lg">Theme ({theme.dark ? "Dark" : "Light"})</AppText>
               </TouchableOpacity>
 
               {/* Explanation language */}
-              <TouchableOpacity
-                className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                onPress={() => setCurrentSubmenu("Explanation Language")}
-              >
-                <Languages size={28} color={colors.text} />
-                <Text className="ml-3 text-lg text-black dark:text-white">Explanation language</Text>
-              </TouchableOpacity>
+              <MenuButton label="Explanation Language" icon={Languages} />
 
               {/* Login */}
               {status !== "authenticated" && (
-                <TouchableOpacity
-                  className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                  onPress={() => setCurrentSubmenu("Login")}
-                >
-                  <User size={28} color={colors.text} />
-                  <Text className="ml-3 text-lg text-black dark:text-white">Login</Text>
-                </TouchableOpacity>
+                <MenuButton label="Login" icon={User} />
               )}
 
               {/* History */}
-              <TouchableOpacity
-                className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                onPress={() => setCurrentSubmenu("History")}
-              >
-                <History size={28} color={colors.text} />
-                <Text className="ml-3 text-lg text-black dark:text-white">History</Text>
-              </TouchableOpacity>
+              <MenuButton label="History" icon={History} />
 
               {/* Favorites */}
-              <TouchableOpacity
-                className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                onPress={() => setCurrentSubmenu("Favorites")}
-              >
-                <Star size={28} color={colors.text} />
-                <Text className="ml-3 text-lg text-black dark:text-white">Favorites</Text>
-              </TouchableOpacity>
+              <MenuButton label="Favorites" icon={Star} />
 
               {/* Privacy policy */}
-              <TouchableOpacity
-                className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                onPress={() => setCurrentSubmenu("Privacy Policy")}
-              >
-                <Shield size={28} color={colors.text} />
-                <Text className="ml-3 text-lg text-black dark:text-white">Privacy policy</Text>
-              </TouchableOpacity>
+              <MenuButton label="Privacy Policy" icon={Shield} />
 
               {/* Authenticated actions */}
               {status === "authenticated" && (
                 <>
                   {/* Change password */}
-                  <TouchableOpacity
-                    className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-4"
-                    onPress={() => setCurrentSubmenu("Change Password")}
-                  >
-                    <Lock size={28} color={colors.text} />
-                    <Text className="ml-3 text-lg text-black dark:text-white">{isCredentials ? "Change password" : "Create password"}</Text>
-                  </TouchableOpacity>
+                  <MenuButton label={isCredentials ? "Change password" : "Create password"} icon={Lock} />
 
                   {/* Logout */}
                   <TouchableOpacity
@@ -214,17 +180,12 @@ export default function UserMenu() {
                     }}
                   >
                     <LogOut size={28} color={colors.text} />
-                    <Text className="ml-3 text-lg text-black dark:text-white">Log Out</Text>
+                    <AppText className="ml-3 text-lg">Log Out</AppText>
                   </TouchableOpacity>
 
                   {/* Delete account */}
-                  <TouchableOpacity
-                    className="flex-row items-center h-20 w-full px-4 rounded-xl bg-zinc-200 dark:bg-zinc-800 mb-8"
-                    onPress={() => setCurrentSubmenu("Delete Account")}
-                  >
-                    <BadgeMinus size={28} color={colors.text} />
-                    <Text className="ml-3 text-lg text-black dark:text-white">Delete account</Text>
-                  </TouchableOpacity>
+                  <MenuButton label="Delete Account" icon={BadgeMinus} />
+
                 </>
               )}
             </ScrollView>
