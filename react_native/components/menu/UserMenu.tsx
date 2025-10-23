@@ -19,6 +19,7 @@ import TranslationHistory from "./TranslationHistory";
 import Favorites from "./Favorites";
 import ExplanationLanguage from "./ExplanationLanguage";
 import PrivacyPolicy from "./PrivacyPolicy";
+import ChangePassword from "./ChangePassword";
 
 import {
   Moon,
@@ -127,6 +128,8 @@ export default function UserMenu() {
             <ExplanationLanguage />
           ) : currentSubmenu === "Privacy Policy" ? (
             <PrivacyPolicy />
+          ) : (currentSubmenu === "Change Password" || currentSubmenu === "Create Password") ? (
+            <ChangePassword isCredentials={isCredentials} />
           ) : (
             <ScrollView
               keyboardShouldPersistTaps="handled"
@@ -165,7 +168,7 @@ export default function UserMenu() {
               {status === "authenticated" && (
                 <>
                   {/* Change password */}
-                  <MenuButton label={isCredentials ? "Change password" : "Create password"} icon={Lock} />
+                  <MenuButton label={isCredentials ? "Change Password" : "Create Password"} icon={Lock} />
 
                   {/* Logout */}
                   <TouchableOpacity
