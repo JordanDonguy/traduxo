@@ -18,6 +18,7 @@ export default function LoadingSpinner({ paddingBottom }: Props) {
           type: "timing",
           duration: 1000,
           loop: true,
+          repeatReverse: false,
         }}
         className="w-40 h-40 border-8 border-zinc-400 dark:border-zinc-500 border-t-zinc-200 dark:border-t-zinc-200 rounded-full"
       />

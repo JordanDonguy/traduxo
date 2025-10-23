@@ -103,13 +103,13 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
       )}
 
       {/* Submit Button */}
-      <TouchableOpacity className="bg-gray-300 dark:bg-zinc-800 rounded-full h-16 flex items-center justify-center mt-4 mb-6" onPress={onSubmit}>
+      <TouchableOpacity className="bg-gray-200 dark:bg-zinc-800 rounded-full h-16 flex items-center justify-center mt-4 mb-6" onPress={onSubmit}>
         <AppText className="text-lg">{(currentSubmenu === "Signup") ? "Sign Up" : "Sign In"}</AppText>
       </TouchableOpacity>
 
       {/* Google OAuth Button */}
       {/* /!\ TO BE IMPLEMENTED -> google login */}
-      <TouchableOpacity className="flex-row items-center justify-center bg-gray-300 dark:bg-zinc-800 h-16 rounded-full mb-6">
+      <TouchableOpacity className="flex-row items-center justify-center bg-gray-200 dark:bg-zinc-800 h-16 rounded-full mb-6">
         <Image source={require("@/assets/images/google-logo.webp")} className="w-10 h-10 mr-4" />
         <AppText className="text-lg">Continue with Google</AppText>
       </TouchableOpacity>

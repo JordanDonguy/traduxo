@@ -20,6 +20,7 @@ import Favorites from "./Favorites";
 import ExplanationLanguage from "./ExplanationLanguage";
 import PrivacyPolicy from "./PrivacyPolicy";
 import ChangePassword from "./ChangePassword";
+import DeleteAccount from "./DeleteAccount";
 
 import {
   Moon,
@@ -130,6 +131,8 @@ export default function UserMenu() {
             <PrivacyPolicy />
           ) : (currentSubmenu === "Change Password" || currentSubmenu === "Create Password") ? (
             <ChangePassword isCredentials={isCredentials} />
+          ) : currentSubmenu === "Delete Account" ? (
+            <DeleteAccount />
           ) : (
             <ScrollView
               keyboardShouldPersistTaps="handled"
