@@ -15,7 +15,6 @@ type TranslationSectionProps = {
   isFavLoading: boolean;
   onFavoriteClick: () => void;
   onSwitchTranslations: (idx: string) => void;
-  children?: React.ReactNode;
 };
 
 function capitalizeFirstLetter(str: string) {
@@ -32,7 +31,6 @@ export default function TranslationSection({
   isFavLoading,
   onFavoriteClick,
   onSwitchTranslations,
-  children,
 }: TranslationSectionProps) {
   const { colors } = useTheme();
 

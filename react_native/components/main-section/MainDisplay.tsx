@@ -9,9 +9,10 @@ import TranslationSection from "./TranslationSection";
 import LandingDisplay from "./LandingDisplay";
 import LoadingAnimation from "./LoadingAnimation";
 import ExplanationSection from "./ExplanationSection";
+import ErrorSection from "./ErrorSection";
 
 export default function MainDisplay() {
-  const { isLoading, error } = useApp();
+  const { isLoading, error, setError } = useApp();
   const {
     translatedText,
     setTranslatedText,
@@ -39,16 +40,32 @@ export default function MainDisplay() {
     }
   };
 
-  if (error.length) return null; // todo: render ErrorSection later
+  // ------------------------------
+  // ---- Render errors if any ----
+  // ------------------------------
+  if (error.length) return <ErrorSection error={error} setError={setError} isExplanationError={false} />;
+
+
+  // ------------------------------
+  // -- Render loading animation --
+  // ------------------------------
   if (isLoading) return (
     <View className="bg-white dark:bg-zinc-950 flex-1 pb-52 flex justify-center">
       <LoadingAnimation />
     </View>
   );
+
+
+  // ------------------------------
+  // --- Render landing display ---
+  // ------------------------------
   if (translatedText.length === 0) return <LandingDisplay />;
 
-  return (
 
+  // ----------------------------------
+  // Render translations & explanations
+  // ----------------------------------
+  return (
     <ScrollView
       className="bg-white dark:bg-zinc-950 mb-48"
       keyboardShouldPersistTaps="handled"
