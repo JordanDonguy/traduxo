@@ -7,6 +7,8 @@ import { MotiView } from "moti";
 import { useTheme } from "@react-navigation/native";
 import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
+import { replaceQuotesWithBold } from "@traduxo/packages/utils/formatting/replaceQuotesWithBold";
+import ErrorSection from "./ErrorSection";
 
 type ExplanationSectionProps = {
   explanation: string;
@@ -14,7 +16,13 @@ type ExplanationSectionProps = {
 
 export default function ExplanationSection({ explanation }: ExplanationSectionProps) {
   const { colors, dark } = useTheme();
-  const { handleExplanation, isExpLoading, setIsExpLoading, explanationError } = useExplanation({});
+  const { 
+    handleExplanation,
+    isExpLoading,
+    setIsExpLoading,
+    explanationError,
+    setExplanationError
+  } = useExplanation({});
 
   const fadeAnim = useRef(new Animated.Value(0.5)).current; // opacity
   const slideAnim = useRef(new Animated.Value(10)).current; // translateY
@@ -41,14 +49,18 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
     handleExplanation();
   };
 
+  // ------------------------------
+  // ---- Render errors if any ----
+  // ------------------------------
   if (explanationError.length) {
     return (
-      <View>
-        <AppText className="font-sans mt-8 text-lg">{explanationError}</AppText>
-      </View>
+      <ErrorSection error={explanationError} setError={setExplanationError} isExplanationError={true} />
     );
   }
 
+  // -----------------------------
+  // ---- Render explanations ----
+  // -----------------------------
   if (explanation.length) {
     return (
       <MotiView
@@ -71,12 +83,15 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
             strong: { fontWeight: '800', color: colors.text, textShadowColor: 'rgba(255,255,255,0.5)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 1 },
           }}
         >
-          {explanation}
+          {replaceQuotesWithBold(explanation)}
         </Markdown>
       </MotiView>
     );
   }
 
+  // ------------------------------
+  // -- Render loading animation --
+  // ------------------------------
   if (isExpLoading) {
     return (
       <View className="flex justify-center items-center w-full h-14 mt-8">
@@ -85,6 +100,9 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
     );
   }
 
+  // -------------------------------
+  // -- Render explanation button --
+  // -------------------------------
   return (
     <MotiView
       from={{ translateX: -300, opacity: 0 }}
