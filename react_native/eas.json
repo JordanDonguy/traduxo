@@ -1,0 +1,21 @@
+{
+  "cli": {
+    "version": ">= 16.24.1"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "package": "com.traduxo.preview"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "autoIncrement": true
+    }
+  }
+}

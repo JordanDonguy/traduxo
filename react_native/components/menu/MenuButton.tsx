@@ -1,7 +1,7 @@
-import React, { JSX } from "react";
+import React from "react";
 import { TouchableOpacity } from "react-native";
 import type { LucideIcon } from "lucide-react-native";
-import AppText from "../AppText"; // your custom text component
+import AppText from "../AppText";
 import { useTheme } from "@react-navigation/native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 

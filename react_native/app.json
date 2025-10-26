@@ -1,31 +1,27 @@
 {
   "expo": {
-    "name": "react_native",
-    "slug": "react_native",
+    "name": "Traduxo",
+    "slug": "Traduxo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
+    "splash": {
+      "image": "./assets/images/favicon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "scheme": "reactnative",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.traduxo.dev"
     },
     "android": {
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.traduxo.dev"
     },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png",
-      "bundler": "metro"
-    },
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "plugins": [
-      "expo-secure-store"
-    ]
+    "extra": {
+      "eas": {
+        "projectId": "f7ea26ef-6c36-49ff-8656-14a5d7324806"
+      }
+    }
   }
 }
