@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppText from "../AppText";
 import { Lock, Mail } from "lucide-react-native";
 import { useAuthHandlers } from "@traduxo/packages/hooks/auth/useAuthHandlers";
@@ -16,7 +17,7 @@ interface LoginProps {
 
 export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps) {
   const { colors } = useTheme();
-  const { showMenu, setShowMenu } = useApp();
+  const { setShowMenu } = useApp();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,14 +32,14 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
     if (currentSubmenu === "Signup") {
       const success = await handleSignup(email, password, confirmPassword, setIsLoading, setError, refresh);
       if (success) {
-        Toast.show({ type: "success", text1: "Successfully signed up! You can now login 🙂", text1Style:({ fontSize: 14 }) })
+        Toast.show({ type: "success", text1: "Successfully signed up! You can now login 🙂", text1Style: ({ fontSize: 14 }) })
         setCurrentSubmenu("Login");
       }
     } else {
       const success = await handleLogin(email, password, setError, setIsLoading, refresh);
       if (success) {
         setShowMenu(false);
-        Toast.show({ type: "success", text1: "Successfully logged in! Welcome back 🙂", text1Style:({ fontSize: 14 }) })
+        Toast.show({ type: "success", text1: "Successfully logged in! Welcome back 🙂", text1Style: ({ fontSize: 14 }) })
         refresh() // Refresh auth context
       };
     }
@@ -47,7 +48,13 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
   if (isLoading) return <LoadingSpinner paddingBottom="20" />
 
   return (
-    <View className={`${showMenu ? "opacity-100" : "opacity-0"} flex-1`}>
+    <KeyboardAwareScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 100 }}
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      extraScrollHeight={20}
+    >
 
       {error ? <Text className="text-red-500 text-center mb-6">{error}</Text> : null}
 
@@ -122,7 +129,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
       )}
 
       {/* Switch Login/Signup */}
-      <AppText className="text-center text-lg">
+      <AppText className="text-center text-lg pb-6">
         {(currentSubmenu === "Signup") ? "Already have an account? " : "No account? "}
         <Text
           className="text-blue-500 underline"
@@ -134,6 +141,6 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
         </Text>
 
       </AppText>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }

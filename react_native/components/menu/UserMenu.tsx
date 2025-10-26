@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, ScrollView, TouchableOpacity } from "react-native";
 import AppText from "../AppText";
 import { MotiView } from 'moti';
 import { LinearGradient } from "expo-linear-gradient";
@@ -61,7 +61,7 @@ export default function UserMenu() {
 
   // Reset submenu if menu is closed
   useEffect(() => {
-    let timeout: number;
+    let timeout: ReturnType<typeof setTimeout>;
     if (!showMenu) {
       timeout = setTimeout(() => {
         setCurrentSubmenu(null);
@@ -88,13 +88,13 @@ export default function UserMenu() {
 
   return (
     <MotiView
-      from={{ opacity: 0, translateX: -1000 }}
-      animate={{ opacity: showMenu ? 1 : 0, translateX: showMenu ? 0 : -1000 }}
+      from={{ opacity: 0, translateX: -400 }}
+      animate={{ opacity: showMenu ? 1 : 0, translateX: showMenu ? 0 : -400 }}
       transition={{
         type: 'spring',
         damping: 20,
-        stiffness: 150,
-        mass: 1,
+        stiffness: 250,
+        mass: 0.6,
       }}
       style={{ transformOrigin: 'left', pointerEvents: showMenu ? "auto" : "none" }}
       className={`absolute inset-0 z-40 h-screen pt-4 justify-center bg-white dark:bg-zinc-950`}
@@ -202,6 +202,7 @@ export default function UserMenu() {
         <LinearGradient
           colors={dark ? ['rgba(0,0,0,0.0)', 'rgba(0,0,0,0.5)'] : ['rgba(255,255,255,0.0)', 'rgba(255,255,255,0.6)']}
           style={{ position: 'absolute', bottom: insets.bottom + 40, left: 0, right: 0, height: 30, zIndex: 50 }}
+          pointerEvents="none"
         />
 
       </View >

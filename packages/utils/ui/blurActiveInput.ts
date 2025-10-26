@@ -8,7 +8,7 @@ import { Platform } from "@traduxo/packages/types/platform";
 export function blurActiveInput(keyboardModule?: { dismiss: () => void }): void {
   const platform =
     (process.env.NEXT_PUBLIC_PLATFORM as Platform) ||
-    (process.env.PLATFORM as Platform);
+    (process.env.EXPO_PUBLIC_PLATFORM as Platform);
 
   // Exit if platform not set
   if (!platform) {

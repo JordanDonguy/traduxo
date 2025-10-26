@@ -40,7 +40,7 @@ export default function RootLayout() {
             }}
           />
 
-          <View className="dark:bg-zinc-950" style={{ height: insets.bottom }} />
+          <View className="bg-white dark:bg-zinc-950" style={{ height: insets.bottom }} />
 
         </AppProvider>
       </AppProviderBase>

@@ -25,7 +25,7 @@ export default function ErrorSection({ isExplanationError, error, setError }: Er
 
 
   // -------- Login button part --------
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleLoginPress = () => {
     setShowMenu(true);

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppText from "../AppText";
 import { Lock } from "lucide-react-native";
 import Toast from "react-native-toast-message";
@@ -32,11 +33,14 @@ export default function ChangePassword({ isCredentials }: ChangePasswordProps) {
   };
 
   return (
-    <ScrollView
-      className="flex-1"
-      contentContainerStyle={{ paddingBottom: 24 }}
+    <KeyboardAwareScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={{ paddingBottom: 100 }}
       keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      extraScrollHeight={20}
     >
+
       {isLoading && (
         <View className="absolute inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
           <ActivityIndicator size="large" color="#fff" />
@@ -99,9 +103,11 @@ export default function ChangePassword({ isCredentials }: ChangePasswordProps) {
           onPress={onSubmit}
           className="bg-gray-200 dark:bg-zinc-800 rounded-full h-16 flex items-center justify-center mt-4 mb-6"
         >
-          <AppText className="text-lg">{isCredentials ? "Change password" : "Create password"}</AppText>
+          <AppText className="text-lg">
+            {isCredentials ? "Change password" : "Create password"}
+          </AppText>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }

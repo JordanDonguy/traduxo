@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, TouchableOpacity, Animated } from "react-native";
+import { View, TouchableOpacity, Animated, Keyboard } from "react-native";
 import AppText from "../AppText";
 import Markdown from "react-native-markdown-display";
 import LoadingAnimation from "./LoadingAnimation";
@@ -112,7 +112,7 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
     >
       <TouchableOpacity
         onPress={() => {
-          blurActiveInput();
+          blurActiveInput(Keyboard);
           fetchExplanation();
         }}
         className="w-full max-w-xl py-4 rounded-full bg-zinc-200 dark:bg-zinc-800 self-center mt-8"

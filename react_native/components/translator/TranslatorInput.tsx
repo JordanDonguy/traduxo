@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Keyboard, Animated, StyleSheet } from "react-native";
+import { View, Keyboard, Animated, StyleSheet, TextInput } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import LanguageSelector from "./LanguageSelector";
 import TextInputForm from "./TextInputForm";
@@ -41,6 +41,7 @@ export default function TranslatorInput() {
   const translateY = useRef(new Animated.Value(0)).current;
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
+  // Move the translator input up when keyboard is shown
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
       setKeyboardVisible(true);
@@ -51,6 +52,7 @@ export default function TranslatorInput() {
       }).start();
     });
 
+    // Move the translator input down when keyboard is closed
     const hideSub = Keyboard.addListener("keyboardDidHide", () => {
       setKeyboardVisible(false);
       Animated.timing(translateY, {
@@ -58,6 +60,7 @@ export default function TranslatorInput() {
         duration: 200,
         useNativeDriver: true,
       }).start();
+      TextInput.State.currentlyFocusedInput()?.blur?.();
     });
 
     return () => {

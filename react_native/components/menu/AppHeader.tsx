@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, TouchableOpacity, Animated, Easing, BackHandler, Pressable } from "react-native";
+import { View, TouchableOpacity, Animated, Easing, BackHandler, Keyboard } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 import { Dices, User } from "lucide-react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import Logo from "../Logo";
@@ -38,7 +39,7 @@ export default function AppHeader() {
         setShowMenu(false);
         return true;
       }
-      return false; // let OS handle
+      return false; // let OS handle it
     };
 
     const subscription = BackHandler.addEventListener("hardwareBackPress", backAction);
@@ -50,12 +51,12 @@ export default function AppHeader() {
       <View className="relative w-full">
         {/* Header */}
         <View className="border-b border-zinc-400 z-50 w-full h-16 flex flex-row items-center justify-between px-4">
-          <Pressable
-            onPress={() => setShowMenu(!showMenu)}
+          <TouchableOpacity
+            onPress={() => setShowMenu(prev => !prev)}
             className="p-2 rounded-full active:opacity-70"
           >
             <User size={32} color={colors.text} />
-          </Pressable>
+          </TouchableOpacity>
 
           <Logo />
 
@@ -68,6 +69,7 @@ export default function AppHeader() {
                 easing: Easing.out(Easing.ease),
                 useNativeDriver: true,
               }).start();
+              blurActiveInput(Keyboard);
               suggestTranslation();
               setShowMenu(false)
             }}
