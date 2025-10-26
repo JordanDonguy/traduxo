@@ -13,10 +13,10 @@
     "scheme": "reactnative",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.traduxo.dev"
+      "bundleIdentifier": "com.traduxo.preview"
     },
     "android": {
-      "package": "com.traduxo.dev"
+      "package": "com.traduxo.preview"
     },
     "extra": {
       "eas": {

@@ -8,10 +8,7 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "package": "com.traduxo.preview"
-      }
+      "distribution": "internal"
     },
     "production": {
       "distribution": "store",

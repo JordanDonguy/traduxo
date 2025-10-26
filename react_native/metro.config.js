@@ -10,13 +10,9 @@ const config = getDefaultConfig(projectRoot);
 // Watch the packages folder
 config.watchFolders = [path.resolve(workspaceRoot, "packages")];
 
-// Allow symlinks (monorepo / PNPM / Yarn workspaces)
-config.resolver.unstable_enableSymlinks = true;
-
 // Force Metro to resolve modules from app node_modules
 config.resolver.extraNodeModules = new Proxy({}, {
   get: (_, name) => path.join(projectRoot, "node_modules", name),
 });
-
 
 module.exports = withNativeWind(config, { input: './app/global.css' })
