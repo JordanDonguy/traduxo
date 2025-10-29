@@ -166,3 +166,39 @@ Vary across regions where ${lang} is spoken.
 Output only as a JSON array of unique strings, no explanations.
 `;
 }
+
+
+// ------------------------------------- Audio Translation Prompt -------------------------------------
+export function getAudioTranslationPrompt({
+  inputLang,
+  outputLang,
+}: Omit<TranslationPromptParams, "inputText">): string {
+  const detectOriginalLang = inputLang === "auto";
+
+  const detectionInstruction = detectOriginalLang
+    ? `3. Detect the ORIGINAL language of the spoken input and return it as a separate JSON object (two-letter ISO-639-1 code, lowercase).`
+    : "";
+
+  return `
+You will receive a spoken user request (audio). The transcription may include informal phrasing, filler words, or mispronunciations.  
+
+1. Understand the tone, style, and function of the spoken input in context (casual? formal? slangy? ironic? emotional? etc.).
+2. Suggest a **modern, natural expression** that would be used **in similar situations** by native speakers in ${outputLang}.
+3. Do not translate literally. Focus on matching how it feels and how it would be used — even if the words are different.
+${detectionInstruction}
+
+**IMPORTANT:** If the audio is empty, silent, or contains no recognizable speech, return exactly **one JSON object** with:
+- {"type":"error","value":"Hmm, seems like I didn’t hear anything... \nCould you speak again please? \n🙏"}
+
+**Output**  
+Return MULTIPLE JSON objects, one per line, **no markdown**, with the following structure:
+
+- {"type":"expression","value":"..."}   // The original expression
+- {"type":"main_translation","value":"..."}
+- {"type":"alternative","value":"..."}
+- {"type":"alternative","value":"..."}
+- {"type":"alternative","value":"..."}
+
+Always return exactly one main translation and exactly 3 alternatives.
+`;
+}

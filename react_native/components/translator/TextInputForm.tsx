@@ -1,26 +1,20 @@
 import React from "react";
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
-import { Mic, CircleStop } from "lucide-react-native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
-import { useTheme } from "@react-navigation/native";
+import VoiceInputButton from "./VoiceInputButton";
 
 type Props = {
   inputText: string;
   setInputText: (text: string) => void;
-  handleTranslate: () => void;
-  isListening?: boolean;
-  handleVoice?: () => void;
+  handleTranslate: (audioBase64?: string) => Promise<void>;
 };
 
 export default function TextInputForm({
   inputText,
   setInputText,
   handleTranslate,
-  isListening = false,
-  handleVoice,
 }: Props) {
   const { showMenu } = useApp();
-  const { colors } = useTheme();
 
   return (
     <View
@@ -34,24 +28,14 @@ export default function TextInputForm({
           placeholder="Enter some text..."
           placeholderTextColor="#9ca3af"
           value={inputText}
-          onChangeText={setInputText} 
+          onChangeText={setInputText}
           maxLength={100}
-          onSubmitEditing={handleTranslate}
+          onSubmitEditing={() => handleTranslate()}
           returnKeyType="send"
         />
 
         {/* Voice button */}
-        <TouchableOpacity
-          onPress={handleVoice}
-          activeOpacity={0.7}
-          className="w-12 h-full pr-2 rounded-full flex justify-center items-center active:opacity-70"
-        >
-          {!isListening ? (
-            <Mic size={28} color={colors.text} />
-          ) : (
-            <CircleStop size={28} color={colors.text} />
-          )}
-        </TouchableOpacity>
+        <VoiceInputButton handleTranslate={handleTranslate} />
       </View>
 
       {/* Character limit warning */}

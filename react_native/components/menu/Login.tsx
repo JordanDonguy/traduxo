@@ -32,14 +32,14 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
     if (currentSubmenu === "Signup") {
       const success = await handleSignup(email, password, confirmPassword, setIsLoading, setError, refresh);
       if (success) {
-        Toast.show({ type: "success", text1: "Successfully signed up! You can now login 🙂", text1Style: ({ fontSize: 14 }) })
+        Toast.show({ type: "success", text1: "Successfully signed up! You can now login 🙂", text1Style: { fontSize: 14 } })
         setCurrentSubmenu("Login");
       }
     } else {
       const success = await handleLogin(email, password, setError, setIsLoading, refresh);
       if (success) {
         setShowMenu(false);
-        Toast.show({ type: "success", text1: "Successfully logged in! Welcome back 🙂", text1Style: ({ fontSize: 14 }) })
+        Toast.show({ type: "success", text1: "Successfully logged in! Welcome back 🙂", text1Style: { fontSize: 14 } })
         refresh() // Refresh auth context
       };
     }

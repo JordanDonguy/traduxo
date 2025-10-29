@@ -1,4 +1,4 @@
-import { getTranslationPrompt } from "../geminiPrompts";
+import { getTranslationPrompt, getAudioTranslationPrompt } from "../geminiPrompts";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 import { SetState } from "@traduxo/packages/types/reactSetState";
@@ -21,8 +21,14 @@ type TranslateHelperArgs = {
   setTranslationId: SetState<string | undefined>;
   setError: SetState<string>;
   fetcher?: typeof fetch;
-  promptGetter?: typeof getTranslationPrompt;
   keyboardModule?: { dismiss: () => void };
+  audioBase64?: string;
+};
+
+type GeminiRequestBody = {
+  prompt: string;
+  mode: "translation";
+  audio?: string;
 };
 
 export async function translationHelper({
@@ -40,11 +46,11 @@ export async function translationHelper({
   setTranslationId,
   setError,
   fetcher = fetch,
-  promptGetter = getTranslationPrompt,
   keyboardModule,
+  audioBase64
 }: TranslateHelperArgs) {
   // ---- Step 0: Guard clause ----
-  if (!inputText.length) return { success: false, error: "No input text" };
+  if (!inputText.length && !audioBase64) return { success: false, error: "No input text" };
 
   // ---- Step 1: Blur any active input ----
   blurActiveInput(keyboardModule);
@@ -58,7 +64,12 @@ export async function translationHelper({
   setTranslationId(undefined);
 
   // ---- Step 3: Generate prompt ----
-  const prompt = promptGetter({ inputText, inputLang, outputLang });
+  let prompt: string;
+  if (audioBase64) {
+    prompt = getAudioTranslationPrompt({ inputLang, outputLang });
+  } else {
+    prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
+  }
 
   // ---- Step 4: Clear input text and update language if not auto ----
   setInputText("");
@@ -69,10 +80,21 @@ export async function translationHelper({
     let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
     // ---- Step 5a: Fetch from API ----
+    const bodyPayload: GeminiRequestBody = {
+      prompt,
+      mode: "translation",
+    };
+
+    // Include audioBase64 if provided
+    if (audioBase64) {
+      bodyPayload.audio = audioBase64;
+    }
+
+    // Make API request
     const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, mode: "translation" }),
+      body: JSON.stringify(bodyPayload),
     });
 
     // ---- Step 5b: Handle rate-limit errors ----
@@ -84,7 +106,10 @@ export async function translationHelper({
     }
 
     // ---- Step 5c: Handle non-ok responses ----
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    if (!res.ok) {
+      console.error("Gemini API error:", await res.text());
+      throw new Error(`Gemini error: ${res.status}`)
+    };
 
     // ---- Step 5d: Get streaming reader ----
     if (res.body) {
@@ -98,18 +123,25 @@ export async function translationHelper({
     for await (const part of decodeStream(usedReader)) {
       const item: TranslationItem = JSON.parse(part);
 
-      // ---- Step 6a: Remove dots at the end of phrases ----
+      // ---- Step 6a: Handle error item (for empty voice inputs) ----
+      if (item.type === "error") {
+        setError(item.value);
+        setIsLoading(false);
+        return { success: false, error: item.value };
+      }
+
+      // ---- Step 6b: Remove dots at the end of phrases ----
       if (typeof item.value === "string") {
         item.value = item.value.replace(/\.+$/, "").trim();
       }
 
-      // ---- Step 6b: Detect input language if auto ----
+      // ---- Step 6c: Detect input language if auto ----
       if (inputLang === "auto" && item.type === "orig_lang_code") {
         detectedInputLang = item.value;
         setInputTextLang(item.value);
       }
 
-      // ---- Step 6c: Update translated text and UI ----
+      // ---- Step 6d: Update translated text and UI ----
       setTranslatedText(prev => [...prev, item]);
       setIsLoading(false);
       setTranslatedTextLang(outputLang);

@@ -69,7 +69,7 @@ export default function TranslatorInput() {
     };
   }, [insets.bottom, translateY]);
 
-  const handleTranslate = async () => {
+  const handleTranslate = async (audioBase64?: string) => {
     setIsLoading(true);
 
     await translationHelper({
@@ -86,6 +86,7 @@ export default function TranslatorInput() {
       setIsFavorite,
       setTranslationId,
       setError,
+      audioBase64
     });
   };
 

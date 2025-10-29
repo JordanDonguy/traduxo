@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Part } from "@google/genai";
 import { checkQuota } from "../../dailyLimiter";
 import { checkAuth } from "../../middlewares/checkAuth";
 import { z } from "zod";
@@ -11,6 +11,7 @@ const BodySchema = z.object({
   prompt: z.string().min(1, "Prompt is required"),
   model: z.string().optional().default("gemini-2.5-flash-lite-preview-09-2025"),
   mode: z.enum(["translation", "explanation", "suggestion"]).default("translation"),
+  audio: z.string().optional()
 });
 
 // ---------------- Handler ----------------
@@ -36,7 +37,28 @@ export async function geminiStream(
       });
     }
 
-    const { prompt, model, mode } = parse.data;
+    const { prompt, model, mode, audio } = parse.data;
+
+    // Build contents object with optional audio
+    const parts: Part[] = [{ text: prompt }];
+
+    // Include audio if available
+    if (audio) {
+      parts.push({
+        inlineData: {
+          data: audio,      // Base64 string
+          mimeType: "audio/m4a",
+        },
+      });
+    }
+
+    // Wrap in a single Content object
+    const contents = [
+      {
+        role: "user",
+        parts,
+      },
+    ];
 
     // 2. Check auth session
     const isLoggedIn = await checkAuth(req);
@@ -60,7 +82,7 @@ export async function geminiStream(
     // 4. Stream AI response
     const stream = await genai.models.generateContentStream({
       model,
-      contents: prompt,
+      contents,
     });
 
     const encoder = new TextEncoder();
