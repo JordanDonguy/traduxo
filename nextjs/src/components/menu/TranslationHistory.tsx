@@ -1,5 +1,6 @@
 "use client"
 
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
@@ -12,10 +13,11 @@ interface TranslationHistoryProps {
 }
 
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
+  const { setError } = useApp();
   const router = useRouter();
   const { status } = useAuth();
   const { translationHistory, isLoading, deleteTranslation } = useTranslationHistory({});
-  const { selectTranslation } = useSelectTranslation({ router });
+  const { selectTranslation } = useSelectTranslation({ router, setError });
 
   return (
     <div

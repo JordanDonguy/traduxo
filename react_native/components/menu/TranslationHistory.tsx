@@ -13,13 +13,13 @@ import LoadingSpinner from "./LoadingSpinner";
 import TranslationItem from "./TranslationItem";
 
 export default function TranslationHistory() {
-  const { setShowMenu } = useApp();
+  const { setShowMenu, setError } = useApp();
   const { status } = useAuth();
   const { translationHistory } = useTranslationContext();
   const { onScroll, showTopGradient } = useScrollGradient();
 
   const { deleteTranslation, isLoading } = useTranslationHistory({});
-  const { selectTranslation } = useSelectTranslation({});
+  const { selectTranslation } = useSelectTranslation({ setError });
 
   // Delete a translation from history
   const handleDelete = async (id: string) => {

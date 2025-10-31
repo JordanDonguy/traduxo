@@ -1,5 +1,6 @@
 "use client"
 
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFavoriteTranslations";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { CircleX } from "lucide-react";
@@ -11,9 +12,10 @@ interface FavoriteTranslationProps {
 };
 
 function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
+  const { setError } = useApp();
   const router = useRouter();
   const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations({});
-  const { selectTranslation } = useSelectTranslation({ router });
+  const { selectTranslation } = useSelectTranslation({ router, setError });
 
   return (
     <div

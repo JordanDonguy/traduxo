@@ -12,11 +12,11 @@ import Toast from "react-native-toast-message";
 import TranslationItem from "./TranslationItem";
 
 export default function Favorites() {
-  const { setShowMenu } = useApp();
+  const { setShowMenu, setError } = useApp();
   const { status } = useAuth();
 
   const { favoriteTranslations, isLoading, deleteTranslation } = useFavoriteTranslations({});
-  const { selectTranslation } = useSelectTranslation({});
+  const { selectTranslation } = useSelectTranslation({ setError });
 
   const { onScroll, showTopGradient } = useScrollGradient();
 

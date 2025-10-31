@@ -8,12 +8,14 @@ type UseSelectTranslationArgs = {
   router?: { push: (path: string) => void }; // generic router
   translationContext?: ReturnType<typeof useTranslationContext>;
   languageContext?: ReturnType<typeof useLanguageContext>;
+  setError?:  React.Dispatch<React.SetStateAction<string>>;
 };
 
 export function useSelectTranslation({
   router,
   translationContext,
   languageContext,
+  setError
 }: UseSelectTranslationArgs = {}) {
   // ---- Step 1: Grab router + contexts ----
 
@@ -28,6 +30,7 @@ export function useSelectTranslation({
 
   // ---- Step 2: Shared handler ----
   function selectTranslation(t: Translation, isFavorite: boolean): void {
+    setError?.("");
     loadTranslationFromMenu(t, isFavorite);
     setInputLang(t.inputLang);
     setOutputLang(t.outputLang);
