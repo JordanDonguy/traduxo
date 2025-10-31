@@ -11,11 +11,13 @@ import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLangua
 import { translationHelper } from "@traduxo/packages/utils/translation/translate";
 import { LinearGradient } from 'expo-linear-gradient';
 
-export default function TranslatorInput() {
+export default function TranslatorInput({ inputRef }: { inputRef: React.RefObject<TextInput | null> }) {
   const { dark } = useTheme();
   const { setIsLoading, setError, showMenu } = useApp();
   const {
     inputText,
+    inputTextLang,
+    translatedTextLang,
     setInputText,
     setTranslatedText,
     setSaveToHistory,
@@ -32,6 +34,8 @@ export default function TranslatorInput() {
   const { isSwitching, switchLanguage } = useLanguageSwitch({
     inputLang,
     outputLang,
+    inputTextLang,
+    translatedTextLang,
     setInputLang,
     setOutputLang,
     detectedLang,
@@ -125,6 +129,7 @@ export default function TranslatorInput() {
         />
 
         <TextInputForm
+          inputRef={inputRef}
           inputText={inputText}
           setInputText={setInputText}
           handleTranslate={handleTranslate}

@@ -11,7 +11,7 @@ import LoadingAnimation from "./LoadingAnimation";
 import ExplanationSection from "./ExplanationSection";
 import ErrorSection from "./ErrorSection";
 
-export default function MainDisplay() {
+export default function MainDisplay({ onFocusInput }: { onFocusInput: () => void }) {
   const { isLoading, error, setError } = useApp();
   const {
     translatedText,
@@ -59,7 +59,7 @@ export default function MainDisplay() {
   // ------------------------------
   // --- Render landing display ---
   // ------------------------------
-  if (translatedText.length === 0) return <LandingDisplay />;
+  if (translatedText.length === 0) return <LandingDisplay onFocusInput={onFocusInput} />;
 
 
   // ----------------------------------

@@ -6,13 +6,9 @@ import { Dices, Languages } from "lucide-react-native";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { MotiView } from "moti";
 
-export default function LandingDisplay() {
+export default function LandingDisplay({ onFocusInput }: { onFocusInput: () => void }) {
   const { colors } = useTheme();
   const { suggestTranslation } = useSuggestion({});
-
-  const focusInput = () => {
-    console.log("Focus translation input (to be implemented)");
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false} >
@@ -27,6 +23,7 @@ export default function LandingDisplay() {
         </AppText>
         {/* Buttons */}
         <View className="flex flex-col gap-6 w-full max-w-[85%] mt-12">
+
           {/* Suggest Expression */}
           <TouchableOpacity
             onPress={suggestTranslation}
@@ -36,9 +33,10 @@ export default function LandingDisplay() {
             <Dices size={24} color={colors.text} />
             <AppText className="font-sans text-xl">Suggest an expression</AppText>
           </TouchableOpacity>
+
           {/* Translate Something */}
           <TouchableOpacity
-            onPress={focusInput}
+            onPress={onFocusInput}
             activeOpacity={0.8}
             className="flex flex-row justify-center items-center rounded-2xl py-4 gap-3 bg-zinc-200 dark:bg-zinc-800"
           >

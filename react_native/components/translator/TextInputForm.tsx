@@ -7,12 +7,14 @@ type Props = {
   inputText: string;
   setInputText: (text: string) => void;
   handleTranslate: (audioBase64?: string) => Promise<void>;
+  inputRef: React.RefObject<TextInput | null>;
 };
 
 export default function TextInputForm({
   inputText,
   setInputText,
   handleTranslate,
+  inputRef
 }: Props) {
   const { showMenu } = useApp();
 
@@ -24,6 +26,7 @@ export default function TextInputForm({
       {/* Form container */}
       <View className="w-full flex-row items-center rounded-2xl h-16 border border-zinc-400 dark:border-zinc-600 mt-2">
         <TextInput
+          ref={inputRef}
           className="font-sans flex-1 h-full px-6 text-lg text-black dark:text-white"
           placeholder="Enter some text..."
           placeholderTextColor="#9ca3af"
