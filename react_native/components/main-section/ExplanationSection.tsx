@@ -16,7 +16,7 @@ type ExplanationSectionProps = {
 
 export default function ExplanationSection({ explanation }: ExplanationSectionProps) {
   const { colors, dark } = useTheme();
-  const { 
+  const {
     handleExplanation,
     isExpLoading,
     setIsExpLoading,
@@ -49,6 +49,19 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
     handleExplanation();
   };
 
+  
+  // ------------------------------
+  // -- Render loading animation --
+  // ------------------------------
+  if (isExpLoading) {
+    return (
+      <View className="flex justify-center items-center w-full h-14 mt-8">
+        <LoadingAnimation />
+      </View>
+    );
+  }
+
+
   // ------------------------------
   // ---- Render errors if any ----
   // ------------------------------
@@ -57,6 +70,7 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
       <ErrorSection error={explanationError} setError={setExplanationError} isExplanationError={true} />
     );
   }
+
 
   // -----------------------------
   // ---- Render explanations ----
@@ -89,16 +103,6 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
     );
   }
 
-  // ------------------------------
-  // -- Render loading animation --
-  // ------------------------------
-  if (isExpLoading) {
-    return (
-      <View className="flex justify-center items-center w-full h-14 mt-8">
-        <LoadingAnimation />
-      </View>
-    );
-  }
 
   // -------------------------------
   // -- Render explanation button --
