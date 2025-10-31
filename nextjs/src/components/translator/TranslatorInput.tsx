@@ -11,11 +11,33 @@ import TextInputForm from "./TextInputForm";
 
 export default function TranslatorInput() {
   const { setIsLoading, setError } = useApp();
-  const { inputText, setInputText, setTranslatedText, setSaveToHistory, setInputTextLang, setTranslatedTextLang, setExplanation, setIsFavorite, setTranslationId } = useTranslationContext();
-  const { inputLang, outputLang, setInputLang, setOutputLang, detectedLang } = useLanguageContext();
+  const {
+    inputText,
+    setInputText,
+    inputTextLang,
+    translatedTextLang,
+    setTranslatedText,
+    setSaveToHistory,
+    setInputTextLang,
+    setTranslatedTextLang,
+    setExplanation,
+    setIsFavorite,
+    setTranslationId
+  } = useTranslationContext();
 
-  const { isSwitching, switchLanguage } = useLanguageSwitch({ inputLang, outputLang, setInputLang, setOutputLang, detectedLang });
+  const { inputLang, outputLang, setInputLang, setOutputLang, detectedLang } = useLanguageContext();
   const { isListening, showWarning, setShowWarning, handleVoice } = useVoiceInput({ inputLang, inputText, setInputText });
+
+  const { isSwitching, switchLanguage } = useLanguageSwitch({
+    inputLang,
+    outputLang,
+    inputTextLang,
+    translatedTextLang,
+    setInputLang,
+    setOutputLang,
+    detectedLang,
+  });
+
 
   // Handle translation request
   const handleTranslate = async (e: React.FormEvent) => {
