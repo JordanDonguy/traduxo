@@ -135,6 +135,7 @@ export default function UserMenu() {
             <DeleteAccount />
           ) : (
             <ScrollView
+              showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
               nestedScrollEnabled
               onScroll={onScroll}

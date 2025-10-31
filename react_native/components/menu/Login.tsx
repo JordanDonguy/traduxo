@@ -49,6 +49,7 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
 
   return (
     <KeyboardAwareScrollView
+      showsVerticalScrollIndicator={false}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: 100 }}
       keyboardShouldPersistTaps="handled"

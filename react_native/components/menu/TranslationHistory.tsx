@@ -58,6 +58,7 @@ export default function TranslationHistory() {
           <View className="flex flex-col gap-6 pb-24">
             {status === "authenticated" && translationHistory.length > 0 && (
               <FlatList
+                showsVerticalScrollIndicator={false}
                 onScroll={onScroll}
                 data={translationHistory}
                 keyExtractor={(item) => item.id}

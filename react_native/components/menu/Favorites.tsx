@@ -57,6 +57,7 @@ export default function Favorites() {
 
           ) : (
             <FlatList
+              showsVerticalScrollIndicator={false}
               onScroll={onScroll}
               data={favoriteTranslations}
               keyExtractor={(item) => item.id}

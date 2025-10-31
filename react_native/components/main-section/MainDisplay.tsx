@@ -67,6 +67,7 @@ export default function MainDisplay({ onFocusInput }: { onFocusInput: () => void
   // ----------------------------------
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       className="bg-white dark:bg-zinc-950 mb-48"
       keyboardShouldPersistTaps="handled"
       nestedScrollEnabled

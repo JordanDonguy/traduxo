@@ -34,6 +34,7 @@ export default function ChangePassword({ isCredentials }: ChangePasswordProps) {
 
   return (
     <KeyboardAwareScrollView
+      showsVerticalScrollIndicator={false}
       style={{ flex: 1 }}
       contentContainerStyle={{ paddingBottom: 100 }}
       keyboardShouldPersistTaps="handled"
