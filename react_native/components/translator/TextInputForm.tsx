@@ -1,5 +1,5 @@
 import React from "react";
-import { View, TextInput, TouchableOpacity, Text } from "react-native";
+import { View, TextInput, Text } from "react-native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import VoiceInputButton from "./VoiceInputButton";
 

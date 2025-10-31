@@ -5,8 +5,7 @@ import AppText from "../AppText";
 import { Lock } from "lucide-react-native";
 import Toast from "react-native-toast-message";
 import { useChangePassword } from "@traduxo/packages/hooks/auth/useChangePassword";
-import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 
 type ChangePasswordProps = {
   isCredentials: boolean | undefined;

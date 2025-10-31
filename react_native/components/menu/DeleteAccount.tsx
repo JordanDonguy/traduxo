@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import AppText from "../AppText";
 import { useDeleteAccount } from "@traduxo/packages/hooks/auth/useDeleteAccount";
 import { useApp } from "@traduxo/packages/contexts/AppContext";

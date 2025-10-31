@@ -70,7 +70,7 @@ export default function UserMenu() {
     return () => {
       if (timeout) clearTimeout(timeout);
     };
-  }, [showMenu]);
+  }, [showMenu, setCurrentSubmenu]);
 
 
   // Open login if global state is true
@@ -79,7 +79,7 @@ export default function UserMenu() {
       setCurrentSubmenu("login")
       setShowLoginForm(false);
     }
-  }, [showLoginForm, setShowLoginForm]);
+  }, [showLoginForm, setShowLoginForm, setCurrentSubmenu]);
 
   // Remove Top Gradient when going into a submenu
   useEffect(() => {

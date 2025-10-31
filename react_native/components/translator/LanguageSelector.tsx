@@ -53,17 +53,6 @@ export default function LanguageSelector({
     label: ISO6391.getName(code),
   }));
 
-
-  const renderItem = (item: { key: string; label: string }, onSelect: (key: string) => void) => (
-    <TouchableOpacity
-      key={item.key}
-      onPress={() => onSelect(item.key)}
-      className="py-3 px-4 border-b border-gray-600"
-    >
-      <AppText className="font-sans text-lg">{item.label}</AppText>
-    </TouchableOpacity>
-  );
-
   const renderModal = (
     visible: boolean,
     setVisible: (val: boolean) => void,

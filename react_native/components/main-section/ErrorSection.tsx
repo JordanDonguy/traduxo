@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import AppText from "../AppText";
 import { useCooldown } from "@traduxo/packages/hooks/ui/useCooldown";
 import { useApp } from "@traduxo/packages/contexts/AppContext";

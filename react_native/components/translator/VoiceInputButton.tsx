@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { TouchableOpacity } from "react-native";
-import { Mic, CircleStop } from "lucide-react-native";
+import { Mic } from "lucide-react-native";
 import useVoiceRecorder from "@/hooks/useVoiceRecorder";
 import { useTheme } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
@@ -52,7 +52,7 @@ export default function VoiceInputButton({ handleTranslate }: { handleTranslate:
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       cancelRecording();
     };
-  }, []);
+  }, [cancelRecording]);
 
   // Show a toast error if there's an error
   useEffect(() => {

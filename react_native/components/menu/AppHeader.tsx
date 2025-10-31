@@ -44,7 +44,7 @@ export default function AppHeader() {
 
     const subscription = BackHandler.addEventListener("hardwareBackPress", backAction);
     return () => subscription.remove();
-  }, [currentSubmenu, showMenu, setShowMenu]);
+  }, [currentSubmenu, showMenu, setShowMenu, setCurrentSubmenu]);
 
   return (
     <SafeAreaView edges={["top"]} className="bg-white dark:bg-black">

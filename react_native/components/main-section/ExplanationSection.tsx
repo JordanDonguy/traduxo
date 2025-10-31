@@ -42,14 +42,14 @@ export default function ExplanationSection({ explanation }: ExplanationSectionPr
         }),
       ]).start();
     }
-  }, [explanation]);
+  }, [explanation, fadeAnim, slideAnim]);
 
   const fetchExplanation = async () => {
     setIsExpLoading(true);
     handleExplanation();
   };
 
-  
+
   // ------------------------------
   // -- Render loading animation --
   // ------------------------------
