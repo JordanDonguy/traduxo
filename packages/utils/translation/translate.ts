@@ -66,7 +66,7 @@ export async function translationHelper({
   // ---- Step 3: Generate prompt ----
   let prompt: string;
   if (audioBase64) {
-    prompt = getAudioTranslationPrompt({ inputLang, outputLang });
+    prompt = getAudioTranslationPrompt(outputLang);
   } else {
     prompt = getTranslationPrompt({ inputText, inputLang, outputLang });
   }
@@ -135,8 +135,8 @@ export async function translationHelper({
         item.value = item.value.replace(/\.+$/, "").trim();
       }
 
-      // ---- Step 6c: Detect input language if auto ----
-      if (inputLang === "auto" && item.type === "orig_lang_code") {
+      // ---- Step 6c: Set input language if returned by Gemini (ie: when in "auto" mode) ----
+      if (item.type === "orig_lang_code") {
         detectedInputLang = item.value;
         setInputTextLang(item.value);
       }
@@ -148,7 +148,7 @@ export async function translationHelper({
     }
 
     // ---- Step 7: Finalize input language if auto-detected ----
-    if (inputLang === "auto") {
+    if (inputLang === "auto" || detectedInputLang) {
       setInputTextLang(prev => prev || detectedInputLang || "XX");
     }
 
