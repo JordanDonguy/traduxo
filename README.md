@@ -43,8 +43,10 @@ With features like **voice input, auto language detection, and personal history*
 
 ## 🛠️ Tech Stack
 
-- ```Next.js``` — React framework for SSR, routing, API routes and performance  
 - ```TypeScript``` — Strict typing for maintainable development  
+- ```Next.js``` — React framework for SSR, routing, API routes and performance  
+- ```React Native``` — Mobile version of the app sharing logic with the web through the monorepo
+- ```Expo``` — Expo-managed workflow for building, running, and testing the React Native app
 - ```Gemini API``` — AI engine powering translations, suggestions, and explanations (currently using Gemini 2.5 Flash-Lite model)
 - ```PostgreSQL``` — Relational database for persistent storage
 - ```Prisma``` — ORM for database access and type-safe queries 
@@ -187,6 +189,31 @@ Once containers are running, the app should be available at:
 - Make sure Docker and Docker Compose are installed and running  
 - Any changes to .env files require restarting the containers
 
+
+---
+
+## 📱 Mobile App (React Native)
+
+Traduxo also includes a fully working **React Native mobile app**, offering the same core features as the web version, powered by the same shared codebase.
+
+The mobile app is **not published on the App Store or Play Store yet**, but you can run it locally using **Expo Go**:
+
+### 🔧 Run the Mobile App Locally
+
+1. Install **Expo Go** on your device
+
+   * iOS: App Store → *Expo Go*
+   * Android: Play Store → *Expo Go*
+
+2. Clone the repository and start the mobile project:
+
+```bash
+cd react_native
+npm install
+npm start
+```
+
+3. Scan the QR code that appears in your terminal or browser using the **Expo Go app**.
 
 
 ---

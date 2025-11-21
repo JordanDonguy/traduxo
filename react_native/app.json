@@ -29,7 +29,9 @@
         {
           "microphonePermission": "Allow Traduxo to access your microphone."
         }
-      ]
+      ],
+      "expo-router",
+      "expo-web-browser"
     ]
   }
 }
