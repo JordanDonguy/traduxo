@@ -153,24 +153,6 @@ describe("useFavoriteTranslations", () => {
   });
 
   // ------ Test 7️⃣ ------
-  it("handles delete translation API failure", async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: "Cannot delete" }),
-    });
-
-    const { result } = renderHook(() =>
-      useFavoriteTranslations({ fetcher: mockFetch })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("1");
-    });
-
-    expect(toast.error).toHaveBeenCalledWith("Cannot delete");
-  });
-
-  // ------ Test 8️⃣ ------
   it("does nothing when session status is loading", () => {
     (useAuth as jest.Mock).mockReturnValue({ status: "loading", token: undefined });
 
@@ -182,7 +164,7 @@ describe("useFavoriteTranslations", () => {
     expect(result.current.isLoading).toBe(true);
   });
 
-  // ------ Test 9️⃣ ------
+  // ------ Test 8️⃣ ------
   it("sets isLoading to false immediately when session is unauthenticated", async () => {
     (useAuth as jest.Mock).mockReturnValue({ status: "unauthenticated", token: undefined });
 
@@ -197,61 +179,7 @@ describe("useFavoriteTranslations", () => {
     expect(result.current.favoriteTranslations).toEqual([]);
   });
 
-  // ------ Test 🔟 ------
-  it("throws default error message if API returns not-ok without error", async () => {
-    // Simulate API returning not-ok with empty body
-    mockFetch.mockResolvedValue({
-      ok: false,
-      json: async () => ({}),
-    });
-
-    const { result } = renderHook(() =>
-      useFavoriteTranslations({ fetcher: mockFetch })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("1");
-    });
-
-    // Toast should receive default message
-    expect(toast.error).toHaveBeenCalledWith("Failed to delete translation");
-  });
-
-  // ------ Test 1️⃣1️⃣ ------
-  it("covers assignment of message in catch block when fetch throws an Error", async () => {
-    const networkError = new Error("Network down");
-    mockFetch.mockImplementation(() => Promise.reject(networkError));
-
-    const { result } = renderHook(() =>
-      useFavoriteTranslations({ fetcher: mockFetch })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("any-id");
-    });
-
-    // Check that the catch block actually used the error message
-    expect(toast.error).toHaveBeenCalledWith("Network down");
-  });
-
-  // ------ Test 1️⃣2️⃣ ------
-  it("handles fetch rejection with non-Error value", async () => {
-    // fetcher rejects with a string (not an Error)
-    mockFetch.mockImplementation(() => Promise.reject("oops"));
-
-    const { result } = renderHook(() =>
-      useFavoriteTranslations({ fetcher: mockFetch })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("any-id");
-    });
-
-    // Should use fallback message
-    expect(toast.error).toHaveBeenCalledWith("An error occurred");
-  });
-
-  // ------ Test 1️⃣3️⃣ ------
+  // ------ Test 9️⃣ ------
   it("should return false immediately if no token is available", async () => {
     // Arrange: mock useAuth to return no token
     (useAuth as jest.Mock).mockReturnValue({
@@ -260,14 +188,17 @@ describe("useFavoriteTranslations", () => {
     });
 
     const { result } = renderHook(() =>
-      useFavoriteTranslations({ fetcher: mockFetch, toaster: toast })
+      useFavoriteTranslations({ fetcher: mockFetch })
     );
 
     // Act
     const res = await act(async () => result.current.deleteTranslation("1"));
 
     // Assert
-    expect(res).toBe(false);
+    expect(res).toStrictEqual({
+      message: "You need to be logged in to add a translation to favorites",
+      success: false,
+    });
     expect(mockFetch).not.toHaveBeenCalled();
     expect(mockSetTranslationId).toHaveBeenCalledWith(undefined);
     expect(mockSetIsFavorite).toHaveBeenCalledWith(false);

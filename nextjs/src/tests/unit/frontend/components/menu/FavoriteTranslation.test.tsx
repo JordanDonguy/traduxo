@@ -9,12 +9,20 @@ import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFa
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 
 // --- Mocks ---
-jest.mock("@traduxo/packages/hooks/favorites/useFavoriteTranslations");
+jest.mock("@traduxo/packages/hooks/favorites/useFavoriteTranslations", () => ({
+  useFavoriteTranslations: jest.fn(),
+}));
 
 jest.mock("@traduxo/packages/hooks/translation/useSelectTranslation");
 
 jest.mock("lucide-react", () => ({
   CircleX: () => <svg data-testid="circle-x" />,
+}));
+
+jest.mock("@traduxo/packages/contexts/AppContext", () => ({
+  useApp: () => ({
+    setError: jest.fn(),
+  }),
 }));
 
 const mockPush = jest.fn();
@@ -25,10 +33,10 @@ jest.mock("next/navigation", () => ({
 
 // ---- Tests ----
 describe("FavoriteTranslation component", () => {
-  const deleteTranslation = jest.fn();
-  const selectTranslation = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
+
     (useFavoriteTranslations as jest.Mock).mockReturnValue({
       favoriteTranslations: [
         { id: 1, inputLang: "en", inputText: "Hello", outputLang: "fr", translation: "Bonjour" },
@@ -36,10 +44,15 @@ describe("FavoriteTranslation component", () => {
       ],
       isLoading: false,
       status: "authenticated",
-      deleteTranslation,
+      deleteTranslation: jest.fn().mockResolvedValue({
+        success: false,
+        message: "An error occurred"
+      })
     });
 
-    (useSelectTranslation as jest.Mock).mockReturnValue({ selectTranslation });
+    (useSelectTranslation as jest.Mock).mockReturnValue({
+      selectTranslation: jest.fn()
+    });
   });
 
   // ------ Test 1️⃣ ------
@@ -60,6 +73,7 @@ describe("FavoriteTranslation component", () => {
 
   // ------ Test 3️⃣ ------
   it("calls selectTranslation when translation clicked", () => {
+    const { selectTranslation } = useSelectTranslation();
     render(<FavoriteTranslation showMenu={true} />);
     const article = screen.getByText("Hello").closest("article");
     fireEvent.click(article!);
@@ -71,6 +85,7 @@ describe("FavoriteTranslation component", () => {
 
   // ------ Test 4️⃣ ------
   it("calls deleteTranslation when delete button clicked", () => {
+    const { deleteTranslation } = useFavoriteTranslations();
     render(<FavoriteTranslation showMenu={true} />);
     const deleteBtn = screen.getAllByTestId("circle-x")[0];
     fireEvent.click(deleteBtn);
@@ -83,7 +98,7 @@ describe("FavoriteTranslation component", () => {
       favoriteTranslations: [],
       isLoading: false,
       status: "authenticated",
-      deleteTranslation,
+      deleteTranslation: jest.fn(),
     });
 
     render(<FavoriteTranslation showMenu={true} />);
@@ -96,7 +111,7 @@ describe("FavoriteTranslation component", () => {
       favoriteTranslations: [],
       isLoading: false,
       status: "unauthenticated",
-      deleteTranslation,
+      deleteTranslation: jest.fn(),
     });
 
     render(<FavoriteTranslation showMenu={true} />);
@@ -125,7 +140,10 @@ describe("FavoriteTranslation component", () => {
       ],
       isLoading: false,
       status: "authenticated",
-      deleteTranslation: jest.fn().mockResolvedValue(false),
+      deleteTranslation: jest.fn().mockResolvedValue({
+        success: false,
+        message: "An error occurred"
+      })
     });
 
     render(<FavoriteTranslation showMenu={true} />);

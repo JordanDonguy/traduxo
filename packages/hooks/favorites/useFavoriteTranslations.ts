@@ -11,7 +11,7 @@ type UseFavoriteTranslationsArgs = {
 
 export function useFavoriteTranslations({
   fetcher = fetch,
-}: UseFavoriteTranslationsArgs) {
+}: UseFavoriteTranslationsArgs = {}) {
   // ---- Step 1: Get dependencies ----
   const { translationId, setTranslationId, setIsFavorite } = useTranslationContext();
   const { status, token } = useAuth();

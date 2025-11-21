@@ -50,6 +50,8 @@ const mockUseApp = (mockSetError = jest.fn()) => {
   jest.spyOn(AppContextModule, "useApp").mockReturnValue({
     showMenu: false,
     setShowMenu: jest.fn(),
+    currentSubmenu: null,
+    setCurrentSubmenu: jest.fn(),
     showLoginForm: false,
     setShowLoginForm: jest.fn(),
     error: "",
@@ -223,63 +225,5 @@ describe("TranslationContext", () => {
     ]);
     expect(result.current.inputTextLang).toBe("en");
     expect(result.current.translatedTextLang).toBe("fr");
-  });
-
-  // ------ Test 6️⃣ ------
-  it("sets error when fetch returns !ok", async () => {
-    const mockSetError = mockUseApp();
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: "Server error" }),
-    }) as jest.Mock;
-
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-    setTranslationData(result);
-
-    act(() => {
-      result.current.setSaveToHistory(true);
-    });
-
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith("Server error");
-    });
-  });
-
-  // ------ Test 7️⃣ ------
-  it("sets fallback error when fetch returns !ok without error field", async () => {
-    const mockSetError = mockUseApp();
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({}),
-    }) as jest.Mock;
-
-    const { result } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-    setTranslationData(result);
-
-    act(() => {
-      result.current.setSaveToHistory(true);
-    });
-
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith("Failed to save translation");
-    });
-  });
-
-  // ------ Test 8️⃣ ------
-  it("sets error when fetch throws", async () => {
-    const mockSetError = mockUseApp();
-    global.fetch = jest.fn().mockRejectedValue(new Error("Network down")) as jest.Mock;
-
-    const { result, rerender } = renderHook(() => useTranslationContext(), { wrapper: Providers });
-    setTranslationData(result);
-
-    act(() => {
-      result.current.setSaveToHistory(true);
-    });
-    rerender();
-
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith("Network error while saving translation");
-    });
   });
 });

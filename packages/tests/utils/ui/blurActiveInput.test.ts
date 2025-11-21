@@ -17,7 +17,7 @@ describe("blurActiveInput", () => {
 
   // ------ Test 1️⃣ ------
   it("blurs the active input element on web", () => {
-    process.env.PLATFORM = "web";
+    process.env.NEXT_PUBLIC_PLATFORM = "web";
 
     const input = document.createElement("input");
     document.body.appendChild(input);
@@ -35,7 +35,7 @@ describe("blurActiveInput", () => {
 
   // ------ Test 2️⃣ ------
   it("does nothing if no element is focused on web", () => {
-    process.env.PLATFORM = "web";
+    process.env.NEXT_PUBLIC_PLATFORM = "web";
 
     const activeBefore = document.activeElement;
     blurActiveInput();
@@ -44,7 +44,7 @@ describe("blurActiveInput", () => {
 
   // ------ Test 3️⃣ ------
   it("calls Keyboard.dismiss on react-native", () => {
-    process.env.PLATFORM = "react-native";
+    process.env.EXPO_PUBLIC_PLATFORM = "react-native";
 
     const mockDismiss = jest.fn();
     blurActiveInput({ dismiss: mockDismiss });
@@ -53,7 +53,7 @@ describe("blurActiveInput", () => {
 
   // ------ Test 4️⃣ ------
   it("warns if RN Keyboard module is not provided", () => {
-    process.env.PLATFORM = "react-native";
+    process.env.EXPO_PUBLIC_PLATFORM = "react-native";
 
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => { });
     blurActiveInput();
@@ -65,7 +65,8 @@ describe("blurActiveInput", () => {
 
   // ------ Test 5️⃣ ------
   it("does nothing if PLATFORM is not set", () => {
-    delete process.env.PLATFORM;
+    delete process.env.NEXT_PUBLIC_PLATFORM;
+    delete process.env.EXPO_PUBLIC_PLATFORM;
 
     const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => { }); // silence console warn
 

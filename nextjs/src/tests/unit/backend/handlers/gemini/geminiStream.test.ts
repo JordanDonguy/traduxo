@@ -225,7 +225,14 @@ describe('geminiStream', () => {
     expect(res.status).toBe(200);
     expect(mockGenAI.models.generateContentStream).toHaveBeenCalledWith({
       model: 'custom-model-v1',
-      contents: 'Test',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: 'Test' },
+          ],
+        },
+      ],
     });
   });
 
