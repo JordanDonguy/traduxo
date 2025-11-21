@@ -117,14 +117,17 @@ export default function Login({ currentSubmenu, setCurrentSubmenu }: LoginProps)
 
       {/* Google OAuth Button */}
       {/* /!\ TO BE IMPLEMENTED -> google login */}
-      <TouchableOpacity className="flex-row items-center justify-center bg-gray-200 dark:bg-zinc-800 h-16 rounded-full mb-6">
+      {/* <TouchableOpacity className="flex-row items-center justify-center bg-gray-200 dark:bg-zinc-800 h-16 rounded-full mb-6">
         <Image source={require("@/assets/images/google-logo.webp")} className="w-10 h-10 mr-4" />
         <AppText className="text-lg">Continue with Google</AppText>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {/* Forgot Password */}
       {(currentSubmenu === "Login") && (
-        <TouchableOpacity onPress={() => handleForgotPassword(email, setError, setIsLoading)}>
+        <TouchableOpacity onPress={async () => {
+          const { success } = await handleForgotPassword(email, setError, setIsLoading);
+          if (success) Toast.show({ type: "success", text1: "Password reset link sent ✅", text1Style: { fontSize: 14 } })
+        }}>
           <Text className="text-blue-500 text-center mb-6 underline text-lg">Forgot your password?</Text>
         </TouchableOpacity>
       )}

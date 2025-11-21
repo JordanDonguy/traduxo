@@ -6,6 +6,7 @@ import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Lock, Mail } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface LoginProps {
   showMenu: boolean
@@ -157,7 +158,10 @@ export default function Login({ showMenu }: LoginProps) {
             id="forgot-password-button"
             aria-label="Forgot your password"
             type="button"
-            onClick={() => handleForgotPassword(email, setError, setIsLoading)}
+            onClick={async () => {
+              const { success } = await handleForgotPassword(email, setError, setIsLoading)
+              if (success) toast.success("If this email exists, a reset link has been sent.");
+            }}
             className="text-blue-500 hover:underline hover:cursor-pointer"
           >
             Forgot your password?
