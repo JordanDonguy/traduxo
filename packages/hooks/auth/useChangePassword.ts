@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
+import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 
 type UseChangePasswordArgs = {
   isCredentials?: boolean;
@@ -49,8 +50,8 @@ export function useChangePassword({
 
     try {
       const url = isCredentials
-        ? "/api/auth/update-password"
-        : "/api/auth/create-password";
+        ? `${API_BASE_URL}/auth/update-password`
+        : `${API_BASE_URL}/auth/create-password`;
 
       const body = isCredentials
         ? { currentPassword, password }

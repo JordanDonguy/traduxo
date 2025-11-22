@@ -1,18 +1,21 @@
 "use client"
 
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useFavoriteTranslations } from "@traduxo/packages/hooks/favorites/useFavoriteTranslations";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
 import { CircleX } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface FavoriteTranslationProps {
   showMenu: boolean
 };
 
 function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
+  const { setError } = useApp();
   const router = useRouter();
   const { favoriteTranslations, isLoading, status, deleteTranslation } = useFavoriteTranslations({});
-  const { selectTranslation } = useSelectTranslation({ router });
+  const { selectTranslation } = useSelectTranslation({ router, setError });
 
   return (
     <div
@@ -43,8 +46,11 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
                 aria-label={`Delete favorite translation ${idx + 1}`}
                 onClick={async (e) => {
                   e.stopPropagation(); // Prevent triggering loadTranslation
-                  const success = await deleteTranslation(t.id);
-                  if (!success) router.push("/");
+                  const res = await deleteTranslation(t.id);
+                  if (!res.success) {
+                    router.push("/");
+                    toast.error(res.message);
+                  };
                 }}
                 className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--input-placeholder)] hover:scale-115 active:scale-90 duration-100"
               >

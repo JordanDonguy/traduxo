@@ -1,20 +1,17 @@
 import { useState } from "react";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
-import { useAuth, AuthContextType } from "@traduxo/packages/contexts/AuthContext";
-import { toast } from "react-toastify";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { addToFavorite, deleteFromFavorite } from "@traduxo/packages/utils/favorites/favorites";
 
 // Injected dependencies for testing
 type UseFavoriteToggleArgs = {
   addToFavoriteFn?: typeof addToFavorite;
   deleteFromFavoriteFn?: typeof deleteFromFavorite;
-  toaster?: typeof toast;
 };
 
 export function useFavoriteToggle({
   addToFavoriteFn = addToFavorite,
   deleteFromFavoriteFn = deleteFromFavorite,
-  toaster = toast,
 }: UseFavoriteToggleArgs = {}) {
   // ---- Step 1: Get context and depencencies ----
   const {
@@ -34,14 +31,13 @@ export function useFavoriteToggle({
   // ---- Step 3: Toggle favorite handler ----
   async function handleFavorite() {
     // Prevent double-click spamming
-    if (isFavLoading) return;
+    if (isFavLoading) return { success: false, message: "Loading..."};
     setIsFavLoading(true);
 
     try {
       if (status !== "authenticated") {
-        toaster.error("You need to be logged in to add translations to favorites.");
         setIsFavLoading(false);
-        return;
+        return { success: false, message: "You need to be logged in to add translations to favorites." };
       }
 
       if (isFavorite) {
@@ -57,12 +53,12 @@ export function useFavoriteToggle({
           setIsFavorite,
           token
         );
-        if (res) toaster.error(res); // API returned an error message
+        if (res) return { success: false, message: res }; // API returned an error message
       }
-      return true;
+      return { success: true };
     } catch (err) {
       console.error("Favorite toggle failed:", err);
-      return false;
+      return { success: false, message: "Error adding or deleting translation from favorites"};
     } finally {
       setIsFavLoading(false);
     }

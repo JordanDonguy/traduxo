@@ -101,7 +101,6 @@ describe("<Login />", () => {
       expect.any(Function),
       expect.any(Function),
       expect.any(Function),
-      expect.any(Function),
     );
   });
 
@@ -111,15 +110,20 @@ describe("<Login />", () => {
     expect(mockHandleGoogleButton).toHaveBeenCalled();
   });
 
-  it("calls handleForgotPassword when clicked", () => {
+  it("calls handleForgotPassword when clicked", async () => {
+    mockHandleForgotPassword.mockResolvedValue({ success: true });
+
     render(<Login showMenu={true} />);
     fireEvent.change(screen.getByLabelText("Email"), { target: { value: "forgot@example.com" } });
     fireEvent.click(screen.getByRole("button", { name: /Forgot your password/i }));
-    expect(mockHandleForgotPassword).toHaveBeenCalledWith(
-      "forgot@example.com",
-      expect.any(Function),
-      expect.any(Function)
-    );
+
+    await waitFor(() => {
+      expect(mockHandleForgotPassword).toHaveBeenCalledWith(
+        "forgot@example.com",
+        expect.any(Function),
+        expect.any(Function)
+      );
+    });
   });
 
   it("applies opacity-100 when showMenu is true", () => {

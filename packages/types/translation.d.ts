@@ -10,6 +10,6 @@ export type Translation = {
 };
 
 export type TranslationItem = {
-  type: "expression" | "main_translation" | "alternative" | "orig_lang_code";
+  type: "expression" | "main_translation" | "alternative" | "orig_lang_code" | "error";
   value: string;
 };

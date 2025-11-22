@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from "react";
 type UseLanguageSwitchProps = {
   inputLang: string;                     // Current input language selected by the user
   outputLang: string;                    // Current output language selected by the user
+  inputTextLang: string;                 // Language of the input text
+  translatedTextLang: string;            // Language of the translated text
   setInputLang: (lang: string) => void;  // Function to update input language
   setOutputLang: (lang: string) => void; // Function to update output language
   detectedLang: string;                  // Detected language if inputLang is set to "auto"
@@ -12,6 +14,8 @@ type UseLanguageSwitchProps = {
 export function useLanguageSwitch({
   inputLang,
   outputLang,
+  inputTextLang,
+  translatedTextLang,
   setInputLang,
   setOutputLang,
   detectedLang,
@@ -27,12 +31,27 @@ export function useLanguageSwitch({
   const switchLanguage = () => {
     setIsSwitching(true);  // Start the switching animation
 
-    // Swap input/output languages
+    // If both inputTextLang and translatedTextLang are defined
+    // Use them to set the new input/output languages directly
+    if (inputTextLang && translatedTextLang) {
+      // If languages are already swapped, revert to original
+      if (inputLang === translatedTextLang && outputLang === inputTextLang) {
+        setInputLang(inputTextLang);
+        setOutputLang(translatedTextLang);
+        return;
+      }
+      // Otherwise, swap based on the text languages
+      setInputLang(translatedTextLang);
+      setOutputLang(inputTextLang);
+      return;
+    };
+
+    // Swap input/output languages normally
     const temp = outputLang;
     if (inputLang === "auto") {
       // If inputLang is "auto", use detected language or fallback as output
       if (detectedLang !== outputLang) {
-      setOutputLang(detectedLang);
+        setOutputLang(detectedLang);
       } else if (outputLang !== "en") {
         setOutputLang("en"); // Fallback to English
       } else {

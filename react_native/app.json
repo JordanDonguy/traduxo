@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "Traduxo",
+    "slug": "Traduxo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/favicon.png",
+    "splash": {
+      "image": "./assets/images/favicon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "scheme": "reactnative",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.traduxo.preview"
+    },
+    "android": {
+      "package": "com.traduxo.preview"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f7ea26ef-6c36-49ff-8656-14a5d7324806"
+      }
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Traduxo to access your microphone."
+        }
+      ],
+      "expo-router",
+      "expo-web-browser"
+    ]
+  }
+}

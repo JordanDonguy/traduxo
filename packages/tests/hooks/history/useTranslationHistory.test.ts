@@ -69,49 +69,17 @@ describe("useTranslationHistory", () => {
       useTranslationHistory({ fetcher: mockFetcher })
     );
 
-    let outcome: boolean | undefined;
+    let outcome: { success: boolean; message?: string } | undefined;
     await act(async () => {
       outcome = await result.current.deleteTranslation("1");
     });
 
-    expect(outcome).toBe(true);
+    expect(outcome).toBeDefined();
+    expect(outcome).toEqual({ success: true });
     expect(mockSetTranslationHistory).toHaveBeenCalledWith(expect.any(Function));
   });
 
   // ------ Test 3️⃣ ------
-  it("calls toast.error when deletion fails (server error)", async () => {
-    mockFetcher.mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: "boom" }),
-    });
-
-    const { result } = renderHook(() =>
-      useTranslationHistory({ fetcher: mockFetcher })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("1");
-    });
-
-    expect(toast.error).toHaveBeenCalledWith("boom");
-  });
-
-  // ------ Test 4️⃣ ------
-  it("calls toast.error when fetch throws (network fail)", async () => {
-    mockFetcher.mockRejectedValue(new Error("network fail"));
-
-    const { result } = renderHook(() =>
-      useTranslationHistory({ fetcher: mockFetcher })
-    );
-
-    await act(async () => {
-      await result.current.deleteTranslation("1");
-    });
-
-    expect(toast.error).toHaveBeenCalledWith("network fail");
-  });
-
-  // ------ Test 5️⃣ ------
   it("delegates to selectTranslation with favorite=false", () => {
     const { result } = renderHook(() => useTranslationHistory({ fetcher: mockFetcher }));
     const fakeTranslation = { id: "1", inputText: "Hello", translation: "Bonjour", inputLang: "en", outputLang: "fr", alt1: "Salut", alt2: "Hey", alt3: "Bonsoir" };
@@ -123,7 +91,7 @@ describe("useTranslationHistory", () => {
     expect(mockSelectTranslation).toHaveBeenCalledWith(fakeTranslation, false);
   });
 
-  // ------ Test 6️⃣ ------
+  // ------ Test 4️⃣ ------
   it("falls back to generic message if res.json throws", async () => {
     mockFetcher.mockResolvedValue({
       ok: false,
@@ -136,13 +104,11 @@ describe("useTranslationHistory", () => {
 
     await act(async () => {
       const success = await result.current.deleteTranslation("1");
-      expect(success).toBe(false);
+      expect(success).toEqual({message: "Failed to delete translation", success: false});
     });
-
-    expect(toast.error).toHaveBeenCalledWith("Failed to delete translation");
   });
 
-  // ------ Test 7️⃣ ------
+  // ------ Test 5️⃣ ------
   it("handles non-Error throws with fallback message", async () => {
     // Simulate a non-Error being thrown
     mockFetcher.mockImplementation(() => { throw "plain string"; });
@@ -153,13 +119,11 @@ describe("useTranslationHistory", () => {
 
     await act(async () => {
       const success = await result.current.deleteTranslation("1");
-      expect(success).toBe(false);
+      expect(success).toEqual({ message: "An error occurred", success: false});
     });
-
-    expect(toast.error).toHaveBeenCalledWith("An error occurred");
   });
 
-  // ------ Test 8️⃣ ------
+  // ------ Test 6️⃣ ------
   it("uses injected selectTranslationHook instead of default", async () => {
     // We create a jest mock function to track calls to `selectTranslation`
     // Then we create a properly typed hook object matching the expected shape of `selectTranslationHook`
@@ -185,7 +149,7 @@ describe("useTranslationHistory", () => {
     expect(mockSelect).toHaveBeenCalledWith(fakeTranslation, false);
   });
 
-  // ------ Test 9️⃣ ------
+  // ------ Test 7️⃣ ------
   it("removes the correct translation from history after successful deletion", async () => {
     mockFetcher.mockResolvedValue({ ok: true, json: jest.fn() });
 
@@ -210,7 +174,7 @@ describe("useTranslationHistory", () => {
     expect(next).toEqual([{ id: "2", inputText: "bar" }]);
   });
 
-  // ------ Test 🔟 ------
+  // ------ Test 8️⃣ ------
   it("returns false immediately from deleteTranslation if no token", async () => {
     const useAuth = require("@traduxo/packages/contexts/AuthContext").useAuth as jest.Mock;
     useAuth.mockReturnValue({ status: "unauthenticated", token: undefined });
@@ -219,12 +183,12 @@ describe("useTranslationHistory", () => {
       useTranslationHistory({ fetcher: mockFetcher })
     );
 
-    let outcome: boolean | undefined;
+    let outcome: { success: boolean; message?: string } | undefined;
     await act(async () => {
       outcome = await result.current.deleteTranslation("123");
     });
 
-    expect(outcome).toBe(false);
+    expect(outcome).toEqual({ success: false, message: "Authentication token missing" });
     expect(mockFetcher).not.toHaveBeenCalled(); // should bail out early
     expect(mockSetTranslationHistory).not.toHaveBeenCalled();
   });

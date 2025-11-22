@@ -6,6 +6,8 @@ import { useTranslationContext } from "@traduxo/packages/contexts/TranslationCon
 import { useFavoriteToggle } from "@traduxo/packages/hooks/favorites/useFavoriteToggle";
 import { useSwitchTranslations } from "@traduxo/packages/hooks/translation/useSwitchTranslations";
 import { replaceQuotesInHTML } from "@/lib/client/utils/ui/replaceQuotesInHTML";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";
 import ExplanationSection from "./ExplanationSection";
@@ -14,6 +16,7 @@ import LoadingAnimation from "./LoadingAnimation";
 
 function MainDisplay() {
   const { isLoading, error, setError } = useApp();
+  const router = useRouter();
 
   const {
     translatedText,
@@ -30,6 +33,15 @@ function MainDisplay() {
     setTranslatedText,
     timeoutFn: setTimeout
   });
+
+  // Add or remove from favorites, display toast error if not successful
+  const onFavoriteClick = async () => {
+    const res = await handleFavorite();
+    if (!res.success) {
+      router.push("/");
+      toast.error(res.message)
+    }
+  };
 
   useEffect(() => {
     const paragraphs = document.querySelectorAll('p');
@@ -57,7 +69,7 @@ function MainDisplay() {
           fading={fading}
           isFavorite={isFavorite}
           isFavLoading={isFavLoading}
-          onFavoriteClick={handleFavorite}
+          onFavoriteClick={onFavoriteClick}
           onSwitchTranslations={switchTranslations}
         >
 

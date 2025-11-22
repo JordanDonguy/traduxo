@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useApp } from "./AppContext";
 import { fetchHistory } from "@traduxo/packages/utils/history/fetchHistory";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { Translation, TranslationItem } from "@traduxo/packages/types/translation";
@@ -34,7 +33,6 @@ export type TranslationState = {
 const TranslationContext = createContext<TranslationState | undefined>(undefined);
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const { setError } = useApp();
   const { status, token } = useAuth();
   const [inputText, setInputText] = useState<string>("");
   const [translatedText, setTranslatedText] = useState<TranslationItem[]>([]);
@@ -72,20 +70,15 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
 
           const data = await res.json();
 
-          if (!res.ok) {
-            setError(data.error || "Failed to save translation");
-          };
-
           setTranslationHistory(prev => [...prev, data.data])
         } catch (err) {
           console.error(err);
-          setError("Network error while saving translation");
         }
       };
       saveTranslation();
       setSaveToHistory(false)
     }
-  }, [saveToHistory, setSaveToHistory, inputTextLang, translatedText, translatedTextLang, status, token, setError]);
+  }, [saveToHistory, setSaveToHistory, inputTextLang, translatedText, translatedTextLang, status, token]);
 
   // Load a translation from user's history to main display
   function loadTranslationFromMenu(t: Translation, fromFavorite: boolean) {

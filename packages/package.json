@@ -1,6 +1,11 @@
 {
   "name": "@traduxo/packages",
   "version": "0.1.0",
-  "type": "module",
-  "private": true
+  "private": true,
+   "peerDependencies": {
+    "react": "19.1.0",
+    "react-native": "0.81.4",
+    "jwt-decode": "^4.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
 }

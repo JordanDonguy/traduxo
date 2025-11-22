@@ -1,7 +1,10 @@
 "use client"
 
+import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useTranslationHistory } from "@traduxo/packages/hooks/history/useTranslationHistory";
 import { useSelectTranslation } from "@traduxo/packages/hooks/translation/useSelectTranslation";
+import { useAuth } from "@traduxo/packages/contexts/AuthContext";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { CircleX } from "lucide-react";
 
@@ -10,9 +13,11 @@ interface TranslationHistoryProps {
 }
 
 function TranslationHistory({ showMenu }: TranslationHistoryProps) {
+  const { setError } = useApp();
   const router = useRouter();
-  const { translationHistory, isLoading, status, deleteTranslation } = useTranslationHistory({});
-  const { selectTranslation } = useSelectTranslation({ router });
+  const { status } = useAuth();
+  const { translationHistory, isLoading, deleteTranslation } = useTranslationHistory({});
+  const { selectTranslation } = useSelectTranslation({ router, setError });
 
   return (
     <div
@@ -41,9 +46,13 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
                   type="button"
                   id={`delete-history-translation-item ${idx + 1}`}
                   aria-label={`Delete history translation ${idx + 1}`}
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation(); // Prevent triggering loadTranslation
-                    deleteTranslation(t.id);
+                    const { success, message } = await deleteTranslation(t.id);
+                    if (!success) {
+                      toast.error(message);
+                      router.push("/");
+                    }
                   }}
                   className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--input-placeholder)] hover:scale-115 active:scale-90 duration-100"
                 >

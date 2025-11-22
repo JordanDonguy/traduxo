@@ -12,13 +12,11 @@ import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 // Injected dependencies for testing
 type UseTranslationHistoryArgs = {
   fetcher?: typeof fetch;
-  toaster?: typeof toast;
   selectTranslationHook?: ReturnType<typeof useSelectTranslation>;
 };
 
 export function useTranslationHistory({
   fetcher = fetch,
-  toaster = toast,
   selectTranslationHook,
 }: UseTranslationHistoryArgs) {
   // ---- Step 1: Grab context/state ----
@@ -33,15 +31,19 @@ export function useTranslationHistory({
   const { selectTranslation } = selectTranslationHook ?? defaultSelectTranslationHook;
 
   // ---- Step 2: Delete handler ----
-  async function deleteTranslation(id: string) {
+  async function deleteTranslation(id: string): Promise<{
+    success: boolean;
+    message?: string;
+  }> {
     try {
-      if (!token) return false;
+      if (!token)
+        return { success: false, message: "Authentication token missing" };
 
       const res = await fetcher(`${API_BASE_URL}/history`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ id }),
       });
@@ -52,11 +54,10 @@ export function useTranslationHistory({
       }
 
       setTranslationHistory((prev) => prev.filter((t) => t.id !== id));
-      return true;
+      return { success: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : "An error occurred";
-      toaster.error(message);
-      return false;
+      return { success: false, message };
     }
   }
 
@@ -72,7 +73,6 @@ export function useTranslationHistory({
   return {
     translationHistory,
     isLoading,
-    status,
     deleteTranslation,
     selectTranslation: (t: Translation) => selectTranslation(t, false), // false = not favorite
   };

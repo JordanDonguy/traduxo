@@ -185,13 +185,11 @@ describe("useAuthHandlers", () => {
   describe("handleSignup", () => {
     let setIsLoading: jest.Mock;
     let setError: jest.Mock;
-    let setIsSignup: jest.Mock;
     let refresh: jest.Mock;
 
     beforeEach(() => {
       setIsLoading = jest.fn();
       setError = jest.fn();
-      setIsSignup = jest.fn();
       refresh = jest.fn();
     });
 
@@ -203,7 +201,6 @@ describe("useAuthHandlers", () => {
         "1234567",
         setIsLoading,
         setError,
-        setIsSignup,
         refresh
       );
 
@@ -219,7 +216,6 @@ describe("useAuthHandlers", () => {
         "87654321",
         setIsLoading,
         setError,
-        setIsSignup,
         refresh
       );
 
@@ -237,7 +233,6 @@ describe("useAuthHandlers", () => {
         "12345678",
         setIsLoading,
         setError,
-        setIsSignup,
         refresh
       );
 
@@ -256,7 +251,6 @@ describe("useAuthHandlers", () => {
         "12345678",
         setIsLoading,
         setError,
-        setIsSignup,
         refresh
       );
 
@@ -277,14 +271,12 @@ describe("useAuthHandlers", () => {
           "12345678",
           setIsLoading,
           setError,
-          setIsSignup,
           refresh
         )
       );
 
       expect(success).toBe(true);
       expect(saveToken).toHaveBeenCalledWith("a", "b");
-      expect(setIsSignup).toHaveBeenCalledWith(false);
       expect(setError).toHaveBeenCalledTimes(1);
       expect(setError).toHaveBeenCalledWith("");
       expect(refresh).toHaveBeenCalled();
@@ -300,7 +292,6 @@ describe("useAuthHandlers", () => {
         "12345678",
         setIsLoading,
         setError,
-        setIsSignup,
         refresh
       );
 
@@ -333,39 +324,39 @@ describe("useAuthHandlers", () => {
       expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    it("calls API and shows success toast", async () => {
+    it("calls API and returns success", async () => {
       (forgotPasswordRequest as jest.Mock).mockResolvedValue({ res: { ok: true }, data: {} });
 
       const { result } = renderHook(() => useAuthHandlers());
 
-      await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
+      const response = await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
 
-      expect(toast.success).toHaveBeenCalledWith(
-        "If this email exists, a reset link has been sent."
-      );
+      expect(response).toEqual({ success: true });
       expect(setError).toHaveBeenCalledWith("");
       expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    it("shows error toast when API response is not ok", async () => {
+    it("returns API error when response is not ok", async () => {
       (forgotPasswordRequest as jest.Mock).mockResolvedValue({ res: { ok: false }, data: { error: "Failed" } });
 
       const { result } = renderHook(() => useAuthHandlers());
 
-      await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
+      const response = await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
 
-      expect(toast.error).toHaveBeenCalledWith("Failed");
+      expect(response).toEqual({ success: false });
+      expect(setError).toHaveBeenCalledWith("Oops! Something went wrong... Please try again 🙏");
       expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    it("shows error toast on network or unexpected errors", async () => {
+    it("returns generic error on network or unexpected errors", async () => {
       (forgotPasswordRequest as jest.Mock).mockRejectedValue(new Error("Network down"));
 
       const { result } = renderHook(() => useAuthHandlers());
 
-      await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
+      const response = await result.current.handleForgotPassword("a@b.com", setError, setIsLoading);
 
-      expect(toast.error).toHaveBeenCalledWith(
+      expect(response).toEqual({ success: false });
+      expect(setError).toHaveBeenCalledWith(
         "Oops! Something went wrong... Please try again 🙏"
       );
       expect(setIsLoading).toHaveBeenCalledWith(false);

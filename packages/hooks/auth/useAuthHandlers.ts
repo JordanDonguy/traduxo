@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+
 import { loginUser } from "@traduxo/packages/utils/auth/login";
 import { logoutUser } from "@traduxo/packages/utils/auth/logout";
 import { signupUser } from "@traduxo/packages/utils/auth/signup";
@@ -80,7 +80,6 @@ export function useAuthHandlers() {
     confirmPassword: string,
     setIsLoading: (loading: boolean) => void,
     setError: (err: string) => void,
-    setIsSignup: (val: boolean) => void,
     refresh: () => Promise<void>
   ): Promise<boolean> => {
     if (password.length < 8 || confirmPassword.length < 8) {
@@ -112,7 +111,6 @@ export function useAuthHandlers() {
 
       saveToken(loginData.accessToken, loginData.refreshToken);
       await refresh();
-      setIsSignup(false);
       return true;
     } catch (err) {
       console.error("Signup failed:", err);
@@ -132,7 +130,7 @@ export function useAuthHandlers() {
     if (!email) {
       setError("Please enter your email to reset your password");
       setIsLoading(false);
-      return;
+      return ({ success: false })
     }
 
     setIsLoading(true);
@@ -141,14 +139,17 @@ export function useAuthHandlers() {
     try {
       const { res, data } = await forgotPasswordRequest(email);
       if (!res.ok) {
-        toast.error(data.error || "Oops! Something went wrong... Please try again 🙏");
-        return;
+        console.log(data.error)
+        setError("Oops! Something went wrong... Please try again 🙏");
+        return ({ success: false });
       }
 
-      toast.success("If this email exists, a reset link has been sent.");
+      return ({ success: true });
+      /* toast.success("If this email exists, a reset link has been sent."); */
     } catch (err) {
       console.error(err);
-      toast.error("Oops! Something went wrong... Please try again 🙏");
+      setError("Oops! Something went wrong... Please try again 🙏");
+      return ({ success: false })
     } finally {
       setIsLoading(false);
     }
