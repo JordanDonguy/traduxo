@@ -7,15 +7,10 @@ import { createSpeechRecognition } from "@/lib/client/utils/ui/speechRecognition
 import { toast } from "react-toastify";
 
 // ---- Mocks ----
-
-// This single instance is used across tests to control recognition behavior.
-// It includes helper methods to manually trigger the internal callbacks
-// (`onResult`, `onStop`, `onError`) for full function coverage.
 const mockRecognizer = {
   start: jest.fn(),
   stop: jest.fn(),
   abort: jest.fn(),
-  _recognition: { abort: jest.fn() } as unknown as SpeechRecognition & { abort: () => void },
   onResult: undefined as ((text: string) => void) | undefined,
   onStop: undefined as (() => void) | undefined,
   onError: undefined as ((err: string) => void) | undefined,
@@ -30,9 +25,6 @@ const mockRecognizer = {
   },
 };
 
-// Mock factory function
-// When `speechRecognizer` is called inside the hook, we return the same
-// mock instance and register the callbacks.
 const mockRecognizerFn = jest.fn(
   ({ onResult, onStop, onError }: { onResult: (text: string) => void; onStop?: () => void; onError?: (err: string) => void }) => {
     mockRecognizer.onResult = onResult;
@@ -48,46 +40,34 @@ describe("useVoiceInput", () => {
   let mockToast: typeof toast;
   let mockConsole: jest.Mock;
 
-  beforeAll(() => {
-    // Use fake timers so we can fast-forward the warning timeout
-    jest.useFakeTimers();
-  });
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   beforeEach(() => {
     mockSetInputText = jest.fn();
-    mockToast = { error: jest.fn() } as unknown as typeof toast;
+    mockToast = { warn: jest.fn(), error: jest.fn(), info: jest.fn() } as unknown as typeof toast;
     mockConsole = jest.fn();
   });
 
-  // ------ Test 1️⃣ ------
-  it("shows warning if inputLang is 'auto' and hides after timeout", () => {
+  // ------ Test 1️⃣: toast warning when inputLang is 'auto' ------
+  it("shows toast info if inputLang is 'auto'", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
         inputLang: "auto",
         setInputText: mockSetInputText,
         inputText: "",
-        timeoutFn: setTimeout,
+        toastFn: mockToast,
       })
     );
 
-    // Trigger handleVoice → should return false
     act(() => {
       const returned = result.current.handleVoice();
       expect(returned).toBe(false);
     });
 
-    // Warning should appear immediately
-    expect(result.current.showWarning).toBe(true);
-
-    // Fast-forward the 4s timeout
-    act(() => jest.advanceTimersByTime(4000));
-    expect(result.current.showWarning).toBe(false);
+    expect(mockToast.info).toHaveBeenCalledWith(
+      "Please select an input language to use voice input 🙏"
+    );
   });
 
-  // ------ Test 2️⃣ ------
+  // ------ Test 2️⃣: unsupported browser ------
   it("displays toast error if browser doesn't support voice input", () => {
     const unsupportedFn = jest.fn(() => null);
 
@@ -111,7 +91,7 @@ describe("useVoiceInput", () => {
     );
   });
 
-  // ------ Test 3️⃣ ------
+  // ------ Test 3️⃣: starts recognition ------
   it("starts recognition when not listening", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -122,7 +102,6 @@ describe("useVoiceInput", () => {
       })
     );
 
-    // Start listening
     act(() => {
       const returned = result.current.handleVoice();
       expect(returned).toBe(true);
@@ -132,7 +111,7 @@ describe("useVoiceInput", () => {
     expect(result.current.isListening).toBe(true);
   });
 
-  // ------ Test 4️⃣ ------
+  // ------ Test 4️⃣: abort recognition when listening but no inputText ------
   it("aborts recognition when listening but no inputText", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -143,12 +122,9 @@ describe("useVoiceInput", () => {
       })
     );
 
-    // Step 1: Start listening
-    act(() => result.current.handleVoice());
-
-    // Step 2: Call handleVoice again with empty input → abort
+    act(() => result.current.handleVoice()); // start listening
     act(() => {
-      const returned = result.current.handleVoice();
+      const returned = result.current.handleVoice(); // abort because inputText is empty
       expect(returned).toBe(true);
     });
 
@@ -156,7 +132,7 @@ describe("useVoiceInput", () => {
     expect(result.current.isListening).toBe(false);
   });
 
-  // ------ Test 5️⃣ ------
+  // ------ Test 5️⃣: stop recognition when listening and inputText exists ------
   it("stops recognition when listening and inputText exists", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -167,12 +143,9 @@ describe("useVoiceInput", () => {
       })
     );
 
-    // Step 1: Start listening
-    act(() => result.current.handleVoice());
-
-    // Step 2: Call handleVoice again with inputText → stop
+    act(() => result.current.handleVoice()); // start listening
     act(() => {
-      const returned = result.current.handleVoice();
+      const returned = result.current.handleVoice(); // stop because inputText exists
       expect(returned).toBe(true);
     });
 
@@ -180,7 +153,7 @@ describe("useVoiceInput", () => {
     expect(result.current.isListening).toBe(false);
   });
 
-  // ------ Test 6️⃣ ------
+  // ------ Test 6️⃣: setInputText on recognition result ------
   it("calls setInputText when onResult is triggered", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -197,7 +170,7 @@ describe("useVoiceInput", () => {
     expect(mockSetInputText).toHaveBeenCalledWith("Hello world");
   });
 
-  // ------ Test 7️⃣ ------
+  // ------ Test 7️⃣: isListening false when recognition stops ------
   it("sets isListening to false when onStop is triggered", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -214,7 +187,7 @@ describe("useVoiceInput", () => {
     expect(result.current.isListening).toBe(false);
   });
 
-  // ------ Test 8️⃣ ------
+  // ------ Test 8️⃣: logs error on recognition error ------
   it("calls consoleFn when onError is triggered", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
@@ -226,13 +199,9 @@ describe("useVoiceInput", () => {
       })
     );
 
-    // ---- Step 1: Trigger voice input handler ----
     act(() => result.current.handleVoice());
-
-    // ---- Step 2: Simulate an error from the recognizer ----
     act(() => mockRecognizer.triggerError("Test error"));
 
-    // ---- Step 3: Assert that consoleFn was called correctly ----
     expect(mockConsole).toHaveBeenCalledWith("Speech error:", "Test error");
   });
 });

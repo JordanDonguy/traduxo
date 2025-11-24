@@ -126,7 +126,6 @@ export function useSuggestion({
           inputText: newExpression,
           inputLang: suggestionLang,
           outputLang,
-          setInputText,
           setInputTextLang,
           setSaveToHistory,
           setTranslatedTextLang,

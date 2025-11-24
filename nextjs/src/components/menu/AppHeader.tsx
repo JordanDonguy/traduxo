@@ -1,21 +1,23 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
 import { toast } from "react-toastify";
-import { User, Dices } from "lucide-react";
+import { User } from "lucide-react";
 import UserMenu from "./UserMenu";
-import Logo from "../Logo";
+import Logo from "./Logo";
+import DicesButton from "../shared/DicesButton";
 
 function AppHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const { showMenu, setShowMenu } = useApp();
   const { refresh } = useAuth();
@@ -56,38 +58,47 @@ function AppHeader() {
     refresh();
   }, [searchParams, pathname, router, refresh]);
 
+  // Close the menu if user clicks outside of the menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (showMenu && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        // Close the menu
+        router.replace(`${pathname}`);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu, router, pathname]);
+
   return (
-    <header className="w-full h-full flex justify-center">
+    <header ref={menuRef} className="w-full h-full flex justify-center">
 
       <UserMenu showMenu={showMenu} submenu={submenu} pathname={pathname} />
 
-      <div className="z-50 fixed w-full max-w-6xl h-14 md:h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
-        <button
-          id="suggestion-button-mobile"
-          aria-label="Suggest an expression"
-          onClick={() => {
-            router.push("/");
-            suggestTranslation();
-          }}
-          className="md:hidden p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"
-        >
-          <Dices size={28} className={`${isRolling ? "animate-dice-roll" : ""}`} />
-        </button>
+      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-12 border-b border-zinc-500 bg-[var(--bg)] flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
+        {/* -------- Mobile Dices Button -------- */}
+        <DicesButton
+          suggestTranslation={suggestTranslation}
+          size={28}
+          isRolling={isRolling}
+          className="md:hidden text-[var(--text)]"
+        />
 
         <Logo />
 
         <div>
-          <button
-            id="suggestion-button-desktop"
-            aria-label="Suggest an expression"
-            onClick={() => {
-              router.push("/");
-              suggestTranslation();
-            }}
-            className="hidden md:inline p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
-          >
-            <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
-          </button>
+          {/* -------- Desktop Dices Button -------- */}
+          <DicesButton
+            suggestTranslation={suggestTranslation}
+            size={28}
+            isRolling={isRolling}
+            className="hidden md:inline text-[var(--text)]"
+          />
+
+          {/* -------- User Button -------- */}
           <button
             id="user-menu-button"
             aria-label="User menu"

@@ -44,6 +44,9 @@ export function useFavoriteToggle({
         // ---- Step 3a: Delete favorite ----
         await deleteFromFavoriteFn(translationId, setTranslationId, setIsFavorite, token);
       } else {
+        // If no translatedText, return false
+        if (!translatedText.length) return { success: false, message: "💡 You need to translate something first before adding a favorite"};
+
         // ---- Step 3b: Add favorite ----
         const res = await addToFavoriteFn(
           translatedText,

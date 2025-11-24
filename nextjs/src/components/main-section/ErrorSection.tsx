@@ -10,7 +10,7 @@ type ErrorSectionProps = {
   setError: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function ErrorSection({error, setError}: ErrorSectionProps) {
+function ErrorSection({ error, setError }: ErrorSectionProps) {
   const { setShowLoginForm } = useApp();
   const errorToDisplay = formatError(error);    // Format error to make sure it's a string
   const cooldown = useCooldown(errorToDisplay.startsWith("Too many requests"));  // Starts a cooldown if rateLimiter error
@@ -32,6 +32,10 @@ function ErrorSection({error, setError}: ErrorSectionProps) {
           aria-label="Login"
           onClick={() => {
             setShowLoginForm(true);
+            const timeout = setTimeout(() => {
+              setError("");
+            }, 400);
+            return () => clearTimeout(timeout);
           }}
           className="hover:bg-[var(--hover-2)] hover:cursor-pointer border border-[var(--border)] rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
         >

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
 import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useFavoriteToggle } from "@traduxo/packages/hooks/favorites/useFavoriteToggle";
 import { useSwitchTranslations } from "@traduxo/packages/hooks/translation/useSwitchTranslations";
@@ -11,21 +12,59 @@ import { toast } from "react-toastify";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";
 import ExplanationSection from "./ExplanationSection";
-import LandingDisplay from "./LandingDisplay";
-import LoadingAnimation from "./LoadingAnimation";
+import LanguageSelector from "./LanguageSelector";
+import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
+import { useVoiceInput } from "@/lib/client/hooks/ui/useVoiceInput";
+import { translationHelper } from "@traduxo/packages/utils/translation/translate";
+import TextInputForm from "./TextInputForm";
 
 function MainDisplay() {
-  const { isLoading, error, setError } = useApp();
+  const {
+    isLoading,
+    setIsLoading,
+    error,
+    setError,
+    showMenu,
+  } = useApp();
+
   const router = useRouter();
 
   const {
+    inputLang,
+    outputLang,
+    setInputLang,
+    setOutputLang,
+    detectedLang
+  } = useLanguageContext();
+
+  const {
+    inputText,
+    setInputText,
     translatedText,
     setTranslatedText,
     inputTextLang,
+    setInputTextLang,
     translatedTextLang,
+    setTranslatedTextLang,
     explanation,
+    setExplanation,
     isFavorite,
+    setIsFavorite,
+    setSaveToHistory,
+    setTranslationId
   } = useTranslationContext();
+
+  const { isSwitching, switchLanguage } = useLanguageSwitch({
+    inputLang,
+    outputLang,
+    inputTextLang,
+    translatedTextLang,
+    setInputLang,
+    setOutputLang,
+    detectedLang,
+  });
+
+  const { isListening, handleVoice } = useVoiceInput({ inputLang, inputText, setInputText });
 
   const { handleFavorite, isFavLoading } = useFavoriteToggle();
   const { switchTranslations, fading } = useSwitchTranslations({
@@ -33,6 +72,25 @@ function MainDisplay() {
     setTranslatedText,
     timeoutFn: setTimeout
   });
+
+  // Handle translation request
+  const handleTranslate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    translationHelper({
+      inputText,
+      inputLang,
+      outputLang,
+      setInputTextLang,
+      setSaveToHistory,
+      setTranslatedTextLang,
+      setTranslatedText,
+      setExplanation,
+      setIsLoading,
+      setIsFavorite,
+      setTranslationId,
+      setError,
+    });
+  };
 
   // Add or remove from favorites, display toast error if not successful
   const onFavoriteClick = async () => {
@@ -43,6 +101,7 @@ function MainDisplay() {
     }
   };
 
+  // Remove quotes from paragraph returned by AI
   useEffect(() => {
     const paragraphs = document.querySelectorAll('p');
     paragraphs.forEach(p => {
@@ -50,35 +109,55 @@ function MainDisplay() {
     });
   }, [explanation.length]);
 
+  // Update input text to be the original expression returned by AI
+  useEffect(() => {
+    if (translatedText) {
+      const returnedInputText = translatedText.find(text => text.type === "expression");
+      setInputText(returnedInputText?.value || "");
+    }
+  }, [translatedText, setInputText])
+
   return (
-    <section className={`relative flex flex-col items-center w-full duration-500 mt-12 mb-40 lg:mb-56
-      ${!translatedText.length ? "justify-center" : "justify-start"}
-      ${explanation.length > 500 ? "mb-40 lg:mb-56" : "mb-52 lg:mb-68"}`}
+    <section className={`${showMenu && "blur-md pointer-events-none"} relative flex flex-col items-center w-full duration-250 px-2 md:px-8 xl:px-20 mt-20`}
     >
       {error.length ? (
         <ErrorSection error={error} setError={setError} />
-      ) : isLoading ? (
-        <LoadingAnimation />
-      ) : translatedText.length === 0 ? (
-        <LandingDisplay />
       ) : (
-        <TranslationSection
-          translatedText={translatedText}
-          inputTextLang={inputTextLang}
-          translatedTextLang={translatedTextLang}
-          fading={fading}
-          isFavorite={isFavorite}
-          isFavLoading={isFavLoading}
-          onFavoriteClick={onFavoriteClick}
-          onSwitchTranslations={switchTranslations}
-        >
-
-          <ExplanationSection
-            explanation={explanation}
-            translatedText={translatedText}
+        <>
+          <LanguageSelector
+            inputLang={inputLang}
+            outputLang={outputLang}
+            setInputLang={setInputLang}
+            setOutputLang={setOutputLang}
+            isSwitching={isSwitching}
+            switchLanguage={switchLanguage}
+            inputTextLang={inputTextLang}
           />
-
-        </TranslationSection>
+          <section className="grid grid-cols-1 lg:grid-cols-2 w-full mt-8 gap-8">
+            <TextInputForm
+              inputText={inputText}
+              setInputText={setInputText}
+              handleTranslate={handleTranslate}
+              isListening={isListening}
+              handleVoice={handleVoice}
+              inputLang={inputTextLang}
+            />
+            <TranslationSection
+              translatedText={translatedText}
+              translatedTextLang={translatedTextLang}
+              fading={fading}
+              isFavorite={isFavorite}
+              isFavLoading={isFavLoading}
+              onFavoriteClick={onFavoriteClick}
+              onSwitchTranslations={switchTranslations}
+              isLoading={isLoading}
+            />
+            <ExplanationSection
+              explanation={explanation}
+              translatedText={translatedText}
+            />
+          </section>
+        </>
       )}
     </section>
   )

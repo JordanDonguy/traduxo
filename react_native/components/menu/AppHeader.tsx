@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { View, TouchableOpacity, Animated, Easing, BackHandler, Keyboard } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
@@ -14,6 +15,7 @@ export default function AppHeader() {
   const { colors, dark } = useTheme();
   const { showMenu, setShowMenu, currentSubmenu, setCurrentSubmenu } = useApp();
   const { refresh } = useAuth();
+  const { setInputText } = useTranslationContext();
   const { suggestTranslation } = useSuggestion({});
 
   const rotation = useRef(new Animated.Value(0)).current;
@@ -70,6 +72,7 @@ export default function AppHeader() {
                 useNativeDriver: true,
               }).start();
               blurActiveInput(Keyboard);
+              setInputText("");
               suggestTranslation();
               setShowMenu(false)
             }}

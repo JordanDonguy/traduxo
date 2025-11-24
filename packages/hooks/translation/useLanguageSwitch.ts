@@ -9,6 +9,7 @@ type UseLanguageSwitchProps = {
   setOutputLang: (lang: string) => void; // Function to update output language
   detectedLang: string;                  // Detected language if inputLang is set to "auto"
   timeoutFn?: typeof setTimeout;         // Injected timeout function for testing
+  delay?: number;                        // Injectable delay for switching state
 };
 
 export function useLanguageSwitch({
@@ -20,6 +21,7 @@ export function useLanguageSwitch({
   setOutputLang,
   detectedLang,
   timeoutFn = setTimeout,
+  delay = 400
 }: UseLanguageSwitchProps) {
 
   // ---- Step 1: Initialize state ----
@@ -69,7 +71,7 @@ export function useLanguageSwitch({
 
     timeoutRef.current = timeoutFn(() => {
       setIsSwitching(false); // End animation after 80ms
-    }, 80);
+    }, delay);
 
     // Cleanup timeout on unmount or when isSwitching changes
     return () => {
