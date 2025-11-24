@@ -39,6 +39,7 @@ export default function TranslatorInput({ inputRef }: { inputRef: React.RefObjec
     setInputLang,
     setOutputLang,
     detectedLang,
+    delay: 80
   });
 
   const insets = useSafeAreaInsets();
