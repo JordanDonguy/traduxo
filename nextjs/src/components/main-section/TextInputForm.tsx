@@ -4,6 +4,7 @@ import { Mic, CircleStop, SendHorizontal } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import DicesButton from "../shared/DicesButton";
+import CopyButton from "./CopyButton";
 
 type TextInputFormProps = {
   inputText: string;
@@ -96,6 +97,7 @@ export default function TextInputForm({
             className="hidden md:inline"
           />
 
+          <CopyButton text={inputText} className="hover:bg-[var(--hover)] " />
         </div>
 
         <div className="text-neutral-500">{inputText.length} / 100</div>

@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Star } from "lucide-react";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import LoadingAnimation from "./LoadingAnimation";
+import CopyButton from "./CopyButton";
 
 type TranslationSectionProps = {
   translatedText: TranslationItem[];
@@ -44,19 +45,23 @@ function TranslationSection({
         <>
           <div className="flex flex-col md:flex-row-reverse justify-between gap-4 px-4 pt-4 md:pl-6 mb-2 font-semibold relative">
 
-            {/* Favorite button */}
-            <button
-              id="favorite-button"
-              aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-              onClick={onFavoriteClick}
-              disabled={isFavLoading}
-              className={`self-end md:self-start md:pr-4 lg:pr-0 md:mt-1 text-[var(--input-placeholder)]
-              hover:cursor-pointer hover:text-[var(--text)]
-              ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
-            `}
-            >
-              <Star data-testid="star-icon" fill={isFavorite ? "currentColor" : "transparent"} />
-            </button>
+            <div className="flex justify-between md:mt-1">
+               <CopyButton text={mainTranslation} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
+              {/* Favorite button */}
+              <button
+                id="favorite-button"
+                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                onClick={onFavoriteClick}
+                disabled={isFavLoading}
+                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--input-placeholder)]
+                hover:cursor-pointer hover:text-[var(--text)] w-10 h-10
+                ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
+              `}
+              >
+                <Star size={28} data-testid="star-icon" fill={isFavorite ? "currentColor" : "transparent"} />
+              </button>
+             
+            </div>
 
             {/* Main translation */}
             <p
