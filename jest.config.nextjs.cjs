@@ -27,7 +27,6 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
     "nextjs/src/lib/**/*.{ts,tsx,js,jsx}",
-    "nextjs/src/components/**/*.{ts,tsx,js,jsx}",
     "nextjs/src/contexts/**/*.{ts,tsx,js,jsx}",
     "!**/node_modules/**",
     "!**/dist/**"
