@@ -82,15 +82,17 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
     );
   }, [theme, mounted]);
 
+ 
+
   if (!mounted) return null;
 
   return (
     <div
       data-testid="user-menu"
       className={`
-        z-40 fixed w-full h-full flex justify-center pt-20 px-6 xl:px-0
-        inset-0 max-h-screen duration-400 origin-top
-        ${showMenu ? "scale-y-100 bg-[var(--menu)]" : "scale-y-0 bg-[var(--bg)]"}`}
+        z-40 fixed top-12 w-full md:w-3/4 md:left-[25%] lg:w-1/2 lg:left-[50%] h-full flex justify-center pt-8 px-4 xl:px-0
+        inset-0 max-h-screen duration-400 origin-right md:border-l border-zinc-500 bg-[var(--bg)] scrollbar-hidden
+        ${showMenu ? "translate-x-0" : "-translate-x-300 md:translate-x-300"}`}
     >
       {(isLoading) ? (
         <div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
