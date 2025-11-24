@@ -12,7 +12,7 @@ type UseVoiceInputProps = {
   // ---- Injected dependencies for testing ----
   speechRecognizer?: typeof createSpeechRecognition;
   timeoutFn?: typeof setTimeout;
-  toastFn?: typeof toast; 
+  toastFn?: typeof toast;
   consoleFn?: typeof console.log;
 };
 
@@ -22,7 +22,6 @@ export function useVoiceInput({
   setInputText,
   inputText,
   speechRecognizer = createSpeechRecognition,
-  timeoutFn = setTimeout,
   toastFn = toast,
   consoleFn = console.log,
 }: UseVoiceInputProps) {
@@ -30,16 +29,13 @@ export function useVoiceInput({
   // isListening: whether speech recognition is currently active
   // showWarning: whether to display a warning when "auto" language is selected
   const [isListening, setIsListening] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
 
   // ---- Step 2: Define the voice input handler ----
   const handleVoice = () => {
     // ---- Step 2a: Check for unsupported "auto" input language ----
     if (inputLang === "auto") {
-      // Show warning to user for 4 seconds
-      setShowWarning(true);
-      timeoutFn(() => setShowWarning(false), 4000);
-      return false;
+      toastFn.warn("Please select an input language to use voice input 🙏");
+      return false
     }
 
     // ---- Step 2b: Create a speech recognition instance ----
@@ -78,5 +74,5 @@ export function useVoiceInput({
   };
 
   // ---- Step 3: Return state and handlers ----
-  return { isListening, showWarning, setShowWarning, handleVoice };
+  return { isListening, handleVoice };
 }

@@ -69,7 +69,7 @@ export function useLanguageSwitch({
 
     timeoutRef.current = timeoutFn(() => {
       setIsSwitching(false); // End animation after 80ms
-    }, 80);
+    }, 400);
 
     // Cleanup timeout on unmount or when isSwitching changes
     return () => {

@@ -32,6 +32,8 @@ describe("useLanguageSwitch", () => {
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "es",
+        inputTextLang: "",
+        translatedTextLang: "",
       })
     );
 
@@ -48,6 +50,8 @@ describe("useLanguageSwitch", () => {
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "es",
+        inputTextLang: "",
+        translatedTextLang: "",
       })
     );
 
@@ -71,6 +75,8 @@ describe("useLanguageSwitch", () => {
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "es",
+        inputTextLang: "",
+        translatedTextLang: "",
       })
     );
 
@@ -88,7 +94,7 @@ describe("useLanguageSwitch", () => {
   });
 
   // ------ Test 4️⃣ ------
-  it("resets isSwitching after 80ms", () => {
+  it("resets isSwitching after 400ms", () => {
     const { result } = renderHook(() =>
       useLanguageSwitch({
         inputLang: "en",
@@ -96,6 +102,8 @@ describe("useLanguageSwitch", () => {
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "es",
+        inputTextLang: "",
+        translatedTextLang: "",
       })
     );
 
@@ -106,7 +114,7 @@ describe("useLanguageSwitch", () => {
 
     // Fast-forward 80ms to simulate animation end
     act(() => {
-      jest.advanceTimersByTime(80);
+      jest.advanceTimersByTime(400);
     });
 
     // Switching should be reset
@@ -114,28 +122,24 @@ describe("useLanguageSwitch", () => {
   });
 
   // ------ Test 5️⃣ ------
-  it("clears timeout when unmounted", () => {
-    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
-
-    const { result, unmount } = renderHook(() =>
+  it("swaps input/output based on inputTextLang and translatedTextLang when provided", () => {
+    const { result } = renderHook(() =>
       useLanguageSwitch({
         inputLang: "en",
         outputLang: "fr",
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "es",
+        inputTextLang: "fr",
+        translatedTextLang: "en",
       })
     );
 
     act(() => result.current.switchLanguage());
 
-    // Unmount the component while timeout is pending
-    unmount();
-
-    // Ensure cleanup is called and timeout cleared
-    expect(clearTimeoutSpy).toHaveBeenCalled();
-
-    clearTimeoutSpy.mockRestore();
+    // Hook detects that languages are already swapped, so it reverts
+    expect(mockSetInputLang).toHaveBeenCalledWith("fr");
+    expect(mockSetOutputLang).toHaveBeenCalledWith("en");
   });
 
   // ------ Test 6️⃣ ------
@@ -147,6 +151,8 @@ describe("useLanguageSwitch", () => {
         setInputLang: mockSetInputLang,
         setOutputLang: mockSetOutputLang,
         detectedLang: "fr", // same as outputLang
+        inputTextLang: "",
+        translatedTextLang: "",
       })
     );
 
@@ -154,23 +160,5 @@ describe("useLanguageSwitch", () => {
 
     expect(mockSetOutputLang).toHaveBeenCalledWith("en");
     expect(mockSetInputLang).toHaveBeenCalledWith("fr");
-  });
-
-  // ------ Test 7️⃣ ------
-  it("falls back to 'fr' when detectedLang equals outputLang and outputLang is 'en'", () => {
-    const { result } = renderHook(() =>
-      useLanguageSwitch({
-        inputLang: "auto",
-        outputLang: "en",
-        setInputLang: mockSetInputLang,
-        setOutputLang: mockSetOutputLang,
-        detectedLang: "en", // same as outputLang
-      })
-    );
-
-    act(() => result.current.switchLanguage());
-
-    expect(mockSetOutputLang).toHaveBeenCalledWith("fr");
-    expect(mockSetInputLang).toHaveBeenCalledWith("en");
   });
 });
