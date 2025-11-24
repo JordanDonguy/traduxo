@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Copy } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface CopyButtonProps {
   text: string;
@@ -18,7 +19,7 @@ const CopyButton = ({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleCopy = () => {
-    if (!text) return;
+    if (!text) return toast.info("No text to copy… 👀");
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);

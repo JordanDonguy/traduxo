@@ -34,7 +34,7 @@ export function useVoiceInput({
   const handleVoice = () => {
     // ---- Step 2a: Check for unsupported "auto" input language ----
     if (inputLang === "auto") {
-      toastFn.warn("Please select an input language to use voice input 🙏");
+      toastFn.info("Please select an input language to use voice input 🙏");
       return false
     }
 

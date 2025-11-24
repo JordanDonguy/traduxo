@@ -38,7 +38,7 @@ function TranslationSection({
 
   return (
     <article
-      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)] rounded-md min-h-42`}
+      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)] rounded-md min-h-50 md:min-h-44`}
     >
       {isLoading ? (
         <div className="flex justify-start pl-12">
@@ -46,7 +46,7 @@ function TranslationSection({
         </div>
       ) : (
         <>
-          <div className="flex flex-col md:flex-row-reverse justify-between gap-4 px-2 pt-4 md:pl-6 mb-2 font-semibold relative">
+          <div className="flex flex-col md:flex-row-reverse justify-between md:gap-4 px-2 pt-2 md:pt-4 md:pl-6 mb-2 font-semibold relative">
 
             <div className="flex justify-between">
               {/* -------- Copy and TTS buttons -------- */}
@@ -82,7 +82,7 @@ function TranslationSection({
           </div>
 
           {/* -------- Alternative translations -------- */}
-          <ul className="pl-18 pr-4 pb-4 flex flex-col gap-2">
+          <ul className="pl-18 pr-4 pb-2 md:pb-4 flex flex-col gap-2">
             {alternatives.map((alt, idx) =>
               <li
                 id={`alternative-translation ${idx + 1}`}

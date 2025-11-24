@@ -25,7 +25,11 @@ const DicesButton = ({
 
   return (
     <button
-      onClick={handleClick}
+      type="button"
+      onClick={(e) => {
+        e.preventDefault();
+        handleClick()
+      }}
       className={`p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer ${className}`}
       aria-label="Suggest an expression"
     >

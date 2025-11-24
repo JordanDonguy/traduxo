@@ -13,7 +13,8 @@ export default function AppProvider({ children }: { children: ReactNode }) {
             position="top-right"
             autoClose={4000}
             toastClassName="pointer-events-auto"
-            className="!top-[70px] !z-10"
+            toastStyle={{ backgroundColor: "var(--btn)", border: "2px solid var(--border)", color: "var(--text)", borderRadius: "6px" }}
+            className="!top-[70px] !z-30"
           />
       </ThemeProvider>
     </AppProviderBase>

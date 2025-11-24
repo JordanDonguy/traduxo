@@ -14,7 +14,7 @@
   --border: #a6a6a6;
   --hover: #e0e0e4;
   --hover-2: #dddde4;
-  --btn: #edf1f1;
+  --btn: #f0f5f5;
   --example: #ececf0;
   --example-border: #cccccc;
   --glow: rgba(0, 0, 0, 0.3);
@@ -344,6 +344,12 @@ select:-webkit-autofill:focus {
 .scrollbar-hidden {
   ::-webkit-scrollbar {
     background-color: var(--bg);
+    width: 0px;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  ::-webkit-scrollbar {
     width: 0px;
   }
 }

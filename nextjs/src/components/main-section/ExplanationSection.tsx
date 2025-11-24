@@ -54,7 +54,7 @@ export default function ExplanationSection({
         aria-label="Get AI explanations"
         onClick={() => {
           if (translatedText.length === 0) {
-            return toast.warn("Hmm… I need a translation before I can explain it 🤔")
+            return toast.info("Hmm… I need a translation before I can explain it 🤔")
           }
           blurActiveInput();
           handleExplanation();

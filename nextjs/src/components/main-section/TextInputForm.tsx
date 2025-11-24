@@ -6,6 +6,7 @@ import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion"
 import DicesButton from "../shared/DicesButton";
 import CopyButton from "./CopyButton";
 import TextToSpeechButton from "./TextToSpeechButton";
+import { toast } from "react-toastify";
 
 type TextInputFormProps = {
   inputText: string;
@@ -30,7 +31,8 @@ export default function TextInputForm({
   const { suggestTranslation, isRolling } = useSuggestion({});
 
   const handleSubmit = ((e: FormEvent<Element>) => {
-    e.preventDefault()
+    e.preventDefault();
+    if (!inputText) return toast.info("Please enter something to translate… ✏️")
     if (typingTimeout.current) {
       clearTimeout(typingTimeout.current);
       typingTimeout.current = null; // mark it cleared

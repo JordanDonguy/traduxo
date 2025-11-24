@@ -42,12 +42,12 @@ describe("useVoiceInput", () => {
 
   beforeEach(() => {
     mockSetInputText = jest.fn();
-    mockToast = { warn: jest.fn(), error: jest.fn() } as unknown as typeof toast;
+    mockToast = { warn: jest.fn(), error: jest.fn(), info: jest.fn() } as unknown as typeof toast;
     mockConsole = jest.fn();
   });
 
   // ------ Test 1️⃣: toast warning when inputLang is 'auto' ------
-  it("shows toast warning if inputLang is 'auto'", () => {
+  it("shows toast info if inputLang is 'auto'", () => {
     const { result } = renderHook(() =>
       useVoiceInput({
         inputLang: "auto",
@@ -62,7 +62,7 @@ describe("useVoiceInput", () => {
       expect(returned).toBe(false);
     });
 
-    expect(mockToast.warn).toHaveBeenCalledWith(
+    expect(mockToast.info).toHaveBeenCalledWith(
       "Please select an input language to use voice input 🙏"
     );
   });
