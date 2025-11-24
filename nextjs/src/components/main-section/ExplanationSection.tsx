@@ -6,6 +6,7 @@ import ErrorSection from "./ErrorSection";
 import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
+import { toast } from "react-toastify";
 
 type ExplanationSectionProps = {
   explanation: string;
@@ -22,17 +23,22 @@ export default function ExplanationSection({
     return <ErrorSection error={explanationError} setError={setExplanationError} />;
   }
 
-  if (explanation.length) {
+  if (explanation.length > 500) {
     return (
-      <div className="flex-1 flex flex-col justify-center explanation mt-10 mb-4 fade-in-item">
-        <ReactMarkdown>{explanation}</ReactMarkdown>
+      <div 
+      className="lg:col-span-2 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-start md:mt-4 mb-8
+        fade-in-explanation border-t md:border border-zinc-500 md:rounded-lg pt-4 md:p-4 md:shadow-md min-h-[60vh]"
+      >
+        <div className="fade-in-item explanation">
+          <ReactMarkdown>{explanation}</ReactMarkdown>
+        </div>
       </div>
     );
   }
 
   if (isExpLoading) {
     return (
-      <div className="flex justify-center items-center w-full h-[58px] mt-8">
+      <div className="lg:col-span-2 flex justify-center items-center w-full h-[58px] md:mt-4">
         <LoadingAnimation />
       </div>
     );
@@ -40,22 +46,20 @@ export default function ExplanationSection({
 
   return (
     <div
-      className={`flex justify-center items-center flex-1 w-full self-center duration-500 ease-in-out transform mt-8
-        ${
-            translatedText.length > 3
-              ? "scale-x-100 opacity-100"
-            : "scale-x-0 opacity-0"
-        }`}
+      className={`lg:col-span-2 flex justify-center items-center flex-1 w-full self-center ease-in-out transform md:mt-4`}
     >
       <button
         id="explanation-button"
         data-testid="explanation-button"
         aria-label="Get AI explanations"
         onClick={() => {
+          if (translatedText.length === 0) {
+            return toast.warn("Hmm… I need a translation before I can explain it 🤔")
+          }
           blurActiveInput();
           handleExplanation();
         }}
-        className="w-full max-w-xl py-4 rounded-full border border-[var(--border)] bg-[var(--btn)] hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
+        className="w-full max-w-xl py-4 rounded-full border-2 border-[var(--border)] text-xl hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
       >
         ✨ AI explanations
       </button>
