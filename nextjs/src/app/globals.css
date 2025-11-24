@@ -15,9 +15,11 @@
   --hover: #e0e0e4;
   --hover-2: #dddde4;
   --btn: #edf1f1;
-  --warning: #485a65;
   --example: #ececf0;
   --example-border: #cccccc;
+  --glow: rgba(0, 0, 0, 0.3);
+  --scrollbar: #d0d0d6;
+  --scrollbar-active: #a8a8b0;
 }
 
 /* ==============================
@@ -26,7 +28,7 @@
 [data-theme='dark'] {
   --bg: #0c0c0c;
   --text: #ededed;
-  --bg-2: #232325;
+  --bg-2: #27272a;
   --menu: #0c0c0c;
   --input: #0c0c0c;
   --input-placeholder: #a3a3a3;
@@ -37,6 +39,9 @@
   --btn: #1b1b1d;
   --example: #222227;
   --example-border: #2e2d31;
+  --glow: rgba(255, 255, 255, 0.3);
+  --scrollbar: #202024;
+  --scrollbar-active: #44444b;
 }
 
 /* ==============================
@@ -46,7 +51,7 @@
   :root:not([data-theme='light']) {
     --bg: #0c0c0c;
     --text: #ededed;
-    --bg-2: #232325;
+    --bg-2: #202024;
     --menu: #0c0c0c;
     --input: #0c0c0c;
     --input-placeholder: #a3a3a3;
@@ -57,6 +62,9 @@
     --btn: #1b1b1d;
     --example: #222227;
     --example-border: #2e2d31;
+    --glow: rgba(255, 255, 255, 0.3);
+    --scrollbar: #202024;
+    --scrollbar-active: #44444b;
   }
 }
 
@@ -104,9 +112,6 @@ strong {
 /* ==============================
    Explanation Section
 ============================== */
-.explanation {
-  min-height: 58px;
-}
 
 .explanation ul {
   margin-bottom: .5rem;
@@ -123,20 +128,16 @@ strong {
 }
 
 .explanation h2 {
-  font-size: 1.75rem;
+  text-align: center;
+  font-size: 1.9rem;
   margin: 2.5rem 0px 1rem;
   font-weight: 600
 }
 
 .explanation h3 {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   padding: 1rem 0px;
-  font-weight: 600;
-}
-
-h3::before {
-  content: ">\00a0\00a0";
-  color: var(--input-placeholder);
+  font-weight: 700;
 }
 
 .explanation p,
@@ -212,13 +213,89 @@ h3::before {
 
 .fade-in-item {
   opacity: 0;
-  animation: fadeIn 0.2s forwards;
+  animation: fadeInItem 0.2s forwards;
   /* quick fade-in */
 }
 
-@keyframes fadeIn {
+@keyframes fadeInItem {
   to {
     opacity: 1;
+  }
+}
+
+.fade-in-explanation {
+  transform: translateY(100px);
+  transform-origin: top;
+  animation: fadeInExplanation 0.7s cubic-bezier(.25, 1.45, .4, 1) forwards;
+  /* quick fade-in */
+}
+
+@keyframes fadeInExplanation {
+  to {
+    transform: translateY(0)
+  }
+}
+
+.spin-once {
+  animation: spinOnce 0.4s ease-in-out;
+}
+
+@keyframes spinOnce {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.scale-once {
+  animation: scaleOnce 0.4s ease-in-out;
+}
+
+@keyframes scaleOnce {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ping-once {
+  position: relative;
+}
+
+.ping-once::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--glow);
+  animation: ping 1.2s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+
+  80% {
+    transform: scale(1.5);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: scale(3);
+    opacity: 0;
   }
 }
 
@@ -242,14 +319,31 @@ select:-webkit-autofill:focus {
 /* ==============================
    Scrollbar Styles
 ============================== */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+
+/* Scrollbar background */
+::-webkit-scrollbar {
+  background-color: var(--bg);
+  width: 12px;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar);
+  border-radius: 1rem;
+
+  /* Fake right margin without affecting shape */
+  box-shadow: inset -1px 0 0 2px var(--bg);
+}
+
+/* Scrollbar when selected */
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-active);
+}
+
+/* CSS class to hide scrollbar when needed (ex: in menu) */
+.scrollbar-hidden {
+  ::-webkit-scrollbar {
+    background-color: var(--bg);
+    width: 0px;
+  }
 }
