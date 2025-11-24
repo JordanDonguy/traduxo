@@ -58,7 +58,6 @@ jest.mock("@traduxo/packages/hooks/auth/useWaitForAuthStatus", () => ({
 const mockTranslationHelper = jest.fn().mockResolvedValue(undefined);
 const mockSuggestExpressionHelper = jest.fn().mockResolvedValue(undefined);
 const mockFetchExpressionPoolHelper = jest.fn().mockResolvedValue(undefined);
-const mockGetSuggestionLanguage = jest.fn(() => "en");
 
 
 // ---- Tests ----

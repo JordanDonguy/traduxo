@@ -10,7 +10,6 @@ type TranslateHelperArgs = {
   inputText: string;
   inputLang: string;
   outputLang: string;
-  setInputText: SetState<string>;
   setInputTextLang: SetState<string>;
   setTranslatedTextLang: SetState<string>;
   setTranslatedText: SetState<TranslationItem[]>;
@@ -35,7 +34,6 @@ export async function translationHelper({
   inputText,
   inputLang,
   outputLang,
-  setInputText,
   setInputTextLang,
   setTranslatedTextLang,
   setTranslatedText,
@@ -72,7 +70,6 @@ export async function translationHelper({
   }
 
   // ---- Step 4: Clear input text and update language if not auto ----
-  setInputText("");
   if (inputLang !== "auto") setInputTextLang(inputLang);
 
   try {

@@ -80,7 +80,6 @@ export default function TranslatorInput({ inputRef }: { inputRef: React.RefObjec
       inputText,
       inputLang,
       outputLang,
-      setInputText,
       setInputTextLang,
       setSaveToHistory,
       setTranslatedTextLang,

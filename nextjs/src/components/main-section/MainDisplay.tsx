@@ -80,7 +80,6 @@ function MainDisplay() {
       inputText,
       inputLang,
       outputLang,
-      setInputText,
       setInputTextLang,
       setSaveToHistory,
       setTranslatedTextLang,
