@@ -40,7 +40,7 @@ const CopyButton = ({
     <div className="relative">
       <button
         onClick={handleCopy}
-        className={`w-10 h-10 hover:cursor-pointer rounded-full flex justify-center items-center ${className}`}
+        className={`w-10 h-10 text-[var(--input-placeholder)] hover:bg-[var(--hover)] hover:text-[var(--text)] hover:cursor-pointer rounded-full flex justify-center items-center ${className}`}
         aria-label="Copy text"
         type="button"
       >

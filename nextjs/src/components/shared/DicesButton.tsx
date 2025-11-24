@@ -26,7 +26,7 @@ const DicesButton = ({
   return (
     <button
       onClick={handleClick}
-      className={`p-2 rounded-full text-[var(--text)] hover:bg-[var(--hover)] hover:cursor-pointer ${className}`}
+      className={`p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer ${className}`}
       aria-label="Suggest an expression"
     >
       <Dices size={size} className={isRolling ? "animate-dice-roll" : ""} />

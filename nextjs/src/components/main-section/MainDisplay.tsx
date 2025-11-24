@@ -140,9 +140,11 @@ function MainDisplay() {
               handleTranslate={handleTranslate}
               isListening={isListening}
               handleVoice={handleVoice}
+              inputLang={inputTextLang}
             />
             <TranslationSection
               translatedText={translatedText}
+              translatedTextLang={translatedTextLang}
               fading={fading}
               isFavorite={isFavorite}
               isFavLoading={isFavLoading}

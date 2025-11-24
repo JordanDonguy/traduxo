@@ -59,7 +59,7 @@ export default function ExplanationSection({
           blurActiveInput();
           handleExplanation();
         }}
-        className="w-full max-w-xl py-4 rounded-full border-2 border-[var(--border)] text-xl hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
+        className="w-full max-w-xl py-4 shadow-sm rounded-full border-2 border-[var(--border)] text-xl hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
       >
         ✨ AI explanations
       </button>

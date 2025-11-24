@@ -5,6 +5,7 @@ import { FormEvent, useRef, useState } from "react";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import DicesButton from "../shared/DicesButton";
 import CopyButton from "./CopyButton";
+import TextToSpeechButton from "./TextToSpeechButton";
 
 type TextInputFormProps = {
   inputText: string;
@@ -12,6 +13,7 @@ type TextInputFormProps = {
   handleTranslate: (e: React.FormEvent) => void;
   isListening: boolean;
   handleVoice: () => void;
+  inputLang: string;
 };
 
 export default function TextInputForm({
@@ -19,7 +21,8 @@ export default function TextInputForm({
   setInputText,
   handleTranslate,
   isListening,
-  handleVoice
+  handleVoice,
+  inputLang
 }: TextInputFormProps) {
   const [animateSend, setAnimateSend] = useState(false);
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -44,6 +47,7 @@ export default function TextInputForm({
       onSubmit={handleSubmit}
       className="col-span-1 flex flex-col justify-between pt-4 pb-2 px-2 md:px-6 border border-zinc-500 rounded-md font-semibold shadow-sm"
     >
+      {/* -------- Text input -------- */}
       <textarea
         id="text-input"
         aria-label="Enter text to translate"
@@ -77,36 +81,42 @@ export default function TextInputForm({
 
       <div className="flex justify-between items-center">
 
+        {/* -------- Voice Input button -------- */}
         <div className="flex">
           <button
             id="voice-input-button"
             aria-label="Voice input"
             data-testid="mic-button"
             type="button"
-            className={`w-10 h-10 hover:cursor-pointer hover:bg-[var(--hover)] rounded-full 
-            ${isListening && "text-red-400"} flex justify-center items-center`}
+            className={`w-10 h-10 text-[var(--input-placeholder)] hover:bg-[var(--hover)] hover:text-[var(--text)] hover:cursor-pointer rounded-full 
+            ${isListening ? "text-red-400" : "text-[var(--input-placeholder)]"} flex justify-center items-center`}
             onClick={handleVoice}
           >
             {!isListening ? <Mic /> : <CircleStop />}
           </button>
 
+          {/* -------- Suggestion button -------- */}
           <DicesButton
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline"
+            className="hidden md:inline text-[var(--input-placeholder)] hover:text-[var(--text)]"
           />
 
-          <CopyButton text={inputText} className="hover:bg-[var(--hover)] " />
+          {/* -------- Copy and TTS buttons -------- */}
+          <CopyButton text={inputText} />
+          <TextToSpeechButton text={inputText} lang={inputLang} />
         </div>
 
+        {/* -------- Input length count -------- */}
         <div className="text-neutral-500">{inputText.length} / 100</div>
 
+        {/* -------- Submit button -------- */}
         <button
           id="submit-translation-button"
           aria-label="Translate"
           type="submit"
-          className={`w-10 h-10 hover:cursor-pointer hover:bg-[var(--hover)] rounded-full flex justify-center items-center
+          className={`w-10 h-10 text-[var(--input-placeholder)] hover:cursor-pointer hover:text-[var(--text)] hover:bg-[var(--hover)] rounded-full flex justify-center items-center
             ${animateSend ? "ping-once" : ""}`}
         >
           <SendHorizontal />

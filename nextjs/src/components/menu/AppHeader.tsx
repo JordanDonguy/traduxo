@@ -84,7 +84,7 @@ function AppHeader() {
           suggestTranslation={suggestTranslation}
           size={28}
           isRolling={isRolling}
-          className="md:hidden"
+          className="md:hidden text-[var(--text)]"
         />
 
         <Logo />
@@ -95,7 +95,7 @@ function AppHeader() {
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline"
+            className="hidden md:inline text-[var(--text)]"
           />
 
           {/* -------- User Button -------- */}

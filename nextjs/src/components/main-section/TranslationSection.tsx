@@ -5,9 +5,11 @@ import { Star } from "lucide-react";
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import LoadingAnimation from "./LoadingAnimation";
 import CopyButton from "./CopyButton";
+import TextToSpeechButton from "./TextToSpeechButton";
 
 type TranslationSectionProps = {
   translatedText: TranslationItem[];
+  translatedTextLang: string;
   fading: string[];
   isFavorite: boolean;
   isFavLoading: boolean;
@@ -23,6 +25,7 @@ function capitalizeFirstLetter(str: string): string {
 
 function TranslationSection({
   translatedText,
+  translatedTextLang,
   fading,
   isFavorite,
   isFavLoading,
@@ -43,29 +46,33 @@ function TranslationSection({
         </div>
       ) : (
         <>
-          <div className="flex flex-col md:flex-row-reverse justify-between gap-4 px-4 pt-4 md:pl-6 mb-2 font-semibold relative">
+          <div className="flex flex-col md:flex-row-reverse justify-between gap-4 px-2 pt-4 md:pl-6 mb-2 font-semibold relative">
 
-            <div className="flex justify-between md:mt-1">
-               <CopyButton text={mainTranslation} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
-              {/* Favorite button */}
+            <div className="flex justify-between">
+              {/* -------- Copy and TTS buttons -------- */}
+              <div className="flex">
+                <CopyButton text={mainTranslation} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
+                <TextToSpeechButton text={mainTranslation} lang={translatedTextLang} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
+              </div>
+
+              {/* -------- Favorite button -------- */}
               <button
                 id="favorite-button"
                 aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                 onClick={onFavoriteClick}
                 disabled={isFavLoading}
-                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--input-placeholder)]
-                hover:cursor-pointer hover:text-[var(--text)] w-10 h-10
+                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--input-placeholder)] flex justify-center items-center
+                hover:cursor-pointer hover:bg-[var(--hover)] hover:text-[var(--text)] h-10 w-10 rounded-full
                 ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
               `}
               >
                 <Star size={28} data-testid="star-icon" fill={isFavorite ? "currentColor" : "transparent"} />
               </button>
-             
             </div>
 
-            {/* Main translation */}
+            {/* -------- Main translation -------- */}
             <p
-              className={`text-2xl min-h-8 flex items-center duration-200 fade-in-item 
+              className={`text-2xl min-h-8 flex items-center duration-200 fade-in-item pl-2
               ${fading.includes(mainTranslation) ? "scale-y-0" : "scale-y-100"}
               ${!mainTranslation && "text-[var(--input-placeholder)]"}
               `}
@@ -74,7 +81,7 @@ function TranslationSection({
             </p>
           </div>
 
-          {/* Alternative translations */}
+          {/* -------- Alternative translations -------- */}
           <ul className="pl-18 pr-4 pb-4 flex flex-col gap-2">
             {alternatives.map((alt, idx) =>
               <li
