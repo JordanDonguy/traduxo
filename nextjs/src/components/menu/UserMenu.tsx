@@ -26,6 +26,7 @@ import {
   Languages,
   Shield
 } from "lucide-react";
+import MenuButton from "./MenuButton";
 
 interface UserMenuProps {
   showMenu: boolean;
@@ -82,7 +83,7 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
     );
   }, [theme, mounted]);
 
- 
+
 
   if (!mounted) return null;
 
@@ -156,140 +157,106 @@ function UserMenu({ showMenu, submenu, pathname }: UserMenuProps) {
 
               <div className="flex flex-col gap-6 items-center w-full max-h-[calc(100dvh-8rem)] pb-8 overflow-y-scroll scrollbar-hide">
                 {/* -------------- Theme toggle -------------- */}
-                <button
+                <MenuButton
                   id="theme-toggle-button"
-                  aria-label="Toggle theme"
+                  label={`Theme (${theme})`}
+                  icon={isDark ? <Moon /> : <Sun />}
                   onClick={() => setTheme(isDark ? "light" : "dark")}
-                  className="w-full h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0 "
-                >
-                  {isDark ? <Moon /> : <Sun />}
-                  <span className="pl-6 text-xl">Theme ({theme})</span>
-                </button>
+                />
 
                 {/* -------------- Explanation language -------------- */}
-                <button
+                <MenuButton
                   id="explanation-language-button"
-                  aria-label="Change explanation language"
+                  label="Explanation language"
+                  icon={<Languages />}
                   onClick={() => {
                     setShowExplanationLang(true);
-                    router.push(`${pathname}?menu=open&submenu=explanationLang`)
+                    router.push(`${pathname}?menu=open&submenu=explanationLang`);
                   }}
-                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                >
-                  <Languages />
-                  <span className="pl-6 text-xl">Explanation language</span>
-                </button>
+                />
 
                 {/* -------------- Login button -------------- */}
                 {status !== "authenticated" && (
-                  <button
+                  <MenuButton
                     id="login-button"
-                    aria-label="Login"
+                    label="Login"
+                    icon={<User />}
                     onClick={() => {
                       setShowLogin(true);
-                      router.push(`${pathname}?menu=open&submenu=login`)
+                      router.push(`${pathname}?menu=open&submenu=login`);
                     }}
-                    className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                  >
-                    <User />
-                    <span className="pl-6 text-xl">Login</span>
-                  </button>
+                  />
                 )}
 
                 {/* -------------- History -------------- */}
-                <button
+                <MenuButton
                   id="history-button"
-                  data-testid="history-button"
-                  aria-label="Translation history"
+                  label="History"
+                  icon={<History />}
                   onClick={() => {
                     setShowHistory(true);
-                    router.push(`${pathname}?menu=open&submenu=history`)
+                    router.push(`${pathname}?menu=open&submenu=history`);
                   }}
-                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                >
-                  <History />
-                  <span className="pl-6 text-xl">History</span>
-                </button>
+                />
 
                 {/* -------------- Favorites -------------- */}
-                <button
+                <MenuButton
                   id="favorites-button"
-                  data-testid="favorites-button"
-                  aria-label="Favorite translations"
+                  label="Favorites"
+                  icon={<Star />}
                   onClick={() => {
                     setShowFavorites(true);
-                    router.push(`${pathname}?menu=open&submenu=favorites`)
+                    router.push(`${pathname}?menu=open&submenu=favorites`);
                   }}
-                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                >
-                  <Star />
-                  <span className="pl-6 text-xl">Favorites</span>
-                </button>
+                />
 
                 {/* -------------- Privacy policy -------------- */}
-                <button
+                <MenuButton
                   id="privacy-policy-button"
-                  aria-label="Privacy policy"
+                  label="Privacy policy"
+                  icon={<Shield />}
                   onClick={() => {
                     setIsLoading(true);
-                    router.push("/privacy")
+                    router.push("/privacy");
                   }}
-                  className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                >
-                  <Shield />
-                  <span className="pl-6 text-xl">Privacy policy</span>
-                </button>
+                />
 
                 {/* Authenticated actions */}
                 {(status === "authenticated") && (
                   <>
                     {/* -------------- Change password -------------- */}
-                    <button
+                    <MenuButton
                       id="change-password-button"
-                      data-testid="change-password-button"
-                      aria-label={isCredentials ? "Change password" : "Create password"}
+                      label={isCredentials ? "Change password" : "Create password"}
+                      icon={<Lock />}
                       onClick={() => {
                         setShowChangePassword(true);
-                        router.push(`${pathname}?menu=open&submenu=changePassword`)
+                        router.push(`${pathname}?menu=open&submenu=changePassword`);
                       }}
-                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                    >
-                      <Lock />
-                      <span className="pl-6 text-xl">
-                        {isCredentials ? "Change password" : "Create password"}
-                      </span>
-                    </button>
+                    />
 
                     {/* -------------- Log Out -------------- */}
-                    <button
+                    <MenuButton
                       id="logout-button"
-                      data-testid="logout-button"
-                      aria-label="Log out"
+                      label="Log Out"
+                      icon={<LogOut />}
                       onClick={async () => {
                         setIsLoading(true);
                         const success = await handleLogout(refresh, setIsLoading);
                         if (success) router.push("/?logout=true");
                       }}
-                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                    >
-                      <LogOut />
-                      <span className="pl-6 text-xl">Log Out</span>
-                    </button>
+                    />
 
                     {/* -------------- Delete account -------------- */}
-                    <button
+                    <MenuButton
                       id="delete-account-button"
-                      data-testid="delete-account-button"
-                      aria-label="Delete account"
+                      label="Delete account"
+                      icon={<BadgeMinus />}
                       onClick={() => {
                         setShowDeleteAccount(true);
-                        router.push(`${pathname}?menu=open&submenu=deleteAccount`)
+                        router.push(`${pathname}?menu=open&submenu=deleteAccount`);
                       }}
-                      className="w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-2xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0"
-                    >
-                      <BadgeMinus />
-                      <span className="pl-6 text-xl">Delete account</span>
-                    </button>
+                    />
                   </>
                 )}
               </div>
