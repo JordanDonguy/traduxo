@@ -116,7 +116,7 @@ function MainDisplay() {
       const returnedInputText = translatedText.find(text => text.type === "expression");
       setInputText(returnedInputText?.value || "");
     }
-  }, [translatedText])
+  }, [translatedText, setInputText])
 
   return (
     <section className={`${showMenu && "blur-md pointer-events-none"} relative flex flex-col items-center w-full duration-250 px-2 md:px-8 xl:px-20 mt-20`}
@@ -144,8 +144,6 @@ function MainDisplay() {
             />
             <TranslationSection
               translatedText={translatedText}
-              inputTextLang={inputTextLang}
-              translatedTextLang={translatedTextLang}
               fading={fading}
               isFavorite={isFavorite}
               isFavLoading={isFavLoading}
