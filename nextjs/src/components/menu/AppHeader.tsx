@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
@@ -16,6 +16,7 @@ function AppHeader() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const { showMenu, setShowMenu } = useApp();
   const { refresh } = useAuth();
@@ -56,12 +57,27 @@ function AppHeader() {
     refresh();
   }, [searchParams, pathname, router, refresh]);
 
+  // Close the menu if user clicks outside of the menu
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (showMenu && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        // Close the menu
+        router.replace(`${pathname}`);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu, router, pathname]);
+
   return (
-    <header className="w-full h-full flex justify-center">
+    <header ref={menuRef} className="w-full h-full flex justify-center">
 
       <UserMenu showMenu={showMenu} submenu={submenu} pathname={pathname} />
 
-      <div className="z-50 fixed w-full max-w-6xl h-14 md:h-12 bg-[var(--bg-2)] rounded-b-4xl shadow-sm flex flex-row-reverse md:flex-row items-center justify-between px-4 xl:pl-8 xl:pr-6">
+      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-12 border-b border-zinc-500 bg-[var(--bg)] flex flex-row-reverse md:flex-row items-center justify-between px-2 md:pl-8 md:pr-6">
         <button
           id="suggestion-button-mobile"
           aria-label="Suggest an expression"
