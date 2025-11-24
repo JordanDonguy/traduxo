@@ -7,9 +7,10 @@ import { useAuth } from "@traduxo/packages/contexts/AuthContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
 import { toast } from "react-toastify";
-import { User, Dices } from "lucide-react";
+import { User } from "lucide-react";
 import UserMenu from "./UserMenu";
-import Logo from "../Logo";
+import Logo from "./Logo";
+import DicesButton from "../shared/DicesButton";
 
 function AppHeader() {
   const router = useRouter();
@@ -77,33 +78,27 @@ function AppHeader() {
 
       <UserMenu showMenu={showMenu} submenu={submenu} pathname={pathname} />
 
-      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-12 border-b border-zinc-500 bg-[var(--bg)] flex flex-row-reverse md:flex-row items-center justify-between px-2 md:pl-8 md:pr-6">
-        <button
-          id="suggestion-button-mobile"
-          aria-label="Suggest an expression"
-          onClick={() => {
-            router.push("/");
-            suggestTranslation();
-          }}
-          className="md:hidden p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"
-        >
-          <Dices size={28} className={`${isRolling ? "animate-dice-roll" : ""}`} />
-        </button>
+      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-12 border-b border-zinc-500 bg-[var(--bg)] flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
+        {/* -------- Mobile Dices Button -------- */}
+        <DicesButton
+          suggestTranslation={suggestTranslation}
+          size={28}
+          isRolling={isRolling}
+          className="md:hidden"
+        />
 
         <Logo />
 
         <div>
-          <button
-            id="suggestion-button-desktop"
-            aria-label="Suggest an expression"
-            onClick={() => {
-              router.push("/");
-              suggestTranslation();
-            }}
-            className="hidden md:inline p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
-          >
-            <Dices className={`${isRolling ? "animate-dice-roll" : ""}`} />
-          </button>
+          {/* -------- Desktop Dices Button -------- */}
+          <DicesButton
+            suggestTranslation={suggestTranslation}
+            size={28}
+            isRolling={isRolling}
+            className="hidden md:inline"
+          />
+
+          {/* -------- User Button -------- */}
           <button
             id="user-menu-button"
             aria-label="User menu"

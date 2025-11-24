@@ -12,11 +12,11 @@ import { toast } from "react-toastify";
 import ErrorSection from "./ErrorSection";
 import TranslationSection from "./TranslationSection";
 import ExplanationSection from "./ExplanationSection";
-import LanguageSelector from "../translator/LanguageSelector";
+import LanguageSelector from "./LanguageSelector";
 import { useLanguageSwitch } from "@traduxo/packages/hooks/translation/useLanguageSwitch";
 import { useVoiceInput } from "@/lib/client/hooks/ui/useVoiceInput";
 import { translationHelper } from "@traduxo/packages/utils/translation/translate";
-import TextInputForm from "../translator/TextInputForm";
+import TextInputForm from "./TextInputForm";
 
 function MainDisplay() {
   const {

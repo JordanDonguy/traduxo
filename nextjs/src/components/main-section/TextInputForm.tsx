@@ -1,8 +1,9 @@
 "use client";
 
-import { Mic, CircleStop, SendHorizontal, Dices } from "lucide-react";
+import { Mic, CircleStop, SendHorizontal } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
+import DicesButton from "../shared/DicesButton";
 
 type TextInputFormProps = {
   inputText: string;
@@ -88,18 +89,12 @@ export default function TextInputForm({
             {!isListening ? <Mic /> : <CircleStop />}
           </button>
 
-          <button
-            id="suggestion-button-mobile"
-            aria-label="Suggest an expression"
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              suggestTranslation();
-            }}
-            className="hidden md:block p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer"
-          >
-            <Dices size={28} className={`${isRolling ? "animate-dice-roll" : ""}`} />
-          </button>
+          <DicesButton
+            suggestTranslation={suggestTranslation}
+            size={28}
+            isRolling={isRolling}
+            className="hidden md:inline"
+          />
 
         </div>
 
