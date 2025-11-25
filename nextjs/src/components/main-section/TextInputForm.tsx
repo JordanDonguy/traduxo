@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 type TextInputFormProps = {
   inputText: string;
   setInputText: (text: string) => void;
-  handleTranslate: (e: React.FormEvent) => void;
+  handleTranslate: (text: string) => void;
   isListening: boolean;
   handleVoice: () => void;
   inputLang: string;
@@ -27,6 +27,7 @@ export default function TextInputForm({
 }: TextInputFormProps) {
   const [animateSend, setAnimateSend] = useState(false);
   const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { suggestTranslation, isRolling } = useSuggestion({});
 
@@ -38,8 +39,17 @@ export default function TextInputForm({
       typingTimeout.current = null; // mark it cleared
     }
     setAnimateSend(false); // make sure animation doesn't trigger
-    handleTranslate(e);
+    handleTranslate(inputText);
   });
+
+  // Auto resize input based on content length
+  const autoResize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    el.style.height = "auto";                 // reset so shrink works
+    el.style.height = `${el.scrollHeight}px`; // set height to content
+  };
 
   return (
     <form
@@ -47,17 +57,19 @@ export default function TextInputForm({
       aria-label="Text input form"
       data-testid="input-form"
       onSubmit={handleSubmit}
-      className="col-span-1 flex flex-col justify-between pt-4 pb-2 px-2 md:px-6 border border-zinc-500 rounded-md font-semibold shadow-sm"
+
+      className="col-span-1 max-h-[50vh] flex flex-col justify-between pt-4 pb-2 md:px-6 border border-[var(--gray-1)] rounded-md font-semibold"
     >
       {/* -------- Text input -------- */}
       <textarea
         id="text-input"
         aria-label="Enter text to translate"
-        className="w-full flex-1 text-2xl focus:outline-none resize-none pl-2"
+        ref={textareaRef}
+        className="w-full text-2xl focus:outline-none resize-none pl-2"
         placeholder="Enter some text..."
         onChange={(e) => {
           setInputText(e.target.value);
-
+          autoResize();
           // reset waiting + animation
           setAnimateSend(false);
 
@@ -90,8 +102,8 @@ export default function TextInputForm({
             aria-label="Voice input"
             data-testid="mic-button"
             type="button"
-            className={`w-10 h-10 text-[var(--input-placeholder)] hover:bg-[var(--hover)] hover:text-[var(--text)] hover:cursor-pointer rounded-full 
-            ${isListening ? "text-red-400" : "text-[var(--input-placeholder)]"} flex justify-center items-center`}
+            className={`w-10 h-10 text-[var(--blue-1)] hover-1 hover:text-[var(--text)] rounded-full 
+            ${isListening ? "text-red-400" : "text-[var(--blue-1)]"} flex justify-center items-center`}
             onClick={handleVoice}
           >
             {!isListening ? <Mic /> : <CircleStop />}
@@ -102,7 +114,7 @@ export default function TextInputForm({
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline text-[var(--input-placeholder)] hover:text-[var(--text)]"
+            className="hidden md:inline text-[var(--blue-1)] hover:text-[var(--text)]"
           />
 
           {/* -------- Copy and TTS buttons -------- */}
@@ -118,7 +130,7 @@ export default function TextInputForm({
           id="submit-translation-button"
           aria-label="Translate"
           type="submit"
-          className={`w-10 h-10 text-[var(--input-placeholder)] hover:cursor-pointer hover:text-[var(--text)] hover:bg-[var(--hover)] rounded-full flex justify-center items-center
+          className={`w-10 h-10 text-[var(--blue-1)] hover:text-[var(--text)] hover-1 rounded-full flex justify-center items-center
             ${animateSend ? "ping-once" : ""}`}
         >
           <SendHorizontal />
