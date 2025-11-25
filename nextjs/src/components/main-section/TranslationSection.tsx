@@ -38,7 +38,7 @@ function TranslationSection({
 
   return (
     <article
-      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)] rounded-md min-h-50 md:min-h-44`}
+      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)] rounded-md min-h-50 md:min-h-46`}
     >
       {isLoading ? (
         <div className="flex justify-start pl-12">
@@ -46,13 +46,13 @@ function TranslationSection({
         </div>
       ) : (
         <>
-          <div className="flex flex-col md:flex-row-reverse justify-between md:gap-4 px-2 pt-2 md:pt-4 md:pl-6 mb-2 font-semibold relative">
+          <div className="flex flex-col md:flex-row-reverse justify-between md:gap-4 pt-2 md:pt-4 md:px-6 mb-2 font-semibold relative">
 
             <div className="flex justify-between">
               {/* -------- Copy and TTS buttons -------- */}
               <div className="flex">
-                <CopyButton text={mainTranslation} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
-                <TextToSpeechButton text={mainTranslation} lang={translatedTextLang} className="text-[var(--input-placeholder)] hover:text-[var(--text)]" />
+                <CopyButton text={mainTranslation} />
+                <TextToSpeechButton text={mainTranslation} lang={translatedTextLang} />
               </div>
 
               {/* -------- Favorite button -------- */}
@@ -61,8 +61,8 @@ function TranslationSection({
                 aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                 onClick={onFavoriteClick}
                 disabled={isFavLoading}
-                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--input-placeholder)] flex justify-center items-center
-                hover:cursor-pointer hover:bg-[var(--hover)] hover:text-[var(--text)] h-10 w-10 rounded-full
+                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--blue-1)] flex justify-center items-center
+                hover-1 hover:text-[var(--text)] h-10 w-10 rounded-full
                 ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
               `}
               >
@@ -89,9 +89,9 @@ function TranslationSection({
                 aria-label={`Alternative translation ${idx + 1}`}
                 key={idx}
                 onClick={() => onSwitchTranslations(alt)}
-                className={`list-disc w-fit  transition-transform duration-200 fade-in-item
+                className={`list-disc marker:text-[var(--blue-1)] w-fit transition-transform duration-200 fade-in-item
                 ${fading.includes(alt) ? "scale-y-0" : "scale-y-100"}
-                hover:text-zinc-400 hover:cursor-pointer`}
+                hover:text-[var(--blue-1)] hover:cursor-pointer`}
               >
                 {capitalizeFirstLetter(alt)}
               </li>

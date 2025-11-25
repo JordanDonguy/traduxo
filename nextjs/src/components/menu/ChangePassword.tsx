@@ -36,13 +36,13 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
         handleSubmit({ currentPassword, password, confirmPassword });
       }}
       className={`
-        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)] pb-6
+        w-full mx-auto flex flex-col text-[var(--text-color)] pb-6
         ${showMenu ? "opacity-100" : "opacity-0"} duration-200 overflow-y-auto scrollbar-hide
         `}
     >
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        <div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed pb-28 inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
       ) : null}
@@ -67,7 +67,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
               name="current-password"
               aria-label="Current password"
               placeholder="********"
-              className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+              className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
@@ -87,7 +87,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
             name="password"
             aria-label="Password"
             placeholder="********"
-            className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+            className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -106,7 +106,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
             name="confirm-password"
             aria-label="Confirm password"
             placeholder="********"
-            className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+            className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -119,7 +119,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
           aria-label={isCredentials ? "Change password" : "Create password"}
           disabled={isLoading}
           type="submit"
-          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
+          className="text-[var(--blue-1)] hover-1 flex-shrink-0 border border-[var(--gray-2)] rounded-full h-12 flex items-center justify-center"
         >
           {isCredentials ? "Change password" : "Create password"}
         </button>
