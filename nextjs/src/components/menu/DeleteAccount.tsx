@@ -27,7 +27,7 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        < div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed pb-28 inset-0 bg-[var(--bg)] bg-opacity-60 z-40 flex items-center justify-center">
           <div role="status" className="spinner" />
         </div>
       ) : null}
@@ -45,7 +45,7 @@ function DeleteAccount({ showMenu }: DeleteAccountProps) {
             aria-label="Cancel account deletion"
             type="button"
             onClick={() => router.push("/?menu=open")}
-            className="h-16 text-center col-span-1 border rounded-full hover:cursor-pointer hover:bg-[var(--hover-2)]"
+            className="h-16 text-center col-span-1 border rounded-full hover-1"
           >
             Cancel
           </button>

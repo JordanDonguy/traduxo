@@ -45,13 +45,13 @@ export default function Login({ showMenu }: LoginProps) {
         }
       }}
       className={`
-        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
+        w-full mx-auto flex flex-col text-[var(--text)]
         ${showMenu ? "opacity-100" : "opacity-0"} duration-200
         `}
     >
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (
-        <div className="fixed inset-0 bg-[var(--menu)] bg-opacity-60 z-40 flex items-center justify-center fade-in-item">
+        <div className="fixed pb-28 inset-0 bg-[var(--bg)] bg-opacity-60 z-40 flex items-center justify-center fade-in-item">
           <div className="spinner" />
         </div>
       ) : null}
@@ -77,7 +77,7 @@ export default function Login({ showMenu }: LoginProps) {
             aria-label="Email"
             autoComplete="email"
             placeholder="you@example.com"
-            className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+            className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -96,7 +96,7 @@ export default function Login({ showMenu }: LoginProps) {
             name="password"
             aria-label="Password"
             placeholder="********"
-            className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+            className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -116,7 +116,7 @@ export default function Login({ showMenu }: LoginProps) {
               name="confirm-password"
               aria-label="Confirm password"
               placeholder="********"
-              className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+              className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -129,7 +129,7 @@ export default function Login({ showMenu }: LoginProps) {
           id="submit-login-button"
           aria-label={isSignup ? "Sign Up" : "Sign In"}
           type="submit"
-          className="hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
+          className="hover-1 flex-shrink-0 border border-[var(--gray-4)] bg-[var(--bg)] rounded-full h-12 flex items-center justify-center"
         >
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
@@ -140,7 +140,7 @@ export default function Login({ showMenu }: LoginProps) {
           aria-label="Continue with Google"
           type="button"
           onClick={() => handleGoogleButton()}
-          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--border)] bg-[var(--menu)] hover:bg-[var(--hover-2)] hover:cursor-pointer"
+          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--gray-4)] bg-[var(--bg)] hover-1"
         >
           <Image
             src="/google-logo.webp"

@@ -76,15 +76,15 @@ function AppHeader() {
   return (
     <header ref={menuRef} className="w-full h-full flex justify-center">
 
-      <UserMenu showMenu={showMenu} submenu={submenu} pathname={pathname} />
+      <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} submenu={submenu} pathname={pathname} />
 
-      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-12 border-b border-zinc-500 bg-[var(--bg)] flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
+      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-16 border-b border-[var(--gray-1)] header-gradient flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
         {/* -------- Mobile Dices Button -------- */}
         <DicesButton
           suggestTranslation={suggestTranslation}
           size={28}
           isRolling={isRolling}
-          className="md:hidden text-[var(--text)]"
+          className="md:hidden"
         />
 
         <Logo />
@@ -95,7 +95,7 @@ function AppHeader() {
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline text-[var(--text)]"
+            className="hidden md:inline"
           />
 
           {/* -------- User Button -------- */}
@@ -105,13 +105,13 @@ function AppHeader() {
             onClick={() => {
               if (showMenu) {
                 setShowMenu(false);         // close instantly
-                router.push("/");           // update URL asynchronously
+                router.push(`${pathname}`); // update URL asynchronously
               } else {
                 setShowMenu(true);          // open instantly
                 router.push(`${pathname}/?menu=open`); // update URL asynchronously
               }
             }}
-            className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
+            className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--blue-1)]"
           >
             <User size={28} className="md:hidden" />
             <User className="hidden md:block" />

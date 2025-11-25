@@ -20,7 +20,7 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
   return (
     <div
       className={`
-        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
+        w-full mx-auto flex flex-col text-[var(--text-color)]
         ${showMenu ? "opacity-100" : "opacity-0"} duration-200
         `}>
       <div className="flex flex-col gap-6">
@@ -37,7 +37,7 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
               onClick={() => selectTranslation(t, true)}
               className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4 fade-in-item
-              border border-transparent hover:border-[var(--input-placeholder)] hover:cursor-pointer
+              border border-transparent hover:border-[var(--blue-1)] hover:cursor-pointer
               "
             >
               <button
@@ -52,15 +52,15 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
                     toast.error(res.message);
                   };
                 }}
-                className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--input-placeholder)] hover:scale-115 active:scale-90 duration-100"
+                className="absolute right-2 top-0 md:right-3 md:top-1 w-4 text-[var(--text)] hover:scale-115 active:scale-90 duration-100"
               >
                 <CircleX className="rounded-full bg-[var(--bg-2)]" />
               </button>
-              <div className="flex items-center gap-4 item-center bg-[var(--menu)] rounded-md">
+              <div className="flex items-center gap-4 item-center bg-[var(--bg)] rounded-md">
                 <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.inputLang.toUpperCase()}</span>
-                <p className="h-fit truncate flex-1">{t.inputText}</p>
+                <p className="h-fit truncate flex-1 text-[var(--blue-1)]">{t.inputText}</p>
               </div>
-              <div className="flex items-center gap-4 item-center bg-[var(--menu)] rounded-md">
+              <div className="flex items-center gap-4 item-center bg-[var(--bg)] rounded-md">
                 <span className="w-10 h-8 border rounded-md flex items-center justify-center">{t.outputLang.toUpperCase()}</span>
                 <p className="h-fit truncate flex-1">{t.translation}</p>
               </div>

@@ -37,7 +37,7 @@ function ErrorSection({ error, setError }: ErrorSectionProps) {
             }, 400);
             return () => clearTimeout(timeout);
           }}
-          className="hover:bg-[var(--hover-2)] hover:cursor-pointer border border-[var(--border)] rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
+          className="hover-1 duration-100 text-lg bg-[var(--bg-2)] rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
         >
           Login
         </button>

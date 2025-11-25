@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
-import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -69,7 +68,6 @@ export default function Page() {
 
   return (
     <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)] overflow-y-scroll max-h-screen">
-      <AppHeaderSuspenseWrapper />
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading && (

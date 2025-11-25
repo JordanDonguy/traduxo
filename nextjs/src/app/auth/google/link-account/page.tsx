@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useGoogleLinking } from "@traduxo/packages/hooks/auth/useGoogleLinking"
-import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
 import { Mail, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -14,8 +13,6 @@ export default function Page() {
 
   return (
     <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)] overflow-y-scroll max-h-screen">
-
-      <AppHeaderSuspenseWrapper />
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading ? (

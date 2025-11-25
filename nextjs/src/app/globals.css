@@ -4,44 +4,38 @@
    Light Theme (Default)
 ============================== */
 :root {
-  --bg: #ffffff;
-  --text: #121212;
-  --bg-2: #ededee;
-  --menu: #ffffff;
-  --input: #f5fdff;
-  --input-placeholder: #7e7e7e;
-  --input-border: #a6a6a6;
-  --border: #a6a6a6;
-  --hover: #e0e0e4;
-  --hover-2: #dddde4;
-  --btn: #f0f5f5;
-  --example: #ececf0;
-  --example-border: #cccccc;
-  --glow: rgba(0, 0, 0, 0.3);
-  --scrollbar: #d0d0d6;
-  --scrollbar-active: #a8a8b0;
+  --bg: rgb(255, 255, 255);
+  --text: rgb(34, 34, 34);
+  --bg-2: rgb(243, 244, 245);
+  --hover: rgb(229, 230, 234);
+  --scrollbar: #dcdce4;
+  --scrollbar-active: #bdbdc6;
+  --gray-1: #d7e0ec;
+  --gray-2: rgb(244, 244, 244);
+  --gray-3: rgb(230, 230, 236);
+  --gray-4: rgb(165, 165, 174);
+  --blue-1: #163fbc;
+  --input-placeholder: rgb(148, 146, 161);
+  --toast-bg: rgb(245, 247, 250);
 }
 
 /* ==============================
    Dark Theme (Manual Switch)
 ============================== */
 [data-theme='dark'] {
-  --bg: #0c0c0c;
+  --bg: #000000;
   --text: #ededed;
-  --bg-2: #27272a;
-  --menu: #0c0c0c;
-  --input: #0c0c0c;
-  --input-placeholder: #a3a3a3;
-  --input-border: #424242;
-  --border: #696969;
-  --hover: #3f3f46;
-  --hover-2: #29292d;
-  --btn: #1b1b1d;
-  --example: #222227;
-  --example-border: #2e2d31;
-  --glow: rgba(255, 255, 255, 0.3);
-  --scrollbar: #202024;
-  --scrollbar-active: #44444b;
+  --bg-2: rgb(27, 27, 34);
+  --hover: #38383e;
+  --scrollbar: #1a1a20;
+  --scrollbar-active: #3c3c49;
+  --gray-1: #3F3F47;
+  --gray-2: #5a5a66;
+  --gray-3: #121217;
+  --gray-4: #3f3f50;
+  --blue-1: rgb(149, 156, 235);
+  --input-placeholder: rgb(114, 112, 123);
+  --toast-bg: #121217;
 }
 
 /* ==============================
@@ -49,32 +43,25 @@
 ============================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0c0c0c;
-    --text: #ededed;
-    --bg-2: #202024;
-    --menu: #0c0c0c;
-    --input: #0c0c0c;
-    --input-placeholder: #a3a3a3;
-    --input-border: #424242;
-    --border: #696969;
-    --hover: #3f3f46;
-    --hover-2: #29292d;
-    --btn: #1b1b1d;
-    --example: #222227;
-    --example-border: #2e2d31;
-    --glow: rgba(255, 255, 255, 0.3);
-    --scrollbar: #202024;
-    --scrollbar-active: #44444b;
+    --bg: #000000;
+    --text: rgb(232, 232, 232);
+    --bg-2: rgb(27, 27, 34);
+    --hover: #38383e;
+    --scrollbar: #1a1a20;
+    --scrollbar-active: #3c3c49;
+    --gray-1: #3F3F47;
+    --gray-2: #5a5a66;
+    --gray-3: #121217;
+    --gray-4: #3f3f50;
+    --blue-1: rgb(149, 156, 235);
+    --input-placeholder: rgb(114, 112, 123);
+    --toast-bg: #121217;
   }
 }
 
 /* ==============================
    Base Styles
 ============================== */
-.logo {
-  color: var(--logo-color);
-}
-
 body {
   background: var(--bg-2);
   color: var(--text);
@@ -85,7 +72,8 @@ select {
   text-align-last: center;
 }
 
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
   color: var(--input-placeholder);
   opacity: 1;
   /* Fix Safari's default opacity */
@@ -95,18 +83,13 @@ strong {
   font-weight: 800;
 }
 
-/* ==============================
-   Warning Background
-============================== */
-.bg-warning {
-  background-image: url("../../public/warning.svg");
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 100%;
+.header-gradient {
+  background: linear-gradient(to right, var(--gray-3), var(--bg));
 }
 
-[data-theme="dark"] .bg-warning {
-  background-image: url("../../public/warning-dark.svg");
+.hover-1:hover {
+  background: var(--hover);
+  cursor: pointer;
 }
 
 /* ==============================
@@ -116,7 +99,7 @@ strong {
 .explanation ul {
   margin-bottom: .5rem;
   padding-bottom: .5rem;
-  border-bottom: 1px solid var(--example-border);
+  border-bottom: 1px solid var(--gray-1);
 }
 
 .explanation ul:last-of-type {
@@ -137,7 +120,8 @@ strong {
 .explanation h3 {
   font-size: 1.4rem;
   padding: 1rem 0px;
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--blue-1)
 }
 
 .explanation p,
@@ -150,7 +134,7 @@ strong {
 }
 
 .explanation ul li {
-  background-color: var(--example);
+  background-color: var(--bg-2);
   border-radius: .5rem;
   padding: .5rem;
   margin: .75rem 0px;
@@ -277,7 +261,7 @@ strong {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: var(--glow);
+  background: var(--hover);
   animation: ping 1.2s ease-out forwards;
   pointer-events: none;
 }
@@ -311,8 +295,8 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  box-shadow: 0 0 0px 1000px var(--your-bg-color) inset !important;
-  -webkit-text-fill-color: var(--your-text-color) !important;
+  box-shadow: 0 0 0px 1000px var(--bg) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 
@@ -322,7 +306,7 @@ select:-webkit-autofill:focus {
 
 /* Scrollbar background */
 ::-webkit-scrollbar {
-  background-color: var(--bg);
+  background-color: transparent;
   width: 12px;
 }
 

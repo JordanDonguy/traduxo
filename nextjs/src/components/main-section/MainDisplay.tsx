@@ -24,7 +24,6 @@ function MainDisplay() {
     setIsLoading,
     error,
     setError,
-    showMenu,
   } = useApp();
 
   const router = useRouter();
@@ -74,10 +73,9 @@ function MainDisplay() {
   });
 
   // Handle translation request
-  const handleTranslate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleTranslate = async (text: string) => {
     translationHelper({
-      inputText,
+      inputText: text,
       inputLang,
       outputLang,
       setInputTextLang,
@@ -118,8 +116,7 @@ function MainDisplay() {
   }, [translatedText, setInputText])
 
   return (
-    <section className={`${showMenu && "blur-md pointer-events-none"} relative flex flex-col items-center w-full duration-250 px-2 md:px-8 xl:px-20 mt-20`}
-    >
+    <section className="relative flex flex-col items-center w-full px-2 md:px-8 xl:px-20 mt-20 md:mt-28">
       {error.length ? (
         <ErrorSection error={error} setError={setError} />
       ) : (
@@ -132,6 +129,8 @@ function MainDisplay() {
             isSwitching={isSwitching}
             switchLanguage={switchLanguage}
             inputTextLang={inputTextLang}
+            handleTranslate={handleTranslate}
+            translatedText={translatedText}
           />
           <section className="grid grid-cols-1 lg:grid-cols-2 w-full mt-8 gap-8">
             <TextInputForm

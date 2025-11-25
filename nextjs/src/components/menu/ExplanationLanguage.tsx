@@ -15,7 +15,7 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
   return (
     <div
       className={`
-        max-w-2xl w-full mx-auto flex flex-col text-[var(--text-color)]
+        w-full mx-auto flex flex-col text-[var(--text-color)]
         ${showMenu ? "opacity-100" : "opacity-0"} duration-200
         `}>
       <div className="flex flex-col gap-6">
@@ -33,11 +33,11 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
                 changeSystemLang(code);
               }}
               className={`relative w-full flex items-center gap-2 md:gap-4 bg-[var(--bg-2)] rounded-xl p-2 md:p-4 h-16 shrink-0
-                border hover:border-[var(--input-placeholder)] hover:cursor-pointer
-                ${systemLang === code ? "border-[var(--input-placeholder)]" : "border-transparent"}`}
+                border hover:border-[var(--blue-1)] hover:cursor-pointer
+                ${systemLang === code ? "border-[var(--gray-4)]" : "border-transparent"}`}
             >
               {systemLang === code ? (
-                <Check className="absolute right-6 rounded-full border p-0.5" />
+                <Check className="absolute right-6 rounded-full border p-0.5 text-[var(--blue-1)]" />
               ) : null}
               <span className="w-full flex items-center justify-center text-lg">
                 {ISO6391.getName(code) || code} ({code.toUpperCase()})

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
+import { TranslationItem } from "@traduxo/packages/types/translation";
 import ISO6391 from "iso-639-1";
 import { ArrowRightLeft } from "lucide-react";
 
@@ -12,7 +14,9 @@ type LanguageSelectorProps = {
   switchLanguage: () => void;
   showWarning?: boolean;
   setShowWarning?: (val: boolean) => void;
-  inputTextLang: string
+  inputTextLang: string,
+  handleTranslate: (text: string) => void;
+  translatedText: TranslationItem[];
 };
 
 export default function LanguageSelector({
@@ -24,12 +28,20 @@ export default function LanguageSelector({
   switchLanguage,
   showWarning = false,
   setShowWarning,
-  inputTextLang
+  inputTextLang,
+  handleTranslate,
+  translatedText
 }: LanguageSelectorProps) {
   const languageCodes = ISO6391.getAllCodes();
+  const mainTranslation = useMemo(() => translatedText.find(item => item.type === "main_translation")?.value ?? "", [translatedText]);
+
+  // Call translation handler with translated text when switching language (to switch translation)
+  useEffect(() => {
+    if (isSwitching && mainTranslation) handleTranslate(mainTranslation)
+  }, [isSwitching, mainTranslation, handleTranslate])
 
   return (
-    <section className="relative w-full grid grid-cols-2 border border-zinc-500 rounded-lg">
+    <section className="relative w-full grid grid-cols-2 rounded-lg ">
       {/* Voice warning */}
       <div className={`${showWarning ? "scale-y-100 opacity-95" : "scale-y-0 opacity-0"} h-60 absolute bottom-37 md:left-28 p-2 bg-warning flex drop-shadow-lg duration-300 origin-bottom`}>
         <span className="max-w-40 block ml-8 mt-8 text-lg">You need to select a language to use voice input</span>
@@ -43,10 +55,9 @@ export default function LanguageSelector({
         value={inputLang}
         onChange={(e) => setInputLang(e.target.value)}
         onClick={() => setShowWarning && setShowWarning(false)}
-        className={`appearance-none h-12 text-center rounded-l-lg
-        hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none duration-100 origin-right ease-in-out`}
+        className={`appearance-none h-12 text-center rounded-l-lg !text-[var(--blue-1)] font-semibold border border-[var(--gray-1)]
+          hover-1 focus:outline-none duration-100 origin-right ease-in-out`}
       >
-
         <option value="auto">
           ✨ Auto {inputLang === "auto" && inputTextLang ? ` (${inputTextLang})` : ""}
         </option>
@@ -64,9 +75,9 @@ export default function LanguageSelector({
         aria-label="Switch input and output languages"
         onClick={switchLanguage}
         className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-          w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg)]
-          hover:cursor-pointer hover:bg-[var(--hover)] z-20 border border-zinc-500
-          ${isSwitching ? "scale-once" : ""}`}
+          w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg)] text-[var(--blue-1)]
+          z-20 border border-[var(--gray-2)] hover:border-[var(--hover)] shadow-sm duration-150
+          ${isSwitching ? "scale-once hover:bg-[var(--bg)]" : "hover-1"}`}
       >
         <ArrowRightLeft className={`filter invert-15 ${isSwitching ? "spin-once" : ""}`} />
       </button>
@@ -78,8 +89,8 @@ export default function LanguageSelector({
         data-testid="output-lang-select"
         value={outputLang}
         onChange={(e) => setOutputLang(e.target.value)}
-        className={`appearance-none bg-[var(--bg-2)] h-12 rounded-r-lg text-center
-          hover:cursor-pointer hover:bg-[var(--hover)] focus:outline-none duration-100 origin-left ease-in-out`}
+        className={`appearance-none bg-[var(--bg-2)] hover-1 h-12 rounded-r-lg text-center
+          hover-1 focus:outline-none !text-[var(--blue-1)] font-semibold`}
       >
         {languageCodes.map(code => (
           <option key={code} value={code}>

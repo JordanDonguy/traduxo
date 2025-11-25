@@ -12,7 +12,7 @@ const MenuButton = ({ id, label, icon, onClick, className }: MenuButtonProps) =>
       id={id}
       aria-label={label}
       onClick={onClick}
-      className={`w-full max-w-2xl h-16 bg-[var(--bg-2)] rounded-xl px-6 flex items-center hover:cursor-pointer hover:bg-[var(--hover)] shrink-0 ${className || ""}`}
+      className={`w-full h-16 bg-[var(--bg-2)] rounded-xl px-6 flex items-center hover-1 shrink-0 ${className || ""}`}
     >
       {icon}
       <span className="pl-6 text-xl">{label}</span>

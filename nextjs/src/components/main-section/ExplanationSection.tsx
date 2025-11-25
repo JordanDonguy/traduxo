@@ -7,6 +7,7 @@ import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanati
 import { TranslationItem } from "@traduxo/packages/types/translation";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 import { toast } from "react-toastify";
+import CopyButton from "./CopyButton";
 
 type ExplanationSectionProps = {
   explanation: string;
@@ -25,13 +26,15 @@ export default function ExplanationSection({
 
   if (explanation.length > 500) {
     return (
-      <div 
-      className="lg:col-span-2 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-start md:mt-4 mb-8
-        fade-in-explanation border-t md:border border-zinc-500 md:rounded-lg pt-4 md:p-4 md:shadow-md min-h-[60vh]"
+      <div
+        className="lg:col-span-2 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-start md:mt-6 mb-8
+        fade-in-explanation pt-4 md:p-4 min-h-[60vh]"
       >
         <div className="fade-in-item explanation">
           <ReactMarkdown>{explanation}</ReactMarkdown>
         </div>
+
+        <CopyButton text={explanation} className="border w-20 rounded-full" />
       </div>
     );
   }
@@ -46,7 +49,7 @@ export default function ExplanationSection({
 
   return (
     <div
-      className={`lg:col-span-2 flex justify-center items-center flex-1 w-full self-center ease-in-out transform md:mt-4`}
+      className={`lg:col-span-2 flex justify-center items-center flex-1 w-full self-center ease-in-out transform md:mt-4 lg:mt-10 `}
     >
       <button
         id="explanation-button"
@@ -59,7 +62,7 @@ export default function ExplanationSection({
           blurActiveInput();
           handleExplanation();
         }}
-        className="w-full max-w-xl py-4 shadow-sm rounded-full border-2 border-[var(--border)] text-xl hover:cursor-pointer hover:bg-[var(--hover)] active:scale-90 duration-100"
+        className="w-full max-w-xl py-4 text-[var(--blue-1)] bg-[var(--bg-2)] hover-1 rounded-full text-xl active:scale-90 duration-100"
       >
         ✨ AI explanations
       </button>

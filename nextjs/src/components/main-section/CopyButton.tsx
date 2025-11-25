@@ -38,10 +38,10 @@ const CopyButton = ({
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative w-fit">
       <button
         onClick={handleCopy}
-        className={`w-10 h-10 text-[var(--input-placeholder)] hover:bg-[var(--hover)] hover:text-[var(--text)] hover:cursor-pointer rounded-full flex justify-center items-center ${className}`}
+        className={`w-10 h-10 text-[var(--blue-1)] hover-1 hover:text-[var(--text)] rounded-full flex justify-center items-center ${className}`}
         aria-label="Copy text"
         type="button"
       >
@@ -49,7 +49,7 @@ const CopyButton = ({
       </button>
 
       {copied && (
-        <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-zinc-700 text-white text-xs px-2 py-1 rounded-md shadow-md">
+        <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-zinc-700 text-white text-xs px-2 py-1 rounded-md shadow-md">
           Copied!
         </span>
       )}
