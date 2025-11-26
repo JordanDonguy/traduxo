@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-y-hidden">
+    <html lang="en" className="overflow-y-hidden bg-[var(--bg)]">
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta

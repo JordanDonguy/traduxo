@@ -10,12 +10,13 @@
   --hover: rgb(229, 230, 234);
   --scrollbar: #dcdce4;
   --scrollbar-active: #bdbdc6;
-  --gray-1: #d7e0ec;
-  --gray-2: rgb(244, 244, 244);
+  --gray-1: rgb(215, 224, 236);
+  --gray-2: rgb(190, 199, 210);
   --gray-3: rgb(230, 230, 236);
   --gray-4: rgb(165, 165, 174);
+  --gray-5: rgb(148, 146, 161);
+  --gray-6: rgb(82, 79, 86);
   --blue-1: #163fbc;
-  --input-placeholder: rgb(148, 146, 161);
   --toast-bg: rgb(245, 247, 250);
 }
 
@@ -24,17 +25,18 @@
 ============================== */
 [data-theme='dark'] {
   --bg: #000000;
-  --text: #ededed;
-  --bg-2: rgb(27, 27, 34);
+  --text: rgb(232, 232, 232);
+  --bg-2: rgb(27, 27, 31);
   --hover: #38383e;
   --scrollbar: #1a1a20;
   --scrollbar-active: #3c3c49;
   --gray-1: #3F3F47;
   --gray-2: #5a5a66;
-  --gray-3: #121217;
+  --gray-3: #121215;
   --gray-4: #3f3f50;
-  --blue-1: rgb(149, 156, 235);
-  --input-placeholder: rgb(114, 112, 123);
+  --gray-5: rgb(114, 112, 123);
+  --gray-6: rgb(160, 156, 173);
+  --blue-1: rgb(160, 166, 235);
   --toast-bg: #121217;
 }
 
@@ -45,16 +47,17 @@
   :root:not([data-theme='light']) {
     --bg: #000000;
     --text: rgb(232, 232, 232);
-    --bg-2: rgb(27, 27, 34);
+    --bg-2: rgb(27, 27, 31);
     --hover: #38383e;
     --scrollbar: #1a1a20;
     --scrollbar-active: #3c3c49;
     --gray-1: #3F3F47;
     --gray-2: #5a5a66;
-    --gray-3: #121217;
+    --gray-3: #121215;
     --gray-4: #3f3f50;
-    --blue-1: rgb(149, 156, 235);
-    --input-placeholder: rgb(114, 112, 123);
+    --gray-5: rgb(114, 112, 123);
+    --gray-6: rgb(160, 156, 173);
+    --blue-1: rgb(160, 166, 235);
     --toast-bg: #121217;
   }
 }
@@ -74,7 +77,7 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--input-placeholder);
+  color: var(--gray-5);
   opacity: 1;
   /* Fix Safari's default opacity */
 }
@@ -87,9 +90,11 @@ strong {
   background: linear-gradient(to right, var(--gray-3), var(--bg));
 }
 
-.hover-1:hover {
-  background: var(--hover);
-  cursor: pointer;
+@media (hover: hover) {
+  .hover-1:hover {
+    background: var(--hover);
+    cursor: pointer;
+  }
 }
 
 /* ==============================

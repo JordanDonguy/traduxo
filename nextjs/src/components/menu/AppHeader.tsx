@@ -78,13 +78,14 @@ function AppHeader() {
 
       <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} submenu={submenu} pathname={pathname} />
 
+
       <div className="z-50 inset-x-0 fixed w-full h-14 md:h-16 border-b border-[var(--gray-1)] header-gradient flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
         {/* -------- Mobile Dices Button -------- */}
         <DicesButton
           suggestTranslation={suggestTranslation}
           size={28}
           isRolling={isRolling}
-          className="md:hidden"
+          className="md:hidden text-[var(--text)]"
         />
 
         <Logo />
@@ -95,7 +96,7 @@ function AppHeader() {
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline"
+            className="hidden md:inline text-[var(--text)]"
           />
 
           {/* -------- User Button -------- */}
@@ -111,7 +112,7 @@ function AppHeader() {
                 router.push(`${pathname}/?menu=open`); // update URL asynchronously
               }
             }}
-            className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--blue-1)]"
+            className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
           >
             <User size={28} className="md:hidden" />
             <User className="hidden md:block" />

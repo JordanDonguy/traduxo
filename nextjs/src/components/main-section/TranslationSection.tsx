@@ -61,7 +61,7 @@ function TranslationSection({
                 aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                 onClick={onFavoriteClick}
                 disabled={isFavLoading}
-                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--blue-1)] flex justify-center items-center
+                className={`self-end md:self-start md:pr-4 lg:pr-0 text-[var(--gray-6)] flex justify-center items-center
                 hover-1 hover:text-[var(--text)] h-10 w-10 rounded-full
                 ${isFavLoading ? "pointer-events-none text-gray-400" : ""}
               `}
@@ -74,7 +74,7 @@ function TranslationSection({
             <p
               className={`text-2xl min-h-8 flex items-center duration-200 fade-in-item pl-2
               ${fading.includes(mainTranslation) ? "scale-y-0" : "scale-y-100"}
-              ${!mainTranslation && "text-[var(--input-placeholder)]"}
+              ${!mainTranslation && "text-[var(--gray-5)]"}
               `}
             >
               {mainTranslation ? capitalizeFirstLetter(mainTranslation) : "Translation"}
@@ -82,7 +82,7 @@ function TranslationSection({
           </div>
 
           {/* -------- Alternative translations -------- */}
-          <ul className="pl-18 pr-4 pb-2 md:pb-4 flex flex-col gap-2">
+          <ul className="pl-10 md:pl-18 pr-4 pb-2 md:pb-4 flex flex-col gap-2">
             {alternatives.map((alt, idx) =>
               <li
                 id={`alternative-translation ${idx + 1}`}

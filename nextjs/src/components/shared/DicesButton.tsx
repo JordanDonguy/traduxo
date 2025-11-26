@@ -30,7 +30,7 @@ const DicesButton = ({
         e.preventDefault();
         handleClick()
       }}
-      className={`p-2 text-[var(--blue-1)] rounded-full hover-1 ${className}`}
+      className={`p-2 text-[var(--gray-6)] rounded-full hover-1 ${className}`}
       aria-label="Suggest an expression"
     >
       <Dices size={size} className={isRolling ? "animate-dice-roll" : ""} />

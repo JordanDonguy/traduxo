@@ -55,7 +55,7 @@ export default function LanguageSelector({
         value={inputLang}
         onChange={(e) => setInputLang(e.target.value)}
         onClick={() => setShowWarning && setShowWarning(false)}
-        className={`appearance-none h-12 text-center rounded-l-lg !text-[var(--blue-1)] font-semibold border border-[var(--gray-1)]
+        className={`appearance-none h-12 text-center rounded-l-lg !text-[var(--text)] font-semibold border border-[var(--gray-1)]
           hover-1 focus:outline-none duration-100 origin-right ease-in-out`}
       >
         <option value="auto">
@@ -75,9 +75,9 @@ export default function LanguageSelector({
         aria-label="Switch input and output languages"
         onClick={switchLanguage}
         className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-          w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg)] text-[var(--blue-1)]
-          z-20 border border-[var(--gray-2)] hover:border-[var(--hover)] shadow-sm duration-150
-          ${isSwitching ? "scale-once hover:bg-[var(--bg)]" : "hover-1"}`}
+          w-12 h-12 flex justify-center items-center rounded-full bg-[var(--bg)] text-[var(--gray-6)]
+          z-20 border border-[var(--gray-2)] hover:border-[var(--gray-5)] duration-150
+          ${isSwitching ? "scale-once hover:bg-[var(--bg)]" : "hover-1 hover:text-[var(--text)]"}`}
       >
         <ArrowRightLeft className={`filter invert-15 ${isSwitching ? "spin-once" : ""}`} />
       </button>
@@ -90,7 +90,7 @@ export default function LanguageSelector({
         value={outputLang}
         onChange={(e) => setOutputLang(e.target.value)}
         className={`appearance-none bg-[var(--bg-2)] hover-1 h-12 rounded-r-lg text-center
-          hover-1 focus:outline-none !text-[var(--blue-1)] font-semibold`}
+          hover-1 focus:outline-none !text-[var(--text)] font-semibold`}
       >
         {languageCodes.map(code => (
           <option key={code} value={code}>

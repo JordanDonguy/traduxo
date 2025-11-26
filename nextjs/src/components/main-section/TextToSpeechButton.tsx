@@ -26,7 +26,7 @@ const TextToSpeechButton = ({ text, lang, className = "", size = 24 }: TextToSpe
   return (
     <button
       onClick={handleSpeak}
-      className={`w-10 h-10 text-[var(--blue-1)] hover-1 hover:text-[var(--text)] rounded-full flex justify-center items-center ${className}`}
+      className={`w-10 h-10 text-[var(--gray-6)] hover-1 hover:text-[var(--text)] rounded-full flex justify-center items-center ${className}`}
       aria-label="Read text aloud"
       type="button"
     >

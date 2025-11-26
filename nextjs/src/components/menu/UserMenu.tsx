@@ -86,7 +86,6 @@ function UserMenu({ showMenu, setShowMenu, submenu, pathname }: UserMenuProps) {
   }, [theme, mounted]);
 
 
-
   if (!mounted) return null;
 
   return (
@@ -227,7 +226,7 @@ function UserMenu({ showMenu, setShowMenu, submenu, pathname }: UserMenuProps) {
                   <Link
                     id="privacy-policy-button"
                     href="/privacy"
-                    onMouseEnter={() => router.prefetch("/privacy")}
+                    prefetch={true}
                     onClick={() => {
                       setShowMenu(false);
                     }}

@@ -102,7 +102,7 @@ export default function TextInputForm({
             aria-label="Voice input"
             data-testid="mic-button"
             type="button"
-            className={`w-10 h-10 text-[var(--blue-1)] hover-1 hover:text-[var(--text)] rounded-full 
+            className={`w-10 h-10 text-[var(--gray-6)] hover-1 hover:text-[var(--text)] rounded-full 
             ${isListening ? "text-red-400" : "text-[var(--blue-1)]"} flex justify-center items-center`}
             onClick={handleVoice}
           >
@@ -130,7 +130,7 @@ export default function TextInputForm({
           id="submit-translation-button"
           aria-label="Translate"
           type="submit"
-          className={`w-10 h-10 text-[var(--blue-1)] hover:text-[var(--text)] hover-1 rounded-full flex justify-center items-center
+          className={`w-10 h-10 text-[var(--blue-1)] hover-1 rounded-full flex justify-center items-center
             ${animateSend ? "ping-once" : ""}`}
         >
           <SendHorizontal />
