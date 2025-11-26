@@ -30,10 +30,16 @@ function AppHeader() {
       setShowMenu(true)
     } else {
       setShowMenu(false)
-      // Remove submenu param using router.replace
-      const params = new URLSearchParams(searchParams);
-      params.delete("submenu");
-      router.replace(`${pathname}?${params.toString()}`);
+      // Remove submenu param using router.replace (if it exists in URL)
+      if (searchParams.has("submenu")) {
+        const params = new URLSearchParams(searchParams);
+        params.delete("submenu");
+
+        const newUrl = `${pathname}${params.toString() ? "?" + params.toString() : ""}`;
+        if (newUrl !== window.location.pathname + window.location.search) {
+          router.replace(newUrl);
+        }
+      }
     }
   }, [searchParams, pathname, router, setShowMenu]);
 
