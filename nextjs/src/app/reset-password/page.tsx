@@ -67,16 +67,16 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-[100svh] flex flex-col items-center w-full bg-[var(--bg)] overflow-y-scroll max-h-screen">
+    <div className="min-h-[100svh] flex flex-col items-center w-full overflow-y-scroll max-h-screen">
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading && (
-        <div className="fixed inset-0 bg-(var[--menu]) bg-opacity-60 z-40 flex items-center justify-center">
+        <div className="fixed inset-0 bg-(var[--bg]) bg-opacity-60 z-40 flex items-center justify-center">
           <div className="spinner" />
         </div>
       )}
 
-      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-4 px-2 md:px-0 pt-16 pb-4 ${isLoading ? "opacity-60" : "opacity-100"}`}>
+      <main className={`flex flex-col justify-center items-center w-full flex-1 max-w-xl gap-8 px-2 md:px-0 pt-16 pb-4 ${isLoading ? "opacity-60" : "opacity-100"}`}>
         <p className="text-xl text-center">Please enter your new password here:</p>
 
         {error && <p className="text-red-500 text-center">{error}</p>}
@@ -86,7 +86,7 @@ export default function Page() {
             e.preventDefault();
             handleSubmit();
           }}
-          className="flex flex-col w-full items-center justify-center gap-4"
+          className="flex flex-col w-full items-center justify-center gap-6"
         >
 
           {/* -------------- Password input -------------- */}
@@ -100,7 +100,7 @@ export default function Page() {
               id="password"
               name="password"
               placeholder="********"
-              className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+              className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -118,7 +118,7 @@ export default function Page() {
               id="confirm-password"
               name="confirm-password"
               placeholder="********"
-              className="bg-[var(--menu)] p-4 w-full rounded-md focus:outline-none"
+              className="bg-[var(--bg)] p-4 w-full rounded-md focus:outline-none"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -128,7 +128,7 @@ export default function Page() {
           {/* -------------- Submit button -------------- */}
           <button
             type="submit"
-            className="w-full hover:bg-[var(--hover-2)] flex-shrink-0 border border-[var(--border)] bg-[var(--menu)] hover:cursor-pointer rounded-full h-12 flex items-center justify-center"
+            className="w-full mt-4 hover-1 flex-shrink-0 border border-[var(--gray-1)] bg-[var(--bg-2)]/70 rounded-full h-12 flex items-center justify-center"
           >
             Change password
           </button>

@@ -7,7 +7,7 @@ function GoogleCallbackContent() {
   useGoogleCallback({});
 
   return (
-    <div className="bg-[var(--bg)] flex flex-col items-center justify-center h-screen gap-8">
+    <div className="flex flex-col items-center justify-center h-screen gap-8">
       <p className="text-3xl text-center text-[var(--text)]">
         Signing you in with Google...
       </p>

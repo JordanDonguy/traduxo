@@ -3,6 +3,7 @@ import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import AppProvider from "@/contexts/AppProvider.web";
 import AppHeaderSuspenseWrapper from "@/components/menu/AppHeaderSuspenseWrapper";
+
 const openSans = Open_Sans({
   variable: "--font-open_sans",
   subsets: ["latin"],
@@ -29,12 +30,14 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${openSans.className} antialiased bg-[var(--bg)]`}
+        className={`${openSans.className} antialiased`}
       >
         <AppProvider>
           <AppHeaderSuspenseWrapper />
           <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>
-          {children}
+          <div className="bg-[var(--bg)]">
+            {children}
+          </div>
         </AppProvider>
       </body>
     </html>

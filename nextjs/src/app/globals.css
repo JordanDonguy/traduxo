@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==============================
-   Light Theme (Default)
+   Light Theme
 ============================== */
 :root {
   --bg: rgb(255, 255, 255);
@@ -21,9 +21,9 @@
 }
 
 /* ==============================
-   Dark Theme (Manual Switch)
+   Dark Theme
 ============================== */
-[data-theme='dark'] {
+.dark {
   --bg: #000000;
   --text: rgb(232, 232, 232);
   --bg-2: rgb(27, 27, 31);
@@ -38,28 +38,6 @@
   --gray-6: rgb(160, 156, 173);
   --blue-1: rgb(160, 166, 235);
   --toast-bg: #121217;
-}
-
-/* ==============================
-   Dark Theme (System Preference)
-============================== */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --bg: #000000;
-    --text: rgb(232, 232, 232);
-    --bg-2: rgb(27, 27, 31);
-    --hover: #38383e;
-    --scrollbar: #1a1a20;
-    --scrollbar-active: #3c3c49;
-    --gray-1: #3F3F47;
-    --gray-2: #5a5a66;
-    --gray-3: #121215;
-    --gray-4: #3f3f50;
-    --gray-5: rgb(114, 112, 123);
-    --gray-6: rgb(160, 156, 173);
-    --blue-1: rgb(160, 166, 235);
-    --toast-bg: #121217;
-  }
 }
 
 /* ==============================

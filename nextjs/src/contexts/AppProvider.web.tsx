@@ -8,7 +8,7 @@ import { AppProviderBase } from "@traduxo/packages/contexts/AppContext";
 export default function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppProviderBase>
-      <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
         <ToastContainer
           position="top-right"

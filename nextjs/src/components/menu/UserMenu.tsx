@@ -227,9 +227,6 @@ function UserMenu({ showMenu, setShowMenu, submenu, pathname }: UserMenuProps) {
                     id="privacy-policy-button"
                     href="/privacy"
                     prefetch={true}
-                    onClick={() => {
-                      setShowMenu(false);
-                    }}
                     className={`w-full h-16 bg-[var(--bg-2)] rounded-xl px-6 flex items-center hover-1 shrink-0`}
                   >
                     <Shield />
