@@ -34,8 +34,12 @@ export default function RootLayout({
       >
         <AppProvider>
           <AppHeaderSuspenseWrapper />
+
           <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>
-          <div className="bg-[var(--bg)]">
+          <div
+            id="page-container"
+            className="min-h-[100svh] max-h-screen flex flex-col items-center w-full overflow-y-scroll"
+          >
             {children}
           </div>
         </AppProvider>

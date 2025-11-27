@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useApp } from "@traduxo/packages/contexts/AppContext";
 import { useAuth } from "@traduxo/packages/contexts/AuthContext";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useSuggestion } from "@traduxo/packages/hooks/suggestion/useSuggestion";
 import { showAuthToasts } from "@traduxo/packages/utils/ui/authToasts";
 import { toast } from "react-toastify";
@@ -11,6 +12,7 @@ import { User } from "lucide-react";
 import UserMenu from "./UserMenu";
 import Logo from "./Logo";
 import DicesButton from "../shared/DicesButton";
+import Link from "next/link";
 
 function AppHeader() {
   const router = useRouter();
@@ -18,12 +20,19 @@ function AppHeader() {
   const pathname = usePathname();
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
   const menuRef = useRef<HTMLDivElement>(null);
-
+  
   const { showMenu, setShowMenu } = useApp();
   const { refresh } = useAuth();
+  const { setTranslatedText, setExplanation } = useTranslationContext();
   const { suggestTranslation, isRolling } = useSuggestion({});
+  
+  // State and ref to hide/show header on scroll (mobile only)
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
+  // ---------------------------------------------------------------
   // Get url params, if menu-open, open the menu, otherwise close it
+  // ---------------------------------------------------------------
   useEffect(() => {
     const menuOpen = searchParams.get("menu") === "open";
     if (menuOpen) {
@@ -43,7 +52,9 @@ function AppHeader() {
     }
   }, [searchParams, pathname, router, setShowMenu]);
 
+  // ----------------------------------------------------------------------------
   // Display a toast message if there's an error or success message in url params
+  // ----------------------------------------------------------------------------
   useEffect(() => {
     // Convert URLSearchParams to a plain object
     const paramsObj: Record<string, string | boolean> = {};
@@ -64,7 +75,9 @@ function AppHeader() {
     refresh();
   }, [searchParams, pathname, router, refresh]);
 
+  // -------------------------------------------------
   // Close the menu if user clicks outside of the menu
+  // -------------------------------------------------
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (showMenu && menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -79,13 +92,46 @@ function AppHeader() {
     };
   }, [showMenu, router, pathname]);
 
+  // ----------------------------------------
+  // Hide/show header on scroll (mobile only)
+  // ----------------------------------------
+  useEffect(() => {
+    const pageContainer = document.getElementById("page-container");
+    if (!pageContainer) return;
+
+    function handleScroll() {
+      if (!pageContainer) return;
+      const currentY = pageContainer.scrollTop;
+
+      if (window.innerWidth < 768) {
+        if (currentY > lastScrollY.current && currentY > 50) {
+          // scrolling down
+          setHidden(true);
+        } else {
+          // scrolling up
+          setHidden(false);
+        }
+      }
+
+      lastScrollY.current = currentY;
+    }
+
+    pageContainer.addEventListener("scroll", handleScroll);
+    return () => pageContainer.removeEventListener("scroll", handleScroll);
+  }, []);
+
+
   return (
     <header ref={menuRef} className="w-full h-full flex justify-center">
 
       <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} submenu={submenu} pathname={pathname} />
 
+      <div
+        className={`z-50 inset-x-0 fixed shadow-md w-full h-14 md:h-16 border-b border-[var(--gray-1)] 
+          header-gradient flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8 
+          transition-transform duration-500 ${hidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"}`}
+      >
 
-      <div className="z-50 inset-x-0 fixed w-full h-14 md:h-16 border-b border-[var(--gray-1)] header-gradient flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8">
         {/* -------- Mobile Dices Button -------- */}
         <DicesButton
           suggestTranslation={suggestTranslation}
@@ -94,7 +140,14 @@ function AppHeader() {
           className="md:hidden text-[var(--text)]"
         />
 
-        <Logo />
+        <Link
+          href={"/"}
+          onClick={() => {
+            setTranslatedText([]);
+            setExplanation("");
+          }}>
+          <Logo />
+        </Link>
 
         <div>
           {/* -------- Desktop Dices Button -------- */}
