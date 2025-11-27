@@ -65,7 +65,7 @@ export default function Login({ showMenu }: LoginProps) {
         {error && <p className="text-red-500 text-center">{error}</p>}
 
         {/* -------------- Email input -------------- */}
-        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
           <label htmlFor="email" className="flex items-center gap-2">
             <Mail />
             <span className="text-xl">Email</span>
@@ -85,7 +85,7 @@ export default function Login({ showMenu }: LoginProps) {
         </div>
 
         {/* -------------- Password input -------------- */}
-        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
           <label htmlFor="password" className="flex items-center gap-2">
             <Lock />
             <span className="text-xl">Password</span>
@@ -105,7 +105,7 @@ export default function Login({ showMenu }: LoginProps) {
 
         {/* -------------- Confirm password input -------------- */}
         {isSignup ? (
-          <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+          <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
             <label htmlFor="confirm-password" className="flex items-center gap-2">
               <Lock />
               <span className="text-xl">Confirm password</span>
@@ -129,7 +129,7 @@ export default function Login({ showMenu }: LoginProps) {
           id="submit-login-button"
           aria-label={isSignup ? "Sign Up" : "Sign In"}
           type="submit"
-          className="hover-1 flex-shrink-0 border border-[var(--gray-4)] bg-[var(--bg)] rounded-full h-12 flex items-center justify-center"
+          className="hover-1 flex-shrink-0 border border-[var(--gray-4)] bg-[var(--bg)] rounded-full h-12 flex items-center justify-center shadow-md"
         >
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
@@ -140,7 +140,7 @@ export default function Login({ showMenu }: LoginProps) {
           aria-label="Continue with Google"
           type="button"
           onClick={() => handleGoogleButton()}
-          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--gray-4)] bg-[var(--bg)] hover-1"
+          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--gray-4)] bg-[var(--bg)] hover-1 shadow-md"
         >
           <Image
             src="/google-logo.webp"

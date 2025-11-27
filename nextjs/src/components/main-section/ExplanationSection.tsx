@@ -27,21 +27,21 @@ export default function ExplanationSection({
   if (explanation.length > 500) {
     return (
       <div
-        className="lg:col-span-2 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-start md:mt-6 mb-8
+        className="lg:col-span-2 pb-2 md:shadow-md md:border border-[var(--gray-1)] md:bg-[var(--bg)]/30 rounded-3xl w-full max-w-4xl mx-auto flex-1 flex flex-col justify-start md:mt-4 lg:mt-6 mb-8
         fade-in-explanation pt-2 md:p-4 min-h-[60vh]"
       >
         <div className="fade-in-item explanation">
           <ReactMarkdown>{explanation}</ReactMarkdown>
         </div>
 
-        <CopyButton text={explanation} className="border w-20 rounded-full" />
+        <CopyButton text={explanation} className="border mb-2 ml-2 md:mx-6 w-20 rounded-full" />
       </div>
     );
   }
 
   if (isExpLoading) {
     return (
-      <div className="lg:col-span-2 flex justify-center items-center w-full h-[58px] md:mt-4">
+      <div className="lg:col-span-2 fade-in-item flex justify-center items-center w-full h-[58px] md:mt-4">
         <LoadingAnimation />
       </div>
     );
@@ -62,7 +62,7 @@ export default function ExplanationSection({
           blurActiveInput();
           handleExplanation();
         }}
-        className="w-full max-w-xl py-4 text-[var(--blue-1)] shadow-sm border border-[var(--gray-1)] bg-[var(--bg-2)]/60 hover-1 rounded-full text-xl active:scale-90 duration-100"
+        className="w-full max-w-xl py-4 text-[var(--blue-1)] shadow-md border border-[var(--gray-1)] bg-[var(--bg-2)]/60 hover-1 rounded-full text-xl active:scale-90 duration-100"
       >
         ✨ AI explanations
       </button>

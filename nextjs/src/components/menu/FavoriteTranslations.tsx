@@ -37,7 +37,7 @@ function FavoriteTranslation({ showMenu }: FavoriteTranslationProps) {
               onClick={() => selectTranslation(t, true)}
               className="
               relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4 fade-in-item
-              border border-transparent hover:border-[var(--blue-1)] hover:cursor-pointer
+              border border-transparent shadow-md hover:border-[var(--blue-1)] hover:cursor-pointer
               "
             >
               <button

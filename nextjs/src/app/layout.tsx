@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-y-hidden bg-[var(--bg)]">
+    <html lang="en" className="overflow-y-hidden">
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta
@@ -36,12 +36,7 @@ export default function RootLayout({
           <AppHeaderSuspenseWrapper />
 
           <h1 className="sr-only">Traduxo – AI-Powered Translations and Expression Suggestions</h1>
-          <div
-            id="page-container"
-            className="min-h-[100svh] max-h-screen flex flex-col items-center w-full overflow-y-scroll"
-          >
-            {children}
-          </div>
+          {children}
         </AppProvider>
       </body>
     </html>

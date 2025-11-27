@@ -39,7 +39,7 @@ function TranslationHistory({ showMenu }: TranslationHistoryProps) {
               onClick={() => selectTranslation(t, false)}
               className="
                 relative w-full flex flex-col gap-2 md:gap-4 bg-[var(--bg-2)] rounded-md p-2 md:p-4
-                border border-transparent hover:border-[var(--blue-1)] hover:cursor-pointer"
+                border border-transparent shadow-md hover:border-[var(--blue-1)] hover:cursor-pointer"
             >
               <button
                 type="button"

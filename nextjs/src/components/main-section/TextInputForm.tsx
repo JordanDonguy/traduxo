@@ -57,15 +57,14 @@ export default function TextInputForm({
       aria-label="Text input form"
       data-testid="input-form"
       onSubmit={handleSubmit}
-
-      className="col-span-1 max-h-[50vh] flex flex-col justify-between pt-4 pb-2 md:px-6 border border-[var(--gray-1)] rounded-md font-semibold"
+      className="col-span-1 max-h-[50vh] shadow-md flex flex-col justify-between pt-4 pb-2 md:px-6 border border-[var(--gray-1)] rounded-md font-semibold"
     >
       {/* -------- Text input -------- */}
       <textarea
         id="text-input"
         aria-label="Enter text to translate"
         ref={textareaRef}
-        className="w-full text-2xl focus:outline-none resize-none pl-2"
+        className="w-full text-2xl focus:outline-none resize-none px-2 pb-2"
         placeholder="Enter some text..."
         onChange={(e) => {
           setInputText(e.target.value);

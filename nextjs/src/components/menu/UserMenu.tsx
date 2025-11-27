@@ -104,7 +104,7 @@ function UserMenu({ showMenu, setShowMenu, submenu, pathname }: UserMenuProps) {
         data-testid="user-menu"
         className={`
         z-40 fixed top-12 w-full md:w-3/4 md:left-[25%] lg:w-1/2 lg:left-[50%] h-full flex justify-center pt-8 md:pt-10 px-4
-        inset-0 max-h-screen duration-400 origin-right md:border-l border-[var(--gray-1)] bg-[var(--bg)] scrollbar-hidden
+        inset-0 max-h-screen duration-400 origin-right md:border-l border-[var(--gray-1)] bg-gradient scrollbar-hidden
         ${showMenu ? "translate-x-0" : "-translate-x-300 md:translate-x-300"}`}
       >
         {(isLoading) ? (
@@ -227,7 +227,7 @@ function UserMenu({ showMenu, setShowMenu, submenu, pathname }: UserMenuProps) {
                     id="privacy-policy-button"
                     href="/privacy"
                     prefetch={true}
-                    className={`w-full h-16 bg-[var(--bg-2)] rounded-xl px-6 flex items-center hover-1 shrink-0`}
+                    className={`w-full h-16 bg-[var(--bg-2)] shadow-md rounded-xl px-6 flex items-center hover-1 shrink-0`}
                   >
                     <Shield />
                     <span className="pl-6 text-xl">Privacy</span>

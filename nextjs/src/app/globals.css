@@ -18,6 +18,7 @@
   --gray-6: rgb(82, 79, 86);
   --blue-1: #163fbc;
   --toast-bg: rgb(245, 247, 250);
+  --bg-gradient: rgb(243, 248, 253);
 }
 
 /* ==============================
@@ -38,13 +39,15 @@
   --gray-6: rgb(160, 156, 173);
   --blue-1: rgb(160, 166, 235);
   --toast-bg: #121217;
+  --bg-gradient: rgb(11, 10, 12);
 }
 
 /* ==============================
    Base Styles
 ============================== */
 body {
-  background: var(--bg-2);
+  background: linear-gradient(to bottom, var(--bg), var(--bg-gradient));
+  background-color: var(--bg-gradient);
   color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -66,6 +69,10 @@ strong {
 
 .header-gradient {
   background: linear-gradient(to right, var(--gray-3), var(--bg));
+}
+
+.bg-gradient {
+  background: linear-gradient(to bottom, var(--bg), var(--bg-gradient));
 }
 
 @media (hover: hover) {
@@ -121,10 +128,12 @@ strong {
   border-radius: .5rem;
   padding: .5rem;
   margin: .75rem 0px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .explanation ul li:nth-child(3) {
   background-color: transparent;
+  box-shadow: none;
 }
 
 /* Dark Mode Overrides */
@@ -192,6 +201,7 @@ strong {
 
 .fade-in-explanation {
   transform: translateY(100px);
+  opacity: 0;
   transform-origin: top;
   animation: fadeInExplanation 0.7s cubic-bezier(.25, 1.45, .4, 1) forwards;
   /* quick fade-in */
@@ -199,7 +209,8 @@ strong {
 
 @keyframes fadeInExplanation {
   to {
-    transform: translateY(0)
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 

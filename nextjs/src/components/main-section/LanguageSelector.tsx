@@ -41,7 +41,7 @@ export default function LanguageSelector({
   }, [isSwitching, mainTranslation, handleTranslate])
 
   return (
-    <section className="relative w-full grid grid-cols-2 rounded-lg ">
+    <section className="relative w-full grid grid-cols-2 shadow-md rounded-lg ">
       {/* Voice warning */}
       <div className={`${showWarning ? "scale-y-100 opacity-95" : "scale-y-0 opacity-0"} h-60 absolute bottom-37 md:left-28 p-2 bg-warning flex drop-shadow-lg duration-300 origin-bottom`}>
         <span className="max-w-40 block ml-8 mt-8 text-lg">You need to select a language to use voice input</span>

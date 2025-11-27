@@ -56,7 +56,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
 
         {/* -------------- Current password input -------------- */}
         {isCredentials ? (
-          <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+          <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
             <label htmlFor="current-password" className="flex items-center gap-2">
               <Lock />
               <span className="text-xl">Current password</span>
@@ -76,7 +76,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
         ) : null}
 
         {/* -------------- Password input -------------- */}
-        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
           <label htmlFor="password" className="flex items-center gap-2">
             <Lock />
             <span className="text-xl">{isCredentials ? "New password" : "Password"}</span>
@@ -95,7 +95,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
         </div>
 
         {/* -------------- Confirm password input -------------- */}
-        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl">
+        <div className="flex flex-col gap-3 bg-[var(--bg-2)] px-4 py-6 md:px-6 rounded-xl shadow-md">
           <label htmlFor="confirm-password" className="flex items-center gap-2">
             <Lock />
             <span className="text-xl">Confirm password</span>
@@ -119,7 +119,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
           aria-label={isCredentials ? "Change password" : "Create password"}
           disabled={isLoading}
           type="submit"
-          className="text-[var(--blue-1)] hover-1 flex-shrink-0 border border-[var(--gray-2)] rounded-full h-12 flex items-center justify-center"
+          className="text-[var(--blue-1)] hover-1 flex-shrink-0 border border-[var(--gray-2)] shadow-md rounded-full h-12 flex items-center justify-center"
         >
           {isCredentials ? "Change password" : "Create password"}
         </button>

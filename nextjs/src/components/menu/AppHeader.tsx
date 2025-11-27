@@ -96,12 +96,8 @@ function AppHeader() {
   // Hide/show header on scroll (mobile only)
   // ----------------------------------------
   useEffect(() => {
-    const pageContainer = document.getElementById("page-container");
-    if (!pageContainer) return;
-
     function handleScroll() {
-      if (!pageContainer) return;
-      const currentY = pageContainer.scrollTop;
+      const currentY = document.body.scrollTop;
 
       if (window.innerWidth < 768) {
         if (currentY > lastScrollY.current && currentY > 50) {
@@ -116,8 +112,8 @@ function AppHeader() {
       lastScrollY.current = currentY;
     }
 
-    pageContainer.addEventListener("scroll", handleScroll);
-    return () => pageContainer.removeEventListener("scroll", handleScroll);
+    document.body.addEventListener("scroll", handleScroll);
+    return () => document.body.removeEventListener("scroll", handleScroll);
   }, []);
 
 
