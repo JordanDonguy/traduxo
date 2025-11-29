@@ -30,7 +30,7 @@ export default function RootLayout({
       </head>
 
       <body
-        className={`${openSans.className} antialiased`}
+        className={`${openSans.className} antialiased max-h-screen overflow-y-scroll md:overflow-y-hidden`}
       >
         <AppProvider>
           <AppHeaderSuspenseWrapper />

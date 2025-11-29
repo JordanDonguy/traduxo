@@ -67,7 +67,7 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-[100svh] flex flex-col items-center w-full max-h-screen overflow-y-scroll">
+    <div className="min-h-[100svh] flex flex-col items-center w-full md:max-h-screen md:overflow-y-scroll">
 
       {/* -------------- Loading spinner -------------- */}
       {isLoading && (
