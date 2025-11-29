@@ -38,7 +38,7 @@ function TranslationSection({
 
   return (
     <article
-      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)]  shadow-md rounded-md min-h-50 md:min-h-46`}
+      className={`w-full h-full col-span-1 flex flex-col gap-2 bg-[var(--bg-2)] border-y border-[var(--gray-2)]/40 shadow-md rounded-2xl min-h-50 md:min-h-46`}
     >
       {isLoading ? (
         <div className="flex justify-start pl-12">

@@ -4,9 +4,11 @@
    Light Theme
 ============================== */
 :root {
-  --bg: rgb(255, 255, 255);
   --text: rgb(34, 34, 34);
+  --bg: rgb(255, 255, 255);
   --bg-2: rgb(243, 244, 245);
+  --bg-3: rgb(253, 254, 255);
+  --menu: rgb(255, 255, 255);
   --hover: rgb(229, 230, 234);
   --scrollbar: #dcdce4;
   --scrollbar-active: #bdbdc6;
@@ -25,21 +27,23 @@
    Dark Theme
 ============================== */
 .dark {
-  --bg: #000000;
   --text: rgb(232, 232, 232);
-  --bg-2: rgb(27, 27, 31);
+  --bg: rgba(0, 0, 0, 0.5);
+  --bg-2: rgb(39, 39, 43);
+  --bg-3: rgb(27, 27, 30);
+  --menu: rgba(0, 0, 0, 0.8);
   --hover: #38383e;
-  --scrollbar: #1a1a20;
+  --scrollbar: rgb(31, 31, 38);
   --scrollbar-active: #3c3c49;
-  --gray-1: #3F3F47;
+  --gray-1: rgb(42, 42, 48);
   --gray-2: #5a5a66;
-  --gray-3: #121215;
+  --gray-3: rgba(42, 42, 46, 0.5);
   --gray-4: #3f3f50;
   --gray-5: rgb(114, 112, 123);
   --gray-6: rgb(160, 156, 173);
-  --blue-1: rgb(160, 166, 235);
+  --blue-1: rgb(167, 173, 235);
   --toast-bg: #121217;
-  --bg-gradient: rgb(11, 10, 12);
+  --bg-gradient: rgb(18, 18, 21);
 }
 
 /* ==============================
@@ -73,6 +77,10 @@ strong {
 
 .bg-gradient {
   background: linear-gradient(to bottom, var(--bg), var(--bg-gradient));
+}
+
+.menu-gradient {
+  background: linear-gradient(to bottom, var(--menu), var(--bg-gradient));
 }
 
 @media (hover: hover) {

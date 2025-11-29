@@ -21,7 +21,7 @@ function AppHeader() {
   const submenu = searchParams.get("submenu"); // "login", "history", etc.;
   const menuRef = useRef<HTMLDivElement>(null);
   
-  const { showMenu, setShowMenu } = useApp();
+  const { showMenu, setShowMenu, setError, setIsLoading } = useApp();
   const { refresh } = useAuth();
   const { setTranslatedText, setExplanation } = useTranslationContext();
   const { suggestTranslation, isRolling } = useSuggestion({});
@@ -123,8 +123,8 @@ function AppHeader() {
       <UserMenu showMenu={showMenu} setShowMenu={setShowMenu} submenu={submenu} pathname={pathname} />
 
       <div
-        className={`z-50 inset-x-0 fixed shadow-md w-full h-14 md:h-16 border-b border-[var(--gray-1)] 
-          header-gradient flex flex-row-reverse md:flex-row items-center justify-between px-2 md:px-8 
+        className={`z-50 inset-x-0 fixed shadow-md w-full h-14 md:h-16 border-b border-[var(--gray-1)] backdrop-blur-md
+          header-gradient flex flex-row-reverse md:flex-row items-center justify-between md:px-12 lg:px-22 
           transition-transform duration-500 ${hidden ? "-translate-y-full md:translate-y-0" : "translate-y-0"}`}
       >
 
@@ -133,25 +133,29 @@ function AppHeader() {
           suggestTranslation={suggestTranslation}
           size={28}
           isRolling={isRolling}
+          text="Suggest"
           className="md:hidden text-[var(--text)]"
         />
 
         <Link
           href={"/"}
           onClick={() => {
+            setIsLoading(false);
+            setError("");
             setTranslatedText([]);
             setExplanation("");
           }}>
           <Logo />
         </Link>
 
-        <div>
+        <div className="flex md:gap-4">
           {/* -------- Desktop Dices Button -------- */}
           <DicesButton
             suggestTranslation={suggestTranslation}
             size={28}
             isRolling={isRolling}
-            className="hidden md:inline text-[var(--text)]"
+            text="Suggest"
+            className="hidden md:flex text-[var(--text)]"
           />
 
           {/* -------- User Button -------- */}
@@ -167,10 +171,11 @@ function AppHeader() {
                 router.push(`${pathname}/?menu=open`); // update URL asynchronously
               }
             }}
-            className="p-2 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)]"
+            className="flex py-2 px-4 rounded-full hover:bg-[var(--hover)] hover:cursor-pointer text-[var(--text)] md:border border-[var(--gray-1)] md:bg-[var(--bg-2)]/60 items-center md:shadow-sm"
           >
             <User size={28} className="md:hidden" />
             <User className="hidden md:block" />
+            <div className="hidden md:inline">User</div>
           </button>
         </div>
       </div>

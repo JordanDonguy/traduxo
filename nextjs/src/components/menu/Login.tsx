@@ -129,7 +129,7 @@ export default function Login({ showMenu }: LoginProps) {
           id="submit-login-button"
           aria-label={isSignup ? "Sign Up" : "Sign In"}
           type="submit"
-          className="hover-1 flex-shrink-0 border border-[var(--gray-4)] bg-[var(--bg)] rounded-full h-12 flex items-center justify-center shadow-md"
+          className="hover-1 flex-shrink-0 border border-[var(--gray-1)] bg-[var(--bg-3)] rounded-full h-12 flex items-center justify-center shadow-md"
         >
           {isSignup ? "Sign Up" : "Sign In"}
         </button>
@@ -140,7 +140,7 @@ export default function Login({ showMenu }: LoginProps) {
           aria-label="Continue with Google"
           type="button"
           onClick={() => handleGoogleButton()}
-          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--gray-4)] bg-[var(--bg)] hover-1 shadow-md"
+          className="relative flex flex-shrink-0 items-center justify-start h-14 px-4 rounded-full border border-[var(--gray-1)] bg-[var(--bg-3)] hover-1 shadow-md"
         >
           <Image
             src="/google-logo.webp"

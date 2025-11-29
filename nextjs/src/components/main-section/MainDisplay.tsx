@@ -116,7 +116,7 @@ function MainDisplay() {
   }, [translatedText, setInputText])
 
   return (
-    <section className="relative md:gap-2 flex flex-col items-center w-full px-2 md:px-8 xl:px-20 mt-20 md:mt-28">
+    <section className="relative md:gap-2 flex flex-col items-center w-full px-2 md:px-8 xl:px-20 mt-22 md:mt-28">
       {error.length ? (
         <ErrorSection error={error} setError={setError} />
       ) : (

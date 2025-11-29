@@ -57,7 +57,7 @@ export default function TextInputForm({
       aria-label="Text input form"
       data-testid="input-form"
       onSubmit={handleSubmit}
-      className="col-span-1 max-h-[50vh] shadow-md flex flex-col justify-between pt-4 pb-2 md:px-6 border border-[var(--gray-1)] rounded-md font-semibold"
+      className="col-span-1 max-h-[50vh] shadow-md flex flex-col justify-between pt-4 pb-2 md:px-6 border-y border-[var(--gray-1)] bg-[var(--bg-3)] rounded-2xl font-semibold"
     >
       {/* -------- Text input -------- */}
       <textarea

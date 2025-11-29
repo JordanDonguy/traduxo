@@ -32,9 +32,9 @@ function ExplanationLanguage({ showMenu }: ExplanationLanguageProps) {
               onClick={() => {
                 changeSystemLang(code);
               }}
-              className={`relative w-full flex items-center gap-2 md:gap-4 bg-[var(--bg-2)] rounded-xl p-2 md:p-4 h-16 shrink-0
+              className={`relative w-full flex items-center gap-2 md:gap-4 bg-[var(--bg-2)]/70 rounded-2xl p-2 md:p-4 h-16 shrink-0
                 border hover:border-[var(--blue-1)] hover:cursor-pointer shadow-md
-                ${systemLang === code ? "border-[var(--gray-4)]" : "border-transparent"}`}
+                ${systemLang === code ? "border-[var(--gray-4)]" : "border-[var(--gray-3)]"}`}
             >
               {systemLang === code ? (
                 <Check className="absolute right-6 rounded-full border p-0.5 text-[var(--blue-1)]" />

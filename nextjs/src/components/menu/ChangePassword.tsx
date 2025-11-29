@@ -119,7 +119,7 @@ export default function ChangePassword({ isCredentials, showMenu }: ChangePasswo
           aria-label={isCredentials ? "Change password" : "Create password"}
           disabled={isLoading}
           type="submit"
-          className="text-[var(--blue-1)] hover-1 flex-shrink-0 border border-[var(--gray-2)] shadow-md rounded-full h-12 flex items-center justify-center"
+          className="text-[var(--blue-1)] hover-1 flex-shrink-0 border border-[var(--gray-1)] bg-[var(--bg-3)] shadow-md rounded-full h-12 flex items-center justify-center"
         >
           {isCredentials ? "Change password" : "Create password"}
         </button>

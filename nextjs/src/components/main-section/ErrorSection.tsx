@@ -23,7 +23,8 @@ function ErrorSection({ error, setError }: ErrorSectionProps) {
   }, [cooldown, errorToDisplay, setError]);
 
   return (
-    <div className={`mt-12 max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col ${errorToDisplay.startsWith("To continue using") ? "gap-8" : "gap-2"}`}>
+    <div className={`mt-12 max-w-[96%] sm:max-w-xl lg:max-w-3xl flex flex-col md:border border-[var(--gray-1)] md:bg-[var(--bg-3)] rounded-3xl md:p-8
+    ${errorToDisplay.startsWith("To continue using") ? "gap-8" : "gap-2"}`}>
       <p className="text-2xl/10 text-center whitespace-pre-line px-4 md:px-0">{errorToDisplay}</p>
 
       {errorToDisplay.startsWith("To continue using") && (
@@ -37,7 +38,7 @@ function ErrorSection({ error, setError }: ErrorSectionProps) {
             }, 400);
             return () => clearTimeout(timeout);
           }}
-          className="hover-1 duration-100 text-lg bg-[var(--bg-2)] rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
+          className="hover-1 duration-100 text-lg bg-[var(--bg-2)]/70 border border-[var(--gray-1)] shadow-md rounded-full h-12 flex items-center justify-center mx-2 md:mx-0"
         >
           Login
         </button>
