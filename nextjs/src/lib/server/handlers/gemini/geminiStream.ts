@@ -9,7 +9,7 @@ export const runtime = "edge";
 // ---------------- Schema ----------------
 const BodySchema = z.object({
   prompt: z.string().min(1, "Prompt is required"),
-  model: z.string().optional().default("gemini-2.5-flash-lite-preview-09-2025"),
+  model: z.string().optional().default("gemini-3.1-flash-lite-preview"),
   mode: z.enum(["translation", "explanation", "suggestion"]).default("translation"),
   audio: z.string().optional()
 });
