@@ -16,12 +16,12 @@ describe("fetchExpressionPoolHelper", () => {
   });
 
   // ------ Test 1️⃣ ------
-  it("fetches and sets cleaned expression pool on success", async () => {
-    const fakeArray = ["hello...", "world..."];
+  it("fetches and sets cleaned expression pool on success (wrapped object)", async () => {
+    const fakeWrapped = { expressions: ["hello...", "world..."] };
     fetcher.mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({ text: JSON.stringify(fakeArray) }),
+      json: async () => ({ text: JSON.stringify(fakeWrapped) }),
     });
 
     const result = await fetchExpressionPoolHelper({
@@ -35,7 +35,7 @@ describe("fetchExpressionPoolHelper", () => {
 
     // Ensures prompt is generated, fetch is called, response is cleaned, and state updated
     expect(promptGetter).toHaveBeenCalledWith("en");
-    expect(fetcher).toHaveBeenCalledWith("/gemini/complete", expect.any(Object));
+    expect(fetcher).toHaveBeenCalledWith("/ai/complete", expect.any(Object));
     expect(responseCleaner).toHaveBeenCalled();
     expect(setExpressionPool).toHaveBeenCalledWith(["hello", "world"]);
     expect(result).toEqual({ success: true, data: ["hello", "world"] });
@@ -109,13 +109,13 @@ describe("fetchExpressionPoolHelper", () => {
 
   // ------ Combined Test ------
   it("uses default fetch, promptGetter, and responseCleaner when not injected", async () => {
-    const fakeArray = ["hi...", "there..."];
+    const fakeWrapped = { expressions: ["hi...", "there..."] };
 
     // Mock global fetch (default)
     globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({ text: JSON.stringify(fakeArray) }),
+      json: async () => ({ text: JSON.stringify(fakeWrapped) }),
     }) as any;
 
     // Call helper WITHOUT injecting fetcher, promptGetter, or responseCleaner
