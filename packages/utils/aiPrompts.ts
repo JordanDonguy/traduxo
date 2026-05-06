@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import { TranslationItem } from "@traduxo/packages/types/translation";
+import type { TranslationItem } from "@traduxo/packages/types/translation";
 
 type TranslationPromptParams = {
   inputText: string;
@@ -35,14 +35,14 @@ export function getTranslationPrompt({
 
   return `
 You will receive a user request that may include extra words such as
-"Can you translate ... into ...".  
+"Can you translate ... into ...".
 
 1. Understand the tone, style, and function of the original expression ${fromLangText} in context (casual? formal? slangy? ironic? emotional? etc.).
 2. Suggest a **modern, natural expression** that would be used **in similar situations** by native speakers in ${outputLang}.
 3. Do not translate literally. Focus on matching how it feels and how it would be used — even if the words are different.
 ${detectionInstruction}
 
-**Output**  
+**Output**
 Return MULTIPLE JSON objects, one per line, **no markdown**, with the following structure:
 
 - {"type":"expression","value":"..."}   // The original expression
@@ -90,7 +90,10 @@ Important instructions:
 - Do not write any introductory sentences.
 - Respond entirely in ${systemLang}.
 - Translate all headings into ${systemLang}.
-- For each example, bold **only** the original expression and its translation. Do not bold any other text or entire phrases.
+- For each example, bold **only** the original expression in the source sentence and the meaning-carrying phrase in the target sentence. Do not bold any other text or entire phrases.
+- The ${inputTextLang} sentence MUST contain "${original}" verbatim.
+- The ${translatedTextLang} sentence MUST sound natural to a native speaker. Do NOT force the suggested translation phrase in word-for-word if it makes the sentence clumsy. Rephrase freely so the sentence flows naturally — what matters is conveying the same meaning, tone, and register, not reusing the exact words from the suggested translation. The candidate translations ("${mainTranslation}"${alternatives ? `, ${alternatives}` : ""}) are guidance, not a constraint.
+- Bold whatever portion of the ${translatedTextLang} sentence carries the meaning of the original expression, even if it does not match the suggested translation word for word.
 
 Format:
 
@@ -103,11 +106,11 @@ Write 3 very short paragraphs with level-3 headings (###) including emojis. Add 
 For each example, use this structure:
 
 ### 💬 Example 1:
-- **${inputTextLang.toUpperCase()}:** Full sentence in ${inputTextLang} containing **${original}**
-- **${translatedTextLang.toUpperCase()}:** Full sentence in ${translatedTextLang} containing **${mainTranslation}**
+- **${inputTextLang.toUpperCase()}:** Natural sentence in ${inputTextLang} containing **${original}**
+- **${translatedTextLang.toUpperCase()}:** Natural sentence in ${translatedTextLang} that conveys the same meaning, with the meaning-carrying phrase in **bold**
 - 💡 Short explanation in ${systemLang}
 
-USER  
+USER
 Original*** (${inputTextLang}): "${original}"
 
 Translation (${translatedTextLang}): "${mainTranslation}${alternatives ? `, ${alternatives}` : ""}"
@@ -137,7 +140,7 @@ You are a native-speaking language teacher and idiom expert.
 Your task:
 ${randomVariant}
 ${detectedLang === "fr" ? "IMPORTANT: Avoid 'Avoir le cafard'." : ""}
-Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation. 
+Then translate it into a **natural, equivalent** expression in ${outputLang}, not a literal translation.
 If no exact idiom exists, choose the closest equivalent used in similar situations.
 
 **Output**
@@ -157,13 +160,13 @@ Return EXACTLY multiple JSON objects, one per line (no markdown), with this form
 // ------------------------------------- Pool Prompt -------------------------------------
 export function getPoolPrompt(lang: string) {
   return `
-Give me 50 diverse, natural, idiomatic expressions in ${lang} that native speakers use in casual conversation. 
+Give me 50 diverse, natural, idiomatic expressions in ${lang} that native speakers use in casual conversation.
 They must be figurative, colorful, or slang - based — avoid any greetings, farewells, or small - talk phrases
-    (e.g., “What’s up ?”, “How’s it going ?”). 
-Do not include overly polite or literal requests like “Could you pass the salt, please ?”. 
-Ensure at least 50 % use metaphors or imagery. 
-Vary across regions where ${lang} is spoken. 
-Output only as a JSON array of unique strings, no explanations.
+    (e.g., “What’s up ?”, “How’s it going ?”).
+Do not include overly polite or literal requests like “Could you pass the salt, please ?”.
+Ensure at least 50 % use metaphors or imagery.
+Vary across regions where ${lang} is spoken.
+Output ONLY a JSON object with this exact shape: {"expressions": ["...", "...", ...]}. No explanations, no markdown.
 `;
 }
 
@@ -171,7 +174,7 @@ Output only as a JSON array of unique strings, no explanations.
 // ------------------------------------- Audio Translation Prompt -------------------------------------
 export function getAudioTranslationPrompt(outputLang: string) {
   return `
-You will receive a spoken user request (audio). The transcription may include informal phrasing, filler words, or mispronunciations.  
+You will receive a spoken user request (audio). The transcription may include informal phrasing, filler words, or mispronunciations.
 
 1. Understand the tone, style, and function of the spoken input in context (casual? formal? slangy? ironic? emotional? etc.).
 2. Suggest a **modern, natural expression** that would be used **in similar situations** by native speakers in ${outputLang}.
@@ -181,7 +184,7 @@ You will receive a spoken user request (audio). The transcription may include in
 **IMPORTANT:** If the audio is empty, silent, or contains no recognizable speech, return exactly **one JSON object** with:
 - {"type":"error","value":"Hmm, seems like I didn’t hear anything... \nCould you speak again please? \n🙏"}
 
-**Output**  
+**Output**
 Return MULTIPLE JSON objects, one per line, **no markdown**, with the following structure:
 
 - {"type":"expression","value":"..."}   // The original expression
