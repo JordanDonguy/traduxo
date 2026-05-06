@@ -1,9 +1,9 @@
+import { useTheme } from "@react-navigation/native";
+import { Mic } from "lucide-react-native";
 import { useEffect, useRef } from "react";
 import { TouchableOpacity } from "react-native";
-import { Mic } from "lucide-react-native";
-import useVoiceRecorder from "@/hooks/useVoiceRecorder";
-import { useTheme } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
+import useVoiceRecorder from "@/hooks/useVoiceRecorder";
 import StopIcon from "./StopIcon";
 
 export default function VoiceInputButton({ handleTranslate }: { handleTranslate: (audioBase64?: string) => Promise<void> }) {
@@ -22,14 +22,14 @@ export default function VoiceInputButton({ handleTranslate }: { handleTranslate:
 
   // Start/stop recording handler
   const handleRecording = async () => {
-    // If it is recording -> stop recording and send audio to Gemini
+    // If it is recording -> stop recording and send audio to AI
     if (isRecording) {
       // Stop timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      // Stop recording and send audio to Gemini
+      // Stop recording and send audio to AI
       const audioBase64 = await stopRecording();
       handleTranslate(audioBase64 || undefined);
 

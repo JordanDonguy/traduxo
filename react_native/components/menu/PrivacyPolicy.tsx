@@ -1,8 +1,7 @@
-import React from "react";
-import { ScrollView, View, TouchableOpacity, Linking, Text } from "react-native";
+import { Linking, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useScrollGradient } from "@/hooks/useScrollGradient";
-import TopGradient from "./TopGradient";
 import AppText from "../AppText";
+import TopGradient from "./TopGradient";
 
 export default function PrivacyPolicy() {
   const { onScroll, showTopGradient } = useScrollGradient();
@@ -90,15 +89,15 @@ export default function PrivacyPolicy() {
           </View>
 
           <View className="pb-2">
-            <AppText className="font-bold">With Google Gemini</AppText>
+            <AppText className="font-bold">With Groq</AppText>
             <View className="pl-8 mt-1">
-              <AppText>• To provide translations and explanations, your inputs (such as text you submit for translation) are sent to Google Gemini, an AI service provided by Google.</AppText>
-              <AppText>• According to Google’s policies, submitted data may be used to improve Google’s AI models.</AppText>
-              <AppText>• We do not control how Google uses this data, but you can review their privacy policy:</AppText>
+              <AppText>• To provide translations, suggestions, and explanations, your inputs (such as text or voice recordings you submit for translation) are sent to Groq, an AI inference provider.</AppText>
+              <AppText>• Voice recordings are transcribed by Groq's speech-to-text service before being processed.</AppText>
+              <AppText>• We do not control how Groq processes or retains this data, but you can review their privacy policy:</AppText>
               <TouchableOpacity
-                onPress={() => Linking.openURL("https://policies.google.com/privacy")}
+                onPress={() => Linking.openURL("https://groq.com/privacy-policy/")}
               >
-                <Text className="text-blue-500 underline mt-1">Google Privacy Policy</Text>
+                <Text className="text-blue-500 underline mt-1">Groq Privacy Policy</Text>
               </TouchableOpacity>
             </View>
           </View>

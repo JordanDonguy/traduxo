@@ -1,7 +1,7 @@
 # 🌍 Traduxo — AI Translation & Expression App
 
 **Traduxo** is a modern web application that helps users go beyond basic translation.  
-It provides **native-like translations, idiomatic expressions, cultural explanations, and real usage examples** powered by **Gemini API**.  
+It provides **native-like translations, idiomatic expressions, cultural explanations, and real usage examples** powered by **Groq AI**.  
 
 With features like **voice input, auto language detection, and personal history**, Traduxo is designed for anyone who wants to **learn, practice, and master expressions across languages**.
 
@@ -17,7 +17,7 @@ With features like **voice input, auto language detection, and personal history*
 
 ## ✨ Features
 
-- 🌎 ```Smart AI Translations``` — Powered by **Gemini API**, offering natural, native-like results with multiple alternatives.  
+- 🌎 ```Smart AI Translations``` — Powered by **Groq AI** (Llama 3.3 70B for translation/suggestion, Qwen3-32B for explanations), offering natural, native-like results with multiple alternatives.  
 - 💡 ```Expression Suggestions``` — Get idiomatic expressions with translations and alternative phrasings.  
 - 📖 ```Explanations Mode``` — Learn the **origin, meaning, nuance, and tone** of an expression with **3 real-world examples**.  
 - 🗣️ ```Voice Input``` — Speak directly to request translations.  
@@ -33,9 +33,9 @@ With features like **voice input, auto language detection, and personal history*
 
 ## ⚙️ How It Works
 
-1. ```Translate``` — Enter text (or speak) → Gemini API returns natural translations + alternatives.  
-2. ```Suggest``` — Request an expression → Gemini provides idioms with translation + alternatives.  
-3. ```Explain``` — Ask for context → Gemini explains the expression’s origin, nuance, and tone with **3 real usage examples**.  
+1. ```Translate``` — Enter text (or speak) → Groq returns natural translations + alternatives. Voice input is transcribed via Groq Whisper.  
+2. ```Suggest``` — Request an expression → Groq provides idioms with translation + alternatives.  
+3. ```Explain``` — Ask for context → Groq explains the expression’s origin, nuance, and tone with **3 real usage examples**.  
 4. ```Save``` — Logged-in users can save results to **history** or **favorites** for later.  
 5. ```Learn``` — Explanations can be delivered in the user’s preferred language.  
 
@@ -47,7 +47,7 @@ With features like **voice input, auto language detection, and personal history*
 - ```Next.js``` — React framework for SSR, routing, API routes and performance  
 - ```React Native``` — Mobile version of the app sharing logic with the web through the monorepo
 - ```Expo``` — Expo-managed workflow for building, running, and testing the React Native app
-- ```Gemini API``` — AI engine powering translations, suggestions, and explanations (currently using Gemini 2.5 Flash-Lite model)
+- ```Groq AI``` — AI engine powering translations, suggestions, and explanations (using `llama-3.3-70b-versatile` for translation/suggestion, `qwen/qwen3-32b` for explanations, and `whisper-large-v3-turbo` for voice transcription)
 - ```PostgreSQL``` — Relational database for persistent storage
 - ```Prisma``` — ORM for database access and type-safe queries 
 - ```JWT + Google OAuth``` — Authentication using JSON Web Tokens and Google OAuth for secure login
