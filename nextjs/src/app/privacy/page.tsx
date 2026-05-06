@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="min-h-[100svh] flex flex-col items-center w-full md:max-h-screen md:overflow-y-scroll">
-      <main className="lg:border border-[var(--gray-1)] lg:bg-[var(--bg-2)]/30 lg:shadow-md flex flex-col justify-center items-start w-full flex-1 max-w-4xl rounded-3xl mx-auto mt-20 md:mt-24 mb-12 gap-4 px-2 md:px-12 lg:p-6">
+    <div className="min-h-svh flex flex-col items-center w-full md:max-h-screen md:overflow-y-scroll">
+      <main className="lg:border border-(--gray-1) lg:bg-(--bg-2)/30 lg:shadow-md flex flex-col justify-center items-start w-full flex-1 max-w-4xl rounded-3xl mx-auto mt-20 md:mt-24 mb-12 gap-4 px-2 md:px-12 lg:p-6">
         <Link href="/" className="text-blue-500 hover:cursor-pointer hover:underline">⬅ Back to main</Link>
         <h1 className="text-2xl font-bold">Privacy Policy</h1>
         <span className="italic text-sm">Last updated: August 25, 2025</span>
@@ -71,12 +71,12 @@ export default function Page() {
               </ul>
             </li>
             <li className="pb-2">
-              <h3 className="font-bold">With Google Gemini</h3>
+              <h3 className="font-bold">With Groq</h3>
               <ul className="list-disc pl-8">
-                <li>To provide translations and explanations, your inputs (such as text you submit for translation) are sent to Google Gemini, an AI service provided by Google.</li>
-                <li>According to Google’s policies, submitted data may be used to improve Google’s AI models.</li>
-                <li>We do not control how Google uses this data, but you can review their privacy policy&nbsp;
-                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:cursor-pointer hover:underline">here</a>.
+                <li>To provide translations, suggestions, and explanations, your inputs (such as text or voice recordings you submit for translation) are sent to Groq, an AI inference provider.</li>
+                <li>Voice recordings are transcribed by Groq&apos;s speech-to-text service before being processed.</li>
+                <li>We do not control how Groq processes or retains this data, but you can review their privacy policy&nbsp;
+                  <a href="https://groq.com/privacy-policy/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:cursor-pointer hover:underline">here</a>.
                 </li>
 
               </ul>

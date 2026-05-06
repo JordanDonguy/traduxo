@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useExplanation } from "@traduxo/packages/hooks/explanation/useExplanation";
 
 // ---- Mocks ----
@@ -31,9 +31,9 @@ jest.mock("@traduxo/packages/contexts/LanguageContext", () => ({
   }),
 }));
 
-// Mock Gemini prompt generator (must return a string)
+// Mock AI prompt generator (must return a string)
 const fakePrompt = "fake prompt";
-jest.mock("@traduxo/packages/utils/geminiPrompts", () => ({
+jest.mock("@traduxo/packages/utils/aiPrompts", () => ({
   getExplanationPrompt: jest.fn(() => fakePrompt),
 }));
 

@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
+import { TextDecoder, TextEncoder } from "node:util";
 import { translationHelper } from "@traduxo/packages/utils/translation/translate";
-import { TextEncoder, TextDecoder } from "util";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
 
 (globalThis as any).TextEncoder = TextEncoder;
@@ -65,7 +65,7 @@ describe("translationHelper", () => {
   // ------ Test 3️⃣ ------
   it("handles a simple streamed translation chunk", async () => {
     const encoder = new TextEncoder();
-    const chunk = JSON.stringify({ type: "main_translation", value: "Bonjour" }) + "\n";
+    const chunk = `${JSON.stringify({ type: "main_translation", value: "Bonjour" })}\n`;
     let callIndex = 0;
 
     const fakeFetcher = jest.fn().mockResolvedValue({
@@ -136,9 +136,9 @@ describe("translationHelper", () => {
   });
 
   // ------ Test 7️⃣ ------
-  it("sets inputTextLang to Gemini's orig_lang_code if provided", async () => {
+  it("sets inputTextLang to AI's orig_lang_code if provided", async () => {
     const encoder = new TextEncoder();
-    const chunk = JSON.stringify({ type: "orig_lang_code", value: "de" }) + "\n";
+    const chunk = `${JSON.stringify({ type: "orig_lang_code", value: "de" })}\n`;
     let callIndex = 0;
 
     const fakeFetcher = jest.fn().mockResolvedValue({
@@ -173,8 +173,8 @@ describe("translationHelper", () => {
     const encoder = new TextEncoder();
     const chunks = [
       "\n", // empty line -> triggers !part.trim() continue
-      JSON.stringify({ type: "main_translation", value: 123 }) + "\n", // non-string value
-      JSON.stringify({ type: "main_translation", value: "Bonjour" }) + "\n", // normal string
+      `${JSON.stringify({ type: "main_translation", value: 123 })}\n`, // non-string value
+      `${JSON.stringify({ type: "main_translation", value: "Bonjour" })}\n`, // normal string
     ];
 
     let callIndex = 0;

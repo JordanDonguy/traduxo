@@ -1,10 +1,11 @@
 /**
  * @jest-environment jsdom
  */
+
+import { TextDecoder, TextEncoder } from "node:util";
+import type { TranslationItem } from "@traduxo/packages/types/translation";
 import { suggestExpressionHelper } from "@traduxo/packages/utils/expression/suggestExpression";
-import { TextEncoder, TextDecoder } from "util";
 import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
-import { TranslationItem } from "@traduxo/packages/types/translation";
 
 (globalThis as unknown as { TextEncoder: typeof TextEncoder }).TextEncoder = TextEncoder;
 (globalThis as unknown as { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder;
@@ -82,7 +83,7 @@ describe("suggestExpressionHelper", () => {
             .mockResolvedValueOnce({
               done: false,
               value: new TextEncoder().encode(
-                JSON.stringify({ type: "expression", value: "bonjour" }) + "\n"
+                `${JSON.stringify({ type: "expression", value: "bonjour" })}\n`
               ),
             })
             .mockResolvedValueOnce({ done: true, value: undefined }),
@@ -133,7 +134,7 @@ describe("suggestExpressionHelper", () => {
 
     const result = await suggestExpressionHelper({ ...defaultArgs, fetcher: fetchMock });
 
-    // Expect the error handler to be called with the Gemini error
+    // Expect the error handler to be called with the generic AI error
     expect(setError).toHaveBeenCalledWith(
       "Oops! Something went wrong on our server.\nPlease try again in a few moments 🙏"
     );
@@ -152,7 +153,7 @@ describe("suggestExpressionHelper", () => {
             .mockResolvedValueOnce({
               done: false,
               value: new TextEncoder().encode(
-                JSON.stringify({ type: "expression", value: 12345 }) + "\n" // number instead of string
+                `${JSON.stringify({ type: "expression", value: 12345 })}\n` // number instead of string
               ),
             })
             .mockResolvedValueOnce({ done: true, value: undefined }),
@@ -206,7 +207,7 @@ describe("suggestExpressionHelper", () => {
             .mockResolvedValueOnce({
               done: false,
               value: new TextEncoder().encode(
-                JSON.stringify({ type: "expression", value: "hola" }) + "\n"
+                `${JSON.stringify({ type: "expression", value: "hola" })}\n`
               ),
             })
             .mockResolvedValueOnce({ done: true, value: undefined }),
@@ -214,7 +215,7 @@ describe("suggestExpressionHelper", () => {
       },
     });
 
-    const result = await suggestExpressionHelper({
+    const _result = await suggestExpressionHelper({
       ...defaultArgs,
       fetcher: fakeFetcher,
       token,
