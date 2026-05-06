@@ -1,10 +1,10 @@
-import { getSuggestionPrompt } from "../geminiPrompts";
-import { TranslationItem } from "@traduxo/packages/types/translation";
-import { blurActiveInput } from "../ui/blurActiveInput";
-import { decodeStream } from "../formatting/decodeStream";
-import { SetState } from "@traduxo/packages/types/reactSetState";
+import type { SetState } from "@traduxo/packages/types/reactSetState";
+import type { TranslationItem } from "@traduxo/packages/types/translation";
+import { getSuggestionPrompt } from "../aiPrompts";
 import { API_BASE_URL } from "../config/apiBase";
 import { createReader } from "../config/createReader";
+import { decodeStream } from "../formatting/decodeStream";
+import { blurActiveInput } from "../ui/blurActiveInput";
 
 type SuggestionHelperArgs = {
   detectedLang: string;
@@ -65,7 +65,7 @@ export async function suggestExpressionHelper({
     let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
     // ---- Step 3a: Fetch from API ----
-    const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
+    const res = await fetcher(`${API_BASE_URL}/ai/stream`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +83,7 @@ export async function suggestExpressionHelper({
     }
 
     // ---- Step 3c: Handle non-ok responses ----
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    if (!res.ok) throw new Error(`AI error: ${res.status}`);
 
     // ---- Step 3d: Get streaming reader (browser/Next.js) ----
     if (res.body) {

@@ -1,10 +1,10 @@
-import { getTranslationPrompt, getAudioTranslationPrompt } from "../geminiPrompts";
-import { TranslationItem } from "@traduxo/packages/types/translation";
-import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
-import { SetState } from "@traduxo/packages/types/reactSetState";
+import type { SetState } from "@traduxo/packages/types/reactSetState";
+import type { TranslationItem } from "@traduxo/packages/types/translation";
 import { decodeStream } from "@traduxo/packages/utils/formatting/decodeStream";
-import { createReader } from "../config/createReader";
+import { blurActiveInput } from "@traduxo/packages/utils/ui/blurActiveInput";
+import { getAudioTranslationPrompt, getTranslationPrompt } from "../aiPrompts";
 import { API_BASE_URL } from "../config/apiBase";
+import { createReader } from "../config/createReader";
 
 type TranslateHelperArgs = {
   inputText: string;
@@ -24,7 +24,7 @@ type TranslateHelperArgs = {
   audioBase64?: string;
 };
 
-type GeminiRequestBody = {
+type AIRequestBody = {
   prompt: string;
   mode: "translation";
   audio?: string;
@@ -77,7 +77,7 @@ export async function translationHelper({
     let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
     // ---- Step 5a: Fetch from API ----
-    const bodyPayload: GeminiRequestBody = {
+    const bodyPayload: AIRequestBody = {
       prompt,
       mode: "translation",
     };
@@ -88,7 +88,7 @@ export async function translationHelper({
     }
 
     // Make API request
-    const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
+    const res = await fetcher(`${API_BASE_URL}/ai/stream`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(bodyPayload),
@@ -104,8 +104,8 @@ export async function translationHelper({
 
     // ---- Step 5c: Handle non-ok responses ----
     if (!res.ok) {
-      console.error("Gemini API error:", await res.text());
-      throw new Error(`Gemini error: ${res.status}`)
+      console.error("AI API error:", await res.text());
+      throw new Error(`AI error: ${res.status}`)
     };
 
     // ---- Step 5d: Get streaming reader ----
@@ -132,7 +132,7 @@ export async function translationHelper({
         item.value = item.value.replace(/\.+$/, "").trim();
       }
 
-      // ---- Step 6c: Set input language if returned by Gemini (ie: when in "auto" mode) ----
+      // ---- Step 6c: Set input language if returned by AI (ie: when in "auto" mode) ----
       if (item.type === "orig_lang_code") {
         detectedInputLang = item.value;
         setInputTextLang(item.value);

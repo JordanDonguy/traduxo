@@ -1,9 +1,9 @@
 
-import { getPoolPrompt } from "../geminiPrompts";
-import { cleanGeminiResponse } from "../formatting/cleanGeminiResponse";
-import { SetState } from "@traduxo/packages/types/reactSetState";
-import { SuggestionResult } from "@traduxo/packages/types/suggestionResult";
+import type { SetState } from "@traduxo/packages/types/reactSetState";
+import type { SuggestionResult } from "@traduxo/packages/types/suggestionResult";
+import { getPoolPrompt } from "../aiPrompts";
 import { API_BASE_URL } from "../config/apiBase";
+import { cleanAIResponse } from "../formatting/cleanAIResponse";
 
 type PoolHelperArgs = {
   suggestionLang: string;
@@ -21,12 +21,12 @@ export async function fetchExpressionPoolHelper({
   setError,
   fetcher = fetch,
   promptGetter = getPoolPrompt,
-  responseCleaner = cleanGeminiResponse,
+  responseCleaner = cleanAIResponse,
 }: PoolHelperArgs): Promise<SuggestionResult<string[]>> {
   try {
     const poolPrompt = promptGetter(suggestionLang);
 
-    const res = await fetcher(`${API_BASE_URL}/gemini/complete`, {
+    const res = await fetcher(`${API_BASE_URL}/ai/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt: poolPrompt }),
@@ -38,10 +38,14 @@ export async function fetchExpressionPoolHelper({
       return { success: false, error };
     }
 
-    if (!res.ok) throw new Error(`Gemini pool request error: ${res.status}`);
+    if (!res.ok) throw new Error(`AI pool request error: ${res.status}`);
 
     const { text } = await res.json();
-    const poolArray: string[] = JSON.parse(responseCleaner(text));
+    const parsed: unknown = JSON.parse(responseCleaner(text));
+    // json_object mode returns a wrapped object; accept either { expressions: [...] } or a raw array.
+    const poolArray: string[] = Array.isArray(parsed)
+      ? (parsed as string[])
+      : ((parsed as { expressions?: string[] })?.expressions ?? []);
 
     const cleanedPool = poolArray.map((expr) => expr.replace(/\.+$/, ""));
     setExpressionPool(cleanedPool);

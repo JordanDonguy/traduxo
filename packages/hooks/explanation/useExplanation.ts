@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
 import { useLanguageContext } from "@traduxo/packages/contexts/LanguageContext";
-import { getExplanationPrompt as defaultGetExplanationPrompt } from "@traduxo/packages/utils/geminiPrompts";
-import { decodeTextStream } from "@traduxo/packages/utils/formatting/decodeTextStream";
+import { useTranslationContext } from "@traduxo/packages/contexts/TranslationContext";
+import { getExplanationPrompt as defaultGetExplanationPrompt } from "@traduxo/packages/utils/aiPrompts";
 import { API_BASE_URL } from "@traduxo/packages/utils/config/apiBase";
 import { createReader } from "@traduxo/packages/utils/config/createReader";
+import { decodeTextStream } from "@traduxo/packages/utils/formatting/decodeTextStream";
+import { useState } from "react";
 
 // Injected dependencies for testing
 type UseExplanationArgs = {
@@ -49,7 +49,7 @@ export function useExplanation({
       // ---- Step 3c: Fetch streaming response if reader's not provided ----
       let usedReader: { read: () => Promise<{ done: boolean; value?: Uint8Array }> };
 
-      const res = await fetcher(`${API_BASE_URL}/gemini/stream`, {
+      const res = await fetcher(`${API_BASE_URL}/ai/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, mode: "explanation" }),
@@ -60,7 +60,7 @@ export function useExplanation({
         setExplanationError(data.error);
         return false;
       }
-      if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+      if (!res.ok) throw new Error(`AI error: ${res.status}`);
 
       // ---- Step 3d: Get streaming reader ----
       if (res.body) {
